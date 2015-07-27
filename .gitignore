@@ -1,0 +1,6 @@
+mkbootimage
+*.bif
+*.bin
+*.bit
+*.elf
+*.dtb

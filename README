@@ -1,0 +1,21 @@
+Zynq mkbootimage
+
+This is an open-source replacement for the Xilinx bootgen application.
+It parses a .bif file and creates a Zynq boot image in .bin format.
+
+It is written entirely in C.
+
+Required C libraries: pcre, libelf.
+
+To build this application run:
+make
+
+To use it, type in:
+./mkbootimage <in_bif_file> <out_bin_file>
+
+Currently it supports creating boot image containing fsbl, bitstream
+and u-boot.
+
+Linux images/devicetrees/ramdisks are not yet supported.
+
+Encryption certificates are not supported.
