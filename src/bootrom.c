@@ -351,6 +351,15 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
     /* Temporarily read the name */
     memcpy(img_name, bif_cfg->nodes[i].fname, img_hdr[i].name_len);
 
+    /* Calculate number of string terminators, this should be 32b
+     * however if the name length is divisible by 4 the bootgen
+     * binary makes it 64b and thats what we're going to do here */
+    if (strlen((char*)img_name) % 4 == 0){
+      img_term_n = 2;
+    } else {
+      img_term_n = 1;
+    }
+
     /* Make the name len be divisible by 4 */
     while(img_hdr[i].name_len % 4)
       img_hdr[i].name_len++;
@@ -365,15 +374,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
       img_hdr[i].name[j+3] = img_name[j+0];
     }
 
-    /* Add string terminator, the documentation says that this has
-     * to be 32b long, however the bootgen binary makes it 64b if
-     * the length of the name is greater than 8 and that's what
-     * we're going to do here */
-    if ( img_hdr[i].name_len > 8 ){
-      img_term_n = 1;
-    } else {
-      img_term_n = 2;
-    }
+    /* Append the actual terminators */
     memset(&(img_hdr[i].name[img_hdr[i].name_len]),
            0x00, img_term_n * sizeof(uint32_t));
 
