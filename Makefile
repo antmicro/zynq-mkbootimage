@@ -1,5 +1,5 @@
 CC=gcc
-FILES=src/{mkbootimage.c,bif.c,bootrom.c}
+FILES=src/mkbootimage.c src/bif.c src/bootrom.c
 CFLAGS=-lpcre -lelf -Wall
 TARGET=mkbootimage
 
