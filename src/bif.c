@@ -171,7 +171,6 @@ int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value){
 
   if (strcmp(attr_name, "load") == 0 ){
     sscanf(value, "0x%08x", &(node->load));
-    printf("Warning: load attribute is not supported yet.\n");
     return 0;
   }
 

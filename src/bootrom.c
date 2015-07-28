@@ -134,7 +134,7 @@ uint32_t append_bitstream(uint32_t *addr, FILE *bitfile){
 /* Returns the offset by which the addr parameter should be moved
  * and partition header info via argument pointer */
 uint32_t append_file_to_image(uint32_t *addr,
-                              const char *filename,
+                              bif_node_t node,
                               bootrom_partition_hdr_t *part_hdr){
   uint32_t file_header;
   struct stat cfile_stat;
@@ -143,18 +143,19 @@ uint32_t append_file_to_image(uint32_t *addr,
   int fd_elf;
   size_t elf_hdr_n;
   GElf_Phdr elf_phdr;
+  linux_image_header_t linux_img;
   int i;
 
   uint32_t total_size = 0;
 
-  if(stat(filename, &cfile_stat)) {
-    printf("Could not stat file: %s\n", filename);
+  if(stat(node.fname, &cfile_stat)) {
+    printf("Could not stat file: %s\n", node.fname);
     exit(1);
   }
-  cfile = fopen(filename, "rb");
+  cfile = fopen(node.fname, "rb");
 
   if (cfile==NULL) {
-    printf("Could not open file: %s\n", filename);
+    printf("Could not open file: %s\n", node.fname);
     exit(1);
   }
 
@@ -170,8 +171,8 @@ uint32_t append_file_to_image(uint32_t *addr,
     }
 
     /* open file descriptor used by elf library */
-    if (( fd_elf = open(filename, O_RDONLY , 0)) < 0){
-      printf("Elf could not open file %s.", filename);
+    if (( fd_elf = open(node.fname, O_RDONLY , 0)) < 0){
+      printf("Elf could not open file %s.", node.fname);
       exit(1);
     }
 
@@ -183,7 +184,7 @@ uint32_t append_file_to_image(uint32_t *addr,
 
     /* make sure it is an elf (despite magic byte check) */
     if(elf_kind(elf) != ELF_K_ELF ){
-        printf( "\"%s\" is not an ELF object.", filename);
+        printf( "\"%s\" is not an ELF object.", node.fname);
         exit(1);
     }
 
@@ -230,7 +231,7 @@ uint32_t append_file_to_image(uint32_t *addr,
     /* Xilinx header is 64b, check the other half */
     fread(&file_header, 1, sizeof(file_header), cfile);
     if (file_header != FILE_MAGIC_XILINXBIT_1){
-      printf("Corrupted bit file: %s\n.", filename);
+      printf("Corrupted bit file: %s\n.", node.fname);
       exit(1);
     }
 
@@ -246,14 +247,51 @@ uint32_t append_file_to_image(uint32_t *addr,
     part_hdr->dest_exec_addr = 0x0;
 
     break;
-  default: /* not supported - quit */
-    printf("File format not recognized: %s.\n", filename);
-    exit(1);
+  case FILE_MAGIC_LINUX:
+    fseek(cfile, 0, SEEK_SET);
+    fread(&linux_img, 1, sizeof(linux_img), cfile);
+
+    fseek(cfile, 0, SEEK_SET);
+    total_size = fread(addr, 1, cfile_stat.st_size, cfile);
+
+    if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM)
+      part_hdr->attributes = BINARY_ATTR_LINUX;
+
+    if (linux_img.type == FILE_LINUX_IMG_TYPE_URD)
+      part_hdr->attributes = BINARY_ATTR_RAMDISK;
+
+    /* set destination device attribute */
+    part_hdr->attributes |=
+      (BOOTROM_PART_ATTR_DEST_DEV_PS << BOOTROM_PART_ATTR_DEST_DEV_OFF);
+
+    /* No load/execution address */
+    part_hdr->dest_load_addr = node.load;
+    part_hdr->dest_exec_addr = 0x0;
+
+    break;
+  default: /* Treat as a binary file */
+
+    fseek(cfile, 0, SEEK_SET);
+    total_size = fread(addr, 1, cfile_stat.st_size, cfile);
+
+    /* set destination device as the only attribute */
+    part_hdr->attributes =
+      (0x1 << BOOTROM_PART_ATTR_DEST_DEV_OFF) | BINARY_ATTR_GENERAL;
+
+    /* No load/execution address */
+    part_hdr->dest_load_addr = node.load;
+    part_hdr->dest_exec_addr = 0x0;
   };
 
   /* remove trailing zeroes */
   while ( *(addr+total_size) == 0x0 ){
     total_size--;
+  }
+
+  /* uImages actually require a 4B of 0x0 after the image
+   * so restore that much in that case */
+  if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM) {
+    total_size++;
   }
 
   /* The output image needs to use the actual value +1B
@@ -310,7 +348,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
 
     /* Append file content to memory */
     img_size = append_file_to_image(coff,
-                                    bif_cfg->nodes[i].fname,
+                                    bif_cfg->nodes[i],
                                     &(part_hdr[i]));
 
     /* Check if dealing with bootloader */
@@ -476,6 +514,15 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
   while ( poff - img_ptr < BOOTROM_PART_HDR_END_OFF / sizeof(uint32_t) ){
     memset(poff, 0x00, sizeof(uint32_t));
     poff++;
+  }
+
+  /* Add 0x00 terminators after partition header
+   * if there are more than 3 images */
+  if( bif_cfg->nodes_num > 3){
+    while ( poff - img_ptr < BOOTROM_PART_HDR_TERM_OFF / sizeof(uint32_t) ){
+      memset(poff, 0x00, sizeof(uint32_t));
+      poff++;
+    }
   }
 
   /* Add 0xFF padding until BOOTROM_BINS_OFF */

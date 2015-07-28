@@ -82,6 +82,21 @@ typedef struct bootrom_img_hdr_t{
   uint8_t  name[BOOTROM_IMG_MAX_NAME_LEN];
 } bootrom_img_hdr_t;
 
+typedef struct linux_image_header_t {
+  uint32_t magic;
+  uint32_t hcrc;
+  uint32_t time;
+  uint32_t size;
+  uint32_t load;
+  uint32_t ep;
+  uint32_t dcrc;
+  uint8_t os;
+  uint8_t arch;
+  uint8_t type;
+  uint8_t comp;
+  uint8_t name[32];
+} linux_image_header_t;
+
 /* attributes of the bootrom partition header */
 #define BOOTROM_PART_ATTR_OWNER_OFF      16
 #define BOOTROM_PART_ATTR_OWNER_MASK     (3 << BOOTROM_PART_ATTR_OWNER_OFF)
@@ -112,6 +127,7 @@ typedef struct bootrom_img_hdr_t{
 #define BOOTROM_IMG_HDR_OFF       0x000008c0
 #define BOOTROM_PART_HDR_OFF      0x00000c80
 #define BOOTROM_PART_HDR_END_OFF  0x00000d7c
+#define BOOTROM_PART_HDR_TERM_OFF 0x00000e3c
 #define BOOTROM_BINS_OFF          0x00001700
 
 /* values from the documentation */
@@ -132,7 +148,16 @@ typedef struct bootrom_img_hdr_t{
 #define FILE_MAGIC_XILINXBIT_0    0xf00f0900
 #define FILE_MAGIC_XILINXBIT_1    0xf00ff00f
 
+#define FILE_MAGIC_LINUX          0x56190527
+
 #define FILE_XILINXBIT_SEC_START  13
 #define FILE_XILINXBIT_SEC_DATA   'e'
+
+#define FILE_LINUX_IMG_TYPE_UIM   2
+#define FILE_LINUX_IMG_TYPE_URD   3
+
+#define BINARY_ATTR_LINUX         0x00
+#define BINARY_ATTR_RAMDISK       0x02
+#define BINARY_ATTR_GENERAL       0x01
 
 #endif /* BOOTROM_H */

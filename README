@@ -14,8 +14,26 @@ To use it, type in:
 ./mkbootimage <in_bif_file> <out_bin_file>
 
 Currently it supports creating boot image containing fsbl, bitstream
-and u-boot.
+u-boot, and linux related binary files.
 
-Linux images/devicetrees/ramdisks are not yet supported.
+For loading linux related images, only the [load] attribute is supported.
+As opposed to the original bootgen, the file extensions are not required.
+
+For example the following .bif file:
+
+the_ROM_image:
+{
+  [bootloader]fsbl.elf
+  fpga.bit
+  u-boot.elf
+  [load=0x2a00000]devicetree.dtb
+  [load=0x2000000]uramdisk
+  [load=0x3000000]uImage
+}
+
+will generate a bin image which can be used in u-boot, as follows:
+bootm 0x3000000 0x2000000 0x2a00000
+
+The [offset] attribute is not yet supported.
 
 Encryption certificates are not supported.
