@@ -85,9 +85,11 @@ int bootrom_prepare_header(bootrom_hdr_t *hdr) {
 
   memset(hdr->user_defined_2, 0xFF, sizeof(hdr->user_defined_2));
 
-  return 0;
+  return BOOTROM_SUCCESS;
 }
 
+/* Returns the appended bitstream size.
+ * Negative value means an error */
 uint32_t append_bitstream(uint32_t *addr, FILE *bitfile) {
   uint32_t *dest = addr;
   uint8_t section_size;
@@ -104,8 +106,8 @@ uint32_t append_bitstream(uint32_t *addr, FILE *bitfile) {
     fread(&section_hdr, 1, sizeof(section_hdr), bitfile);
     if (section_hdr[1] != 0x0) {
       fclose(bitfile);
-      printf("Bitstream file seems to have mismatched sections.\n");
-      exit(1);
+      fprintf(stderr, "Bitstream file seems to have mismatched sections.\n");
+      return -BOOTROM_ERROR_BITSTREAM;
     }
 
     if (section_hdr[0] == FILE_XILINXBIT_SEC_DATA)
@@ -132,7 +134,8 @@ uint32_t append_bitstream(uint32_t *addr, FILE *bitfile) {
 }
 
 /* Returns the offset by which the addr parameter should be moved
- * and partition header info via argument pointer */
+ * and partition header info via argument pointer.
+ * Negative value means an error */
 uint32_t append_file_to_image(uint32_t *addr,
                               bif_node_t node,
                               bootrom_partition_hdr_t *part_hdr) {
@@ -149,14 +152,14 @@ uint32_t append_file_to_image(uint32_t *addr,
   uint32_t total_size = 0;
 
   if(stat(node.fname, &cfile_stat)) {
-    printf("Could not stat file: %s\n", node.fname);
-    exit(1);
+    fprintf(stderr, "Could not stat file: %s\n", node.fname);
+    return -BOOTROM_ERROR_NOFILE;
   }
   cfile = fopen(node.fname, "rb");
 
   if (cfile==NULL) {
-    printf("Could not open file: %s\n", node.fname);
-    exit(1);
+    fprintf(stderr, "Could not open file: %s\n", node.fname);
+    return -BOOTROM_ERROR_NOFILE;
   }
 
   /* Check file format */
@@ -166,41 +169,48 @@ uint32_t append_file_to_image(uint32_t *addr,
   case FILE_MAGIC_ELF:
     /* init elf library */
     if(elf_version(EV_CURRENT) == EV_NONE ) {
-      printf("ELF library initialization failed\n");
-      exit(1);
+      fprintf(stderr, "ELF library initialization failed\n");
+      /* Close the file */
+      fclose(cfile);
+      return -BOOTROM_ERROR_ELF;
     }
 
     /* open file descriptor used by elf library */
     if (( fd_elf = open(node.fname, O_RDONLY , 0)) < 0) {
-      printf("Elf could not open file %s.", node.fname);
-      exit(1);
+      fprintf(stderr, "Could not open file %s.", node.fname);
+      /* Close the file */
+      fclose(cfile);
+      return -BOOTROM_ERROR_ELF;
     }
 
     /* init elf */
     if (( elf = elf_begin(fd_elf, ELF_C_READ , NULL )) == NULL ) {
-      printf("Elf file error\n");
-      exit(1);
+      /* Close the file */
+      fclose(cfile);
+      return -BOOTROM_ERROR_ELF;
     }
 
     /* make sure it is an elf (despite magic byte check) */
     if(elf_kind(elf) != ELF_K_ELF ) {
-      printf( "\"%s\" is not an ELF object.", node.fname);
-      exit(1);
+      /* Close the file */
+      fclose(cfile);
+      return -BOOTROM_ERROR_ELF;
     }
 
     /* get elf headers count */
     if(elf_getphdrnum(elf, &elf_hdr_n)!= 0) {
-      printf("Elf file header error.\n");
-      exit(1);
+      /* Close the file */
+      fclose(cfile);
+      return -BOOTROM_ERROR_ELF;
     }
 
     /* iterate through all headers to find the executable */
     for(i = 0; i < elf_hdr_n; i ++) {
       if(gelf_getphdr(elf, i, &elf_phdr) != &elf_phdr) {
-        printf("Elf file header error.\n");
-        exit(1);
+        /* Close the file */
+        fclose(cfile);
+        return -BOOTROM_ERROR_ELF;
       }
-
 
       /* check if the current one has executable flag set */
       if (elf_phdr.p_flags & PF_X) {
@@ -231,12 +241,16 @@ uint32_t append_file_to_image(uint32_t *addr,
     /* Xilinx header is 64b, check the other half */
     fread(&file_header, 1, sizeof(file_header), cfile);
     if (file_header != FILE_MAGIC_XILINXBIT_1) {
-      printf("Corrupted bit file: %s\n.", node.fname);
-      exit(1);
+      /* Close the file */
+      fclose(cfile);
+      return -BOOTROM_ERROR_BITSTREAM;
     }
 
     /* It matches, append it to the image */
     total_size = append_bitstream(addr, cfile);
+
+    if (total_size < 0 ) /* An error occurred */
+      return total_size;
 
     /* set destination device as the only attribute */
     part_hdr->attributes =
@@ -320,7 +334,8 @@ uint32_t append_file_to_image(uint32_t *addr,
   return total_size;
 }
 
-/* Returns total size of the created image */
+/* Returns total size of the created image.
+ * Negative value means an error */
 uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg) {
   /* declare variables */
   bootrom_hdr_t hdr;
@@ -350,6 +365,8 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg) {
     img_size = append_file_to_image(coff,
                                     bif_cfg->nodes[i],
                                     &(part_hdr[i]));
+    if (img_size < 0) /* Error */
+      return img_size;
 
     /* Check if dealing with bootloader */
     if (bif_cfg->nodes[i].bootloader) {

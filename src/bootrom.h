@@ -3,6 +3,11 @@
 
 #include "bif.h"
 
+#define BOOTROM_SUCCESS 0
+#define BOOTROM_ERROR_NOFILE 1
+#define BOOTROM_ERROR_BITSTREAM 2
+#define BOOTROM_ERROR_ELF 3
+
 uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg);
 
 /* BootROM Header based on ug585 */
