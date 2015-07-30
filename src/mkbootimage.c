@@ -70,7 +70,7 @@ int main(int argc, const char *argv[])
   ofile_size = create_boot_image(file_data, &cfg);
   ofile = fopen(argv[2], "wb");
 
-  if (ofile == NULL ){
+  if (ofile == NULL ) {
     fprintf(stderr, "Could not open output file: %s\n", argv[2]);
     return EXIT_FAILURE;
   }

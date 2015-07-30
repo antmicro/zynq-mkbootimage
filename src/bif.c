@@ -31,7 +31,7 @@
 
 #include "bif.h"
 
-int init_bif_cfg(bif_cfg_t *cfg){
+int init_bif_cfg(bif_cfg_t *cfg) {
   cfg->nodes_num = 0;
   cfg->nodes_avail = BIF_MAX_NODES_NUM;
   /* TODO make it dynamic */
@@ -39,7 +39,7 @@ int init_bif_cfg(bif_cfg_t *cfg){
   return BIF_SUCCESS;
 }
 
-int deinit_bif_cfg(bif_cfg_t *cfg){
+int deinit_bif_cfg(bif_cfg_t *cfg) {
   cfg->nodes_num = 0;
   cfg->nodes_avail = BIF_MAX_NODES_NUM;
   /* TODO make it dynamic */
@@ -47,13 +47,13 @@ int deinit_bif_cfg(bif_cfg_t *cfg){
   return BIF_SUCCESS;
 }
 
-int parse_bif(const char* fname, bif_cfg_t *cfg){
+int parse_bif(const char* fname, bif_cfg_t *cfg) {
   FILE *bif_file;
   int bif_size;
   char *bif_content;
   pcre *re;
 
-  if (!(bif_file = fopen(fname, "r"))){
+  if (!(bif_file = fopen(fname, "r"))) {
     return BIF_ERROR_NOFILE;
   }
 
@@ -83,7 +83,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
   int pcre_err_off;
   re = pcre_compile(pcre_regex, 0, &pcre_err, &pcre_err_off, NULL);
 
-  if (re == NULL){
+  if (re == NULL) {
     return BIF_ERROR_PARSER;
   }
 
@@ -111,7 +111,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
     node.bootloader = 0;
 
     ret = pcre_exec(re, NULL, bif_cfg, strlen(bif_cfg), soff, 0, ovec, 30);
-    if (ret < 4){
+    if (ret < 4) {
       free(bif_content);
       fclose(bif_file);
       return -1;
@@ -122,13 +122,13 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
     cattr[ovec[5] - ovec[4]] = '\0';
 
     isoff = 0;
-    if (re_attr == NULL){
+    if (re_attr == NULL) {
       return BIF_ERROR_PARSER;
     }
     int aret = 0;
     do {
       aret = pcre_exec(re_attr, NULL, cattr, strlen(cattr), isoff, 0, iovec, 30);
-      if (aret < 1 && isoff == 0 && strlen(cattr) > 0){
+      if (aret < 1 && isoff == 0 && strlen(cattr) > 0) {
         attr_ret  = bif_node_set_attr(&node, cattr, NULL);
 
         if (attr_ret != BIF_SUCCESS)
@@ -167,13 +167,13 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
   return BIF_SUCCESS;
 }
 
-int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value){
-  if (strcmp(attr_name, "bootloader") == 0){
+int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value) {
+  if (strcmp(attr_name, "bootloader") == 0) {
     node->bootloader = 0xFF;
     return BIF_SUCCESS;
   }
 
-  if (strcmp(attr_name, "load") == 0 ){
+  if (strcmp(attr_name, "load") == 0 ) {
     sscanf(value, "0x%08x", &(node->load));
     return BIF_SUCCESS;
   }
@@ -182,7 +182,7 @@ int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value){
   return BIF_ERROR_UNSUPORTED_ATTR;
 }
 
-int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node){
+int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
   /* TODO check node availability */
   cfg->nodes[cfg->nodes_num] = *node;
 

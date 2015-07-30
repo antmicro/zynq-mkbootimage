@@ -36,14 +36,14 @@
 #include "bootrom.h"
 
 /* This calculates the checksum up to (and including) end_addr */
-uint32_t bootrom_calc_checksum(uint32_t *start_addr, uint32_t *end_addr ){
+uint32_t bootrom_calc_checksum(uint32_t *start_addr, uint32_t *end_addr ) {
   uint32_t *ptr;
   uint32_t sum;
 
   sum = 0;
   ptr = start_addr;
 
-  while( ptr <= end_addr){
+  while( ptr <= end_addr) {
     sum += *ptr;
     ptr++;
   }
@@ -51,7 +51,7 @@ uint32_t bootrom_calc_checksum(uint32_t *start_addr, uint32_t *end_addr ){
   return ~sum;
 }
 
-int bootrom_prepare_header(bootrom_hdr_t *hdr){
+int bootrom_prepare_header(bootrom_hdr_t *hdr) {
   int i = 0;
   for (i = 0; i < sizeof(hdr->interrupt_table); i++) {
     hdr->interrupt_table[i]=BOOTROM_INT_TABLE_DEFAULT;
@@ -88,7 +88,7 @@ int bootrom_prepare_header(bootrom_hdr_t *hdr){
   return 0;
 }
 
-uint32_t append_bitstream(uint32_t *addr, FILE *bitfile){
+uint32_t append_bitstream(uint32_t *addr, FILE *bitfile) {
   uint32_t *dest = addr;
   uint8_t section_size;
   char section_data[255];
@@ -135,7 +135,7 @@ uint32_t append_bitstream(uint32_t *addr, FILE *bitfile){
  * and partition header info via argument pointer */
 uint32_t append_file_to_image(uint32_t *addr,
                               bif_node_t node,
-                              bootrom_partition_hdr_t *part_hdr){
+                              bootrom_partition_hdr_t *part_hdr) {
   uint32_t file_header;
   struct stat cfile_stat;
   FILE *cfile;
@@ -162,61 +162,61 @@ uint32_t append_file_to_image(uint32_t *addr,
   /* Check file format */
   fread(&file_header, 1, sizeof(file_header), cfile);
 
-  switch(file_header){
+  switch(file_header) {
   case FILE_MAGIC_ELF:
     /* init elf library */
-    if(elf_version(EV_CURRENT) == EV_NONE ){
+    if(elf_version(EV_CURRENT) == EV_NONE ) {
       printf("ELF library initialization failed\n");
       exit(1);
     }
 
     /* open file descriptor used by elf library */
-    if (( fd_elf = open(node.fname, O_RDONLY , 0)) < 0){
+    if (( fd_elf = open(node.fname, O_RDONLY , 0)) < 0) {
       printf("Elf could not open file %s.", node.fname);
       exit(1);
     }
 
     /* init elf */
-    if (( elf = elf_begin(fd_elf, ELF_C_READ , NULL )) == NULL ){
-        printf("Elf file error\n");
-        exit(1);
+    if (( elf = elf_begin(fd_elf, ELF_C_READ , NULL )) == NULL ) {
+      printf("Elf file error\n");
+      exit(1);
     }
 
     /* make sure it is an elf (despite magic byte check) */
-    if(elf_kind(elf) != ELF_K_ELF ){
-        printf( "\"%s\" is not an ELF object.", node.fname);
-        exit(1);
+    if(elf_kind(elf) != ELF_K_ELF ) {
+      printf( "\"%s\" is not an ELF object.", node.fname);
+      exit(1);
     }
 
     /* get elf headers count */
-    if(elf_getphdrnum(elf, &elf_hdr_n)!= 0){
-         printf("Elf file header error.\n");
-         exit(1);
+    if(elf_getphdrnum(elf, &elf_hdr_n)!= 0) {
+      printf("Elf file header error.\n");
+      exit(1);
     }
 
     /* iterate through all headers to find the executable */
     for(i = 0; i < elf_hdr_n; i ++) {
-        if(gelf_getphdr(elf, i, &elf_phdr) != &elf_phdr){
-            printf("Elf file header error.\n");
-            exit(1);
-        }
+      if(gelf_getphdr(elf, i, &elf_phdr) != &elf_phdr) {
+        printf("Elf file header error.\n");
+        exit(1);
+      }
 
 
-        /* check if the current one has executable flag set */
-        if (elf_phdr.p_flags & PF_X){
-          /* this is the one - prepare file for reading */
-          fseek(cfile, elf_phdr.p_offset, SEEK_SET);
+      /* check if the current one has executable flag set */
+      if (elf_phdr.p_flags & PF_X) {
+        /* this is the one - prepare file for reading */
+        fseek(cfile, elf_phdr.p_offset, SEEK_SET);
 
-          /* append the data */
-          total_size = fread(addr, 1, elf_phdr.p_filesz, cfile);
+        /* append the data */
+        total_size = fread(addr, 1, elf_phdr.p_filesz, cfile);
 
-          /* set the load and execution address */
-          part_hdr->dest_load_addr = elf_phdr.p_vaddr;
-          part_hdr->dest_exec_addr = elf_phdr.p_vaddr;
+        /* set the load and execution address */
+        part_hdr->dest_load_addr = elf_phdr.p_vaddr;
+        part_hdr->dest_exec_addr = elf_phdr.p_vaddr;
 
-          /* exit loop */
-          break;
-        }
+        /* exit loop */
+        break;
+      }
     }
     /* close the elf file descriptor */
     elf_end(elf);
@@ -230,7 +230,7 @@ uint32_t append_file_to_image(uint32_t *addr,
   case FILE_MAGIC_XILINXBIT_0:
     /* Xilinx header is 64b, check the other half */
     fread(&file_header, 1, sizeof(file_header), cfile);
-    if (file_header != FILE_MAGIC_XILINXBIT_1){
+    if (file_header != FILE_MAGIC_XILINXBIT_1) {
       printf("Corrupted bit file: %s\n.", node.fname);
       exit(1);
     }
@@ -284,7 +284,7 @@ uint32_t append_file_to_image(uint32_t *addr,
   };
 
   /* remove trailing zeroes */
-  while ( *(addr+total_size) == 0x0 ){
+  while ( *(addr+total_size) == 0x0 ) {
     total_size--;
   }
 
@@ -309,7 +309,7 @@ uint32_t append_file_to_image(uint32_t *addr,
   memset(part_hdr->reserved, 0x00, sizeof(part_hdr->reserved));
 
   /* Add 0xFF padding */
-  while (total_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))){
+  while (total_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
     total_size++;
     memset(addr+total_size, 0xFF, sizeof(uint32_t));
   }
@@ -321,7 +321,7 @@ uint32_t append_file_to_image(uint32_t *addr,
 }
 
 /* Returns total size of the created image */
-uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
+uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg) {
   /* declare variables */
   bootrom_hdr_t hdr;
 
@@ -352,7 +352,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
                                     &(part_hdr[i]));
 
     /* Check if dealing with bootloader */
-    if (bif_cfg->nodes[i].bootloader){
+    if (bif_cfg->nodes[i].bootloader) {
       /* If so - update the header to point at the correct bootloader */
       hdr.src_offset = (coff - img_ptr) * sizeof(uint32_t);
 
@@ -370,7 +370,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
 
 
     /* Update the offset, skip padding for the last image */
-    if (i == bif_cfg->nodes_num - 1){
+    if (i == bif_cfg->nodes_num - 1) {
       coff += part_hdr[i].pd_word_len;
     } else {
       coff += img_size;
@@ -392,7 +392,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
     /* Calculate number of string terminators, this should be 32b
      * however if the name length is divisible by 4 the bootgen
      * binary makes it 64b and thats what we're going to do here */
-    if (strlen((char*)img_name) % 4 == 0){
+    if (strlen((char*)img_name) % 4 == 0) {
       img_term_n = 2;
     } else {
       img_term_n = 1;
@@ -446,7 +446,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
   /* Add 0xFF padding */
   uint32_t img_hdr_size = 0;
   img_hdr_size = sizeof(img_hdr_tab) / sizeof(uint32_t);
-  while (img_hdr_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))){
+  while (img_hdr_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
     memset(poff + img_hdr_size, 0xFF, sizeof(uint32_t));
     img_hdr_size++;
   }
@@ -456,7 +456,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
   for (i = 0; i < img_hdr_tab.hdrs_count; i++) {
     /* Write 0xFF padding first - will use offset info later */
     img_hdr_size = sizeof(img_hdr[i]) / sizeof(uint32_t);
-    while (img_hdr_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))){
+    while (img_hdr_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
       memset(poff + img_hdr_size, 0xFF, sizeof(uint32_t));
       img_hdr_size++;
     }
@@ -483,7 +483,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
       bootrom_calc_checksum(&(part_hdr[i].pd_word_len),
                             &part_hdr[i].reserved[3]);
 
-    if (i == 0){
+    if (i == 0) {
       img_hdr_tab.part_img_hdr_off = (poff - img_ptr);
     }
 
@@ -497,7 +497,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
   memcpy(hoff, &(img_hdr_tab), sizeof(img_hdr_tab));
 
   /* Add 0xFF padding until BOOTROM_PART_HDR_OFF */
-  while ( poff - img_ptr < BOOTROM_PART_HDR_OFF / sizeof(uint32_t) ){
+  while ( poff - img_ptr < BOOTROM_PART_HDR_OFF / sizeof(uint32_t) ) {
     memset(poff, 0xFF, sizeof(uint32_t));
     poff++;
   }
@@ -511,22 +511,22 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg){
   }
 
   /* Add 0x00 padding until BOOTROM_PART_HDR_END_OFF */
-  while ( poff - img_ptr < BOOTROM_PART_HDR_END_OFF / sizeof(uint32_t) ){
+  while ( poff - img_ptr < BOOTROM_PART_HDR_END_OFF / sizeof(uint32_t) ) {
     memset(poff, 0x00, sizeof(uint32_t));
     poff++;
   }
 
   /* Add 0x00 terminators after partition header
    * if there are more than 3 images */
-  if( bif_cfg->nodes_num > 3){
-    while ( poff - img_ptr < BOOTROM_PART_HDR_TERM_OFF / sizeof(uint32_t) ){
+  if( bif_cfg->nodes_num > 3) {
+    while ( poff - img_ptr < BOOTROM_PART_HDR_TERM_OFF / sizeof(uint32_t) ) {
       memset(poff, 0x00, sizeof(uint32_t));
       poff++;
     }
   }
 
   /* Add 0xFF padding until BOOTROM_BINS_OFF */
-  while ( poff - img_ptr < BOOTROM_BINS_OFF / sizeof(uint32_t) ){
+  while ( poff - img_ptr < BOOTROM_BINS_OFF / sizeof(uint32_t) ) {
     memset(poff, 0xFF, sizeof(uint32_t));
     poff++;
   }

@@ -34,7 +34,7 @@ typedef struct bootrom_hdr_t {
 } bootrom_hdr_t;
 
 /* BootROM image header table based on ug821 */
-typedef struct bootrom_img_hdr_tab_t{
+typedef struct bootrom_img_hdr_tab_t {
   uint32_t version;
   uint32_t hdrs_count;
   uint32_t part_hdr_off; /* word offset to the partition header */
@@ -44,7 +44,7 @@ typedef struct bootrom_img_hdr_tab_t{
 
 /* BootROM partition header based on ug821 */
 /* All offsets are relative to the start of the boot image */
-typedef struct bootrom_partition_hdr_t{
+typedef struct bootrom_partition_hdr_t {
   uint32_t pd_word_len; /* encrypted partiton data length */
   uint32_t ed_word_len; /* unecrypted data length */
   uint32_t total_word_len; /* total encrypted,padding,expansion, auth length */
@@ -70,7 +70,7 @@ typedef struct bootrom_partition_hdr_t{
 #define BOOTROM_IMG_PADDING_SIZE 64
 
 /* BootROM image header based on ug821 */
-typedef struct bootrom_img_hdr_t{
+typedef struct bootrom_img_hdr_t {
   uint32_t next_img_off; /* 0 if last */
   uint32_t part_hdr_off;
   uint32_t part_count; /* always set to 0 */
