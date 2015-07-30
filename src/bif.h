@@ -4,6 +4,11 @@
 
 #define BIF_MAX_NODES_NUM 10
 
+#define BIF_SUCCESS                0
+#define BIF_ERROR_NOFILE           1
+#define BIF_ERROR_PARSER           2
+#define BIF_ERROR_UNSUPORTED_ATTR  3
+
 typedef struct bif_node_t {
   char fname[100];
 

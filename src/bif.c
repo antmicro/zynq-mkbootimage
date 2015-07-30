@@ -36,7 +36,7 @@ int init_bif_cfg(bif_cfg_t *cfg){
   cfg->nodes_avail = BIF_MAX_NODES_NUM;
   /* TODO make it dynamic */
 
-  return 0;
+  return BIF_SUCCESS;
 }
 
 int deinit_bif_cfg(bif_cfg_t *cfg){
@@ -44,7 +44,7 @@ int deinit_bif_cfg(bif_cfg_t *cfg){
   cfg->nodes_avail = BIF_MAX_NODES_NUM;
   /* TODO make it dynamic */
 
-  return 0;
+  return BIF_SUCCESS;
 }
 
 int parse_bif(const char* fname, bif_cfg_t *cfg){
@@ -54,8 +54,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
   pcre *re;
 
   if (!(bif_file = fopen(fname, "r"))){
-    printf("Could not open file: %s\n", fname);
-    exit(1);
+    return BIF_ERROR_NOFILE;
   }
 
   /* Find file size */
@@ -85,8 +84,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
   re = pcre_compile(pcre_regex, 0, &pcre_err, &pcre_err_off, NULL);
 
   if (re == NULL){
-    printf("Could not compile regex %s:%s", pcre_regex, pcre_err);
-    exit(1);
+    return BIF_ERROR_PARSER;
   }
 
   /* Attributes regex */
@@ -96,6 +94,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
 
   /* TODO cleanup */
   int ret;
+  int attr_ret;
   int ovec[30];
   int soff=0;
   int iovec[30];
@@ -124,14 +123,16 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
 
     isoff = 0;
     if (re_attr == NULL){
-      printf("Could not compile regex %s:%s", pcre_attr_regex, pcre_err);
-      exit(1);
+      return BIF_ERROR_PARSER;
     }
     int aret = 0;
     do {
       aret = pcre_exec(re_attr, NULL, cattr, strlen(cattr), isoff, 0, iovec, 30);
       if (aret < 1 && isoff == 0 && strlen(cattr) > 0){
-        bif_node_set_attr(&node, cattr, NULL);
+        attr_ret  = bif_node_set_attr(&node, cattr, NULL);
+
+        if (attr_ret != BIF_SUCCESS)
+          return attr_ret;
         break;
       }
       int i;
@@ -142,7 +143,10 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
         memcpy(pattr_v, cattr + iovec[(i+1)*2], iovec[2*(i+1)+1] - iovec[2*(i+1)]);
         pattr_v[iovec[2*(i+1)+1] - iovec[2*(i+1)]] = '\0';
 
-        bif_node_set_attr(&node, pattr_n, pattr_v);
+        attr_ret = bif_node_set_attr(&node, pattr_n, pattr_v);
+
+        if (attr_ret != BIF_SUCCESS)
+          return attr_ret;
       }
       isoff = iovec[1];
     } while (aret > 3);
@@ -160,28 +164,22 @@ int parse_bif(const char* fname, bif_cfg_t *cfg){
   free(bif_content);
   fclose(bif_file);
 
-  return 0;
+  return BIF_SUCCESS;
 }
 
 int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value){
   if (strcmp(attr_name, "bootloader") == 0){
     node->bootloader = 0xFF;
-    return 0;
+    return BIF_SUCCESS;
   }
 
   if (strcmp(attr_name, "load") == 0 ){
     sscanf(value, "0x%08x", &(node->load));
-    return 0;
+    return BIF_SUCCESS;
   }
 
-  if (strcmp(attr_name, "offset") == 0 ){
-    sscanf(value, "0x%08x", &(node->offset));
-    printf("Warning: offset attribute is not supported yet.\n");
-    return 0;
-  }
-
-  printf("Error: node attribute not supported: \"%s\", quitting.\n", attr_name);
-  exit(1);
+  fprintf(stderr, "Node attribute not supported: \"%s\"\n", attr_name);
+  return BIF_ERROR_UNSUPORTED_ATTR;
 }
 
 int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node){
@@ -189,5 +187,5 @@ int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node){
   cfg->nodes[cfg->nodes_num] = *node;
 
   (cfg->nodes_num)++;
-  return 0;
+  return BIF_SUCCESS;
 }
