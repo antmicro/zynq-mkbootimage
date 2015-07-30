@@ -36,6 +36,7 @@ int main(int argc, const char *argv[])
   uint32_t ofile_size;
   uint32_t *file_data;
   bif_cfg_t cfg;
+  int ret;
   int i;
 
   init_bif_cfg(&cfg);
@@ -44,10 +45,12 @@ int main(int argc, const char *argv[])
     printf("Zynq mkbootimage\n");
     printf("(c) 2013-2015 Antmicro Ltd.\n");
     printf("Usage: mkbootimage <input_bif_file> <output_bit_file>\n");
-    exit(1);
+    return EXIT_FAILURE;
   }
 
-  parse_bif(argv[1], &cfg);
+  ret = parse_bif(argv[1], &cfg);
+  if (ret != BIF_SUCCESS)
+    fprintf(stderr, "Could not parse %s file.\n", argv[1]);
 
   for (i = 0; i < cfg.nodes_num; i++) {
     printf("Node: %s", cfg.nodes[i].fname);
@@ -68,8 +71,8 @@ int main(int argc, const char *argv[])
   ofile = fopen(argv[2], "wb");
 
   if (ofile == NULL ){
-    printf("Could not open output file: %s\n", argv[2]);
-    exit(1);
+    fprintf(stderr, "Could not open output file: %s\n", argv[2]);
+    return EXIT_FAILURE;
   }
 
   fwrite(file_data, sizeof(uint32_t), ofile_size, ofile);
@@ -79,6 +82,6 @@ int main(int argc, const char *argv[])
   deinit_bif_cfg(&cfg);
 
   printf("All done, quitting\n");
-  return 0;
+  return EXIT_SUCCESS;
 }
 
