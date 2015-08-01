@@ -52,16 +52,17 @@ int main(int argc, const char *argv[])
   if (ret != BIF_SUCCESS)
     fprintf(stderr, "Could not parse %s file.\n", argv[1]);
 
+  printf("Nodes found in the %s file:\n", argv[1]);
   for (i = 0; i < cfg.nodes_num; i++) {
-    printf("Node: %s", cfg.nodes[i].fname);
+    printf(" %s", cfg.nodes[i].fname);
     if (cfg.nodes[i].bootloader)
       printf(" (bootloader)\n");
     else
       printf("\n");
     if (cfg.nodes[i].load)
-      printf(" load:   %08x\n", cfg.nodes[i].load);
+      printf("  load:   %08x\n", cfg.nodes[i].load);
     if (cfg.nodes[i].offset)
-      printf(" offset: %08x\n", cfg.nodes[i].offset);
+      printf("  offset: %08x\n", cfg.nodes[i].offset);
   }
 
   /* Generate bin file */
