@@ -112,9 +112,8 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
 
     ret = pcre_exec(re, NULL, bif_cfg, strlen(bif_cfg), soff, 0, ovec, 30);
     if (ret < 4) {
-      free(bif_content);
-      fclose(bif_file);
-      return -1;
+      /* no more nodes */
+      break;
     }
 
     /* parse attributes */
