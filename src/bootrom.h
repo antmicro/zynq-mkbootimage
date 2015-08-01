@@ -8,7 +8,7 @@
 #define BOOTROM_ERROR_BITSTREAM 2
 #define BOOTROM_ERROR_ELF 3
 
-uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg);
+int create_boot_image(uint32_t*, bif_cfg_t*, uint32_t*);
 
 /* BootROM Header based on ug585 */
 typedef struct bootrom_hdr_t {

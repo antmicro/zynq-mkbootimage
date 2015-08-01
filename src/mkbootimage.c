@@ -68,9 +68,9 @@ int main(int argc, const char *argv[])
   /* Generate bin file */
   file_data = malloc (sizeof *file_data * 10000000);
 
-  ofile_size = create_boot_image(file_data, &cfg);
+  ret = create_boot_image(file_data, &cfg, &ofile_size);
 
-  if (ofile_size < 0) { /* Error */
+  if (ret != BOOTROM_SUCCESS) { /* Error */
     free(file_data);
     return ofile_size;
   }

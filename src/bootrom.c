@@ -88,13 +88,12 @@ int bootrom_prepare_header(bootrom_hdr_t *hdr) {
   return BOOTROM_SUCCESS;
 }
 
-/* Returns the appended bitstream size.
- * Negative value means an error */
-uint32_t append_bitstream(uint32_t *addr, FILE *bitfile) {
+/* Returns the appended bitstream size via the last argument.
+ * The regular return value is the error code. */
+int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
   uint32_t *dest = addr;
   uint8_t section_size;
   char section_data[255];
-  uint32_t bit_size;
   char old_val[4];
   char new_val[4];
   char section_hdr[2];
@@ -107,7 +106,7 @@ uint32_t append_bitstream(uint32_t *addr, FILE *bitfile) {
     if (section_hdr[1] != 0x0) {
       fclose(bitfile);
       fprintf(stderr, "Bitstream file seems to have mismatched sections.\n");
-      return -BOOTROM_ERROR_BITSTREAM;
+      return BOOTROM_ERROR_BITSTREAM;
     }
 
     if (section_hdr[0] == FILE_XILINXBIT_SEC_DATA)
@@ -117,10 +116,12 @@ uint32_t append_bitstream(uint32_t *addr, FILE *bitfile) {
     fread(&section_data, 1, section_size, bitfile);
   }
 
-  fread(&bit_size, 1, 3, bitfile);
-  bit_size = ((bit_size >> 16) & 0xFF) | (bit_size & 0xFF00) | ((bit_size << 16) & 0xFF0000);
+  fread(img_size, 1, 3, bitfile);
+  *img_size = ((*img_size >> 16) & 0xFF) |
+               (*img_size & 0xFF00) |
+               ((*img_size << 16) & 0xFF0000);
 
-  for (i = 0; i <= bit_size; i+=sizeof(old_val)) {
+  for (i = 0; i <= *img_size; i+=sizeof(old_val)) {
     fread(&old_val, 1, sizeof(old_val), bitfile);
     new_val[0] = old_val[3];
     new_val[1] = old_val[2];
@@ -130,15 +131,16 @@ uint32_t append_bitstream(uint32_t *addr, FILE *bitfile) {
     dest++;
   }
 
-  return bit_size;
+  return BOOTROM_SUCCESS;
 }
 
 /* Returns the offset by which the addr parameter should be moved
- * and partition header info via argument pointer.
- * Negative value means an error */
-uint32_t append_file_to_image(uint32_t *addr,
-                              bif_node_t node,
-                              bootrom_partition_hdr_t *part_hdr) {
+ * and partition header info via argument pointers.
+ * The regular return value is the error code. */
+int append_file_to_image(uint32_t *addr,
+                         bif_node_t node,
+                         bootrom_partition_hdr_t *part_hdr,
+                         uint32_t *img_size) {
   uint32_t file_header;
   struct stat cfile_stat;
   FILE *cfile;
@@ -147,9 +149,10 @@ uint32_t append_file_to_image(uint32_t *addr,
   size_t elf_hdr_n;
   GElf_Phdr elf_phdr;
   linux_image_header_t linux_img;
+  int ret;
   int i;
 
-  uint32_t total_size = 0;
+  *img_size = 0;
 
   if(stat(node.fname, &cfile_stat)) {
     fprintf(stderr, "Could not stat file: %s\n", node.fname);
@@ -157,7 +160,7 @@ uint32_t append_file_to_image(uint32_t *addr,
   }
   cfile = fopen(node.fname, "rb");
 
-  if (cfile==NULL) {
+  if (cfile == NULL) {
     fprintf(stderr, "Could not open file: %s\n", node.fname);
     return -BOOTROM_ERROR_NOFILE;
   }
@@ -218,7 +221,7 @@ uint32_t append_file_to_image(uint32_t *addr,
         fseek(cfile, elf_phdr.p_offset, SEEK_SET);
 
         /* append the data */
-        total_size = fread(addr, 1, elf_phdr.p_filesz, cfile);
+        *img_size = fread(addr, 1, elf_phdr.p_filesz, cfile);
 
         /* set the load and execution address */
         part_hdr->dest_load_addr = elf_phdr.p_vaddr;
@@ -243,14 +246,14 @@ uint32_t append_file_to_image(uint32_t *addr,
     if (file_header != FILE_MAGIC_XILINXBIT_1) {
       /* Close the file */
       fclose(cfile);
-      return -BOOTROM_ERROR_BITSTREAM;
+      return BOOTROM_ERROR_BITSTREAM;
     }
 
     /* It matches, append it to the image */
-    total_size = append_bitstream(addr, cfile);
-
-    if (total_size < 0 ) /* An error occurred */
-      return total_size;
+    ret = append_bitstream(addr, cfile, img_size);
+    if (ret != BOOTROM_SUCCESS) {
+      return ret;
+    }
 
     /* set destination device as the only attribute */
     part_hdr->attributes =
@@ -266,7 +269,7 @@ uint32_t append_file_to_image(uint32_t *addr,
     fread(&linux_img, 1, sizeof(linux_img), cfile);
 
     fseek(cfile, 0, SEEK_SET);
-    total_size = fread(addr, 1, cfile_stat.st_size, cfile);
+    *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
 
     if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM)
       part_hdr->attributes = BINARY_ATTR_LINUX;
@@ -286,7 +289,7 @@ uint32_t append_file_to_image(uint32_t *addr,
   default: /* Treat as a binary file */
 
     fseek(cfile, 0, SEEK_SET);
-    total_size = fread(addr, 1, cfile_stat.st_size, cfile);
+    *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
 
     /* set destination device as the only attribute */
     part_hdr->attributes =
@@ -298,21 +301,21 @@ uint32_t append_file_to_image(uint32_t *addr,
   };
 
   /* remove trailing zeroes */
-  while ( *(addr+total_size) == 0x0 ) {
-    total_size--;
+  while ( *(addr + (*img_size)) == 0x0 ) {
+    (*img_size)--;
   }
 
   /* uImages actually require a 4B of 0x0 after the image
    * so restore that much in that case */
   if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM) {
-    total_size++;
+    (*img_size)++;
   }
 
   /* The output image needs to use the actual value +1B
    * for some reason */
-  part_hdr->pd_word_len = total_size + 1;
-  part_hdr->ed_word_len = total_size + 1;
-  part_hdr->total_word_len = total_size + 1;
+  part_hdr->pd_word_len = *img_size + 1;
+  part_hdr->ed_word_len = *img_size + 1;
+  part_hdr->total_word_len = *img_size + 1;
 
   /* Section count is always set to 1 */
   part_hdr->section_count = 0x1;
@@ -323,20 +326,22 @@ uint32_t append_file_to_image(uint32_t *addr,
   memset(part_hdr->reserved, 0x00, sizeof(part_hdr->reserved));
 
   /* Add 0xFF padding */
-  while (total_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
-    total_size++;
-    memset(addr+total_size, 0xFF, sizeof(uint32_t));
+  while (*img_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
+    (*img_size)++;
+    memset(addr + (*img_size), 0xFF, sizeof(uint32_t));
   }
 
   /* Close the file */
   fclose(cfile);
 
-  return total_size;
+  return BOOTROM_SUCCESS;
 }
 
-/* Returns total size of the created image.
- * Negative value means an error */
-uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg) {
+/* Returns total size of the created image via the last argument.
+ * The regular return value is the error code. */
+int create_boot_image(uint32_t *img_ptr,
+                      bif_cfg_t *bif_cfg,
+                      uint32_t *total_size) {
   /* declare variables */
   bootrom_hdr_t hdr;
 
@@ -344,6 +349,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg) {
   uint32_t *poff; /* current partiton offset */
   uint32_t *hoff; /* partition header table offset */
   uint16_t i, j;
+  int ret;
   int img_term_n = 0;
   uint8_t img_name[BOOTROM_IMG_MAX_NAME_LEN];
 
@@ -362,11 +368,14 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg) {
   for (i = 0; i < bif_cfg->nodes_num; i++) {
 
     /* Append file content to memory */
-    img_size = append_file_to_image(coff,
-                                    bif_cfg->nodes[i],
-                                    &(part_hdr[i]));
-    if (img_size < 0) /* Error */
-      return img_size;
+    ret = append_file_to_image(coff,
+                               bif_cfg->nodes[i],
+                               &(part_hdr[i]),
+                               &img_size);
+
+    if (ret != BOOTROM_SUCCESS) {
+      return ret;
+    }
 
     /* Check if dealing with bootloader */
     if (bif_cfg->nodes[i].bootloader) {
@@ -551,5 +560,7 @@ uint32_t create_boot_image(uint32_t *img_ptr, bif_cfg_t *bif_cfg) {
   /* Finally write the header to the image */
   memcpy(img_ptr, &(hdr), sizeof(hdr));
 
-  return coff - img_ptr;
+  *total_size = coff - img_ptr;
+
+  return BOOTROM_SUCCESS;
 }
