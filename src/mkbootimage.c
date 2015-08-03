@@ -26,33 +26,72 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <argp.h>
 
 #include "bif.h"
 #include "bootrom.h"
 
-int main(int argc, const char *argv[])
-{
+/* Prepare global variables for arg parser */
+const char *argp_program_version = "mkbootimage 1.0";
+static char doc[] = "Generate bootloader images for Xilinx Zynq based platforms.";
+static char args_doc[] = "<input_bif_file> <output_bin_file>";
+
+/* Prapare struct for holding parsed arguments */
+struct arguments {
+  char *bif_filename;
+  char *bin_filename;
+};
+
+/* Define argument parser */
+static error_t argp_parser(int key, char *arg, struct argp_state *state) {
+  struct arguments *arguments = state->input;
+
+  switch (key) {
+  case ARGP_KEY_ARG:
+    switch(state->arg_num) {
+    case 0:
+      arguments->bif_filename = arg;
+      break;
+    case 1:
+      arguments->bin_filename = arg;
+      break;
+    default:
+      argp_usage(state);
+    }
+    break;
+  case ARGP_KEY_END:
+    if (state->arg_num < 2)
+      argp_usage (state);
+    break;
+  default:
+    return ARGP_ERR_UNKNOWN;
+  }
+  return 0;
+}
+
+/* Finally initialize argp struct */
+static struct argp argp = { 0, argp_parser, args_doc, doc, 0, 0, 0 };
+
+/* Declare the main function */
+int main(int argc, char *argv[]) {
   FILE *ofile;
   uint32_t ofile_size;
   uint32_t *file_data;
+  struct arguments arguments;
   bif_cfg_t cfg;
   int ret;
   int i;
 
+  /* Parse program arguments */
+  argp_parse(&argp, argc, argv, 0, 0, &arguments);
+
   init_bif_cfg(&cfg);
 
-  if (argc != 3) {
-    printf("Zynq mkbootimage\n");
-    printf("(c) 2013-2015 Antmicro Ltd.\n");
-    printf("Usage: mkbootimage <input_bif_file> <output_bit_file>\n");
-    return EXIT_FAILURE;
-  }
-
-  ret = parse_bif(argv[1], &cfg);
+  ret = parse_bif(arguments.bif_filename, &cfg);
   if (ret != BIF_SUCCESS)
-    fprintf(stderr, "Could not parse %s file.\n", argv[1]);
+    fprintf(stderr, "Could not parse %s file.\n", arguments.bif_filename);
 
-  printf("Nodes found in the %s file:\n", argv[1]);
+  printf("Nodes found in the %s file:\n", arguments.bif_filename);
   for (i = 0; i < cfg.nodes_num; i++) {
     printf(" %s", cfg.nodes[i].fname);
     if (cfg.nodes[i].bootloader)
@@ -75,10 +114,10 @@ int main(int argc, const char *argv[])
     return ofile_size;
   }
 
-  ofile = fopen(argv[2], "wb");
+  ofile = fopen(arguments.bin_filename, "wb");
 
   if (ofile == NULL ) {
-    fprintf(stderr, "Could not open output file: %s\n", argv[2]);
+    fprintf(stderr, "Could not open output file: %s\n", arguments.bin_filename);
     return EXIT_FAILURE;
   }
 
