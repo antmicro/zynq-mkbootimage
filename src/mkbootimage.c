@@ -32,7 +32,7 @@
 #include "bootrom.h"
 
 /* Prepare global variables for arg parser */
-const char *argp_program_version = "mkbootimage 1.0";
+const char *argp_program_version = MKBOOTIMAGE_VER;
 static char doc[] = "Generate bootloader images for Xilinx Zynq based platforms.";
 static char args_doc[] = "<input_bif_file> <output_bin_file>";
 
