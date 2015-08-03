@@ -88,8 +88,10 @@ int main(int argc, char *argv[]) {
   init_bif_cfg(&cfg);
 
   ret = parse_bif(arguments.bif_filename, &cfg);
-  if (ret != BIF_SUCCESS)
+  if (ret != BIF_SUCCESS) {
     fprintf(stderr, "Could not parse %s file.\n", arguments.bif_filename);
+    return EXIT_FAILURE;
+  }
 
   printf("Nodes found in the %s file:\n", arguments.bif_filename);
   for (i = 0; i < cfg.nodes_num; i++) {
