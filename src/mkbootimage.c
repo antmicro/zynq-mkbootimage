@@ -85,6 +85,9 @@ int main(int argc, char *argv[]) {
   /* Parse program arguments */
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
+  /* Print program version info */
+  printf("%s\n", MKBOOTIMAGE_VER);
+
   init_bif_cfg(&cfg);
 
   ret = parse_bif(arguments.bif_filename, &cfg);
