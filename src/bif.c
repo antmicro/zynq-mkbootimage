@@ -89,7 +89,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
 
   /* Attributes regex */
   pcre *re_attr;
-  char *pcre_attr_regex = "(([a-zA-Z0-9]+)=([a-zA-Z0-9]+))+";
+  char *pcre_attr_regex = "((\\w+)=(\\w+))+";
   re_attr = pcre_compile(pcre_attr_regex, 0, &pcre_err, &pcre_err_off, NULL);
 
   /* TODO cleanup */
