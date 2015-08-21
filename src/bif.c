@@ -78,7 +78,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
   memcpy(bif_cfg, beg+1, end-beg-1);
 
   /* First extract the name and the parameter group if exists */
-  char *pcre_regex = "(\\[(.*)\\])?([a-zA-Z.-]+)";
+  char *pcre_regex = "(\\[(.*)\\])?([^\t\\/\n]+)";
   const char *pcre_err;
   int pcre_err_off;
   re = pcre_compile(pcre_regex, 0, &pcre_err, &pcre_err_off, NULL);
