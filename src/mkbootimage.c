@@ -91,8 +91,8 @@ int main(int argc, char *argv[]) {
   init_bif_cfg(&cfg);
 
   ret = parse_bif(arguments.bif_filename, &cfg);
-  if (ret != BIF_SUCCESS) {
-    fprintf(stderr, "Could not parse %s file.\n", arguments.bif_filename);
+  if (ret != BIF_SUCCESS || cfg.nodes_num == 0) {
+    fprintf(stderr, "Error parsing %s file.\n", arguments.bif_filename);
     return EXIT_FAILURE;
   }
 

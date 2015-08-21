@@ -73,6 +73,11 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
   beg = strchr(bif_content, '{');
   end = strchr(bif_content, '}');
 
+  /* Check if correct */
+  if (end == 0 || beg == 0 || beg >= end) {
+    return BIF_ERROR_PARSER;
+  }
+
   /* extract the actual config */
   char *bif_cfg = malloc(sizeof *bif_cfg * (end-beg));
   memcpy(bif_cfg, beg+1, end-beg-1);
