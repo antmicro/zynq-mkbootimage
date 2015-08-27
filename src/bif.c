@@ -81,6 +81,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
   /* extract the actual config */
   char *bif_cfg = malloc(sizeof *bif_cfg * (end-beg));
   memcpy(bif_cfg, beg+1, end-beg-1);
+  bif_cfg[end - beg - 1] = '\0';
 
   /* First extract the name and the parameter group if exists */
   char *pcre_regex = "(\\[(.*)\\])?([^\t\\/\n]+)";
