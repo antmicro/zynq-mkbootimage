@@ -112,8 +112,9 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
   bif_node_t node;
 
   do {
-    /* TODO better cleaning of the node */
     strcpy(node.fname, "");
+    node.offset = 0;
+    node.load = 0;
     node.bootloader = 0;
 
     ret = pcre_exec(re, NULL, bif_cfg, strlen(bif_cfg), soff, 0, ovec, 30);
