@@ -34,6 +34,4 @@ the_ROM_image:
 will generate a bin image which can be used in u-boot, as follows:
 bootm 0x3000000 0x2000000 0x2a00000
 
-The [offset] attribute is not yet supported.
-
 Encryption certificates are not supported.
