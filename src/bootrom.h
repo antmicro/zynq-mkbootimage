@@ -7,6 +7,7 @@
 #define BOOTROM_ERROR_NOFILE 1
 #define BOOTROM_ERROR_BITSTREAM 2
 #define BOOTROM_ERROR_ELF 3
+#define BOOTROM_ERROR_SEC_OVERLAP 4
 
 int create_boot_image(uint32_t*, bif_cfg_t*, uint32_t*);
 
@@ -132,7 +133,6 @@ typedef struct linux_image_header_t {
 #define BOOTROM_IMG_HDR_OFF       0x000008c0
 #define BOOTROM_PART_HDR_OFF      0x00000c80
 #define BOOTROM_PART_HDR_END_OFF  0x00000d7c
-#define BOOTROM_PART_HDR_TERM_OFF 0x00000e3c
 #define BOOTROM_BINS_OFF          0x00001700
 
 /* values from the documentation */

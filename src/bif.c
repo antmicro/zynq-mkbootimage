@@ -184,13 +184,40 @@ int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value) {
     return BIF_SUCCESS;
   }
 
+  if (strcmp(attr_name, "offset") == 0 ) {
+    sscanf(value, "0x%08x", &(node->offset));
+    return BIF_SUCCESS;
+  }
+
   fprintf(stderr, "Node attribute not supported: \"%s\"\n", attr_name);
   return BIF_ERROR_UNSUPORTED_ATTR;
 }
 
 int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
   /* TODO check node availability */
-  cfg->nodes[cfg->nodes_num] = *node;
+  uint16_t pos;
+  bif_node_t tmp_node;
+
+  pos = cfg->nodes_num;
+  cfg->nodes[pos] = *node;
+
+  /* Move nodes without offset to the top */
+  while (pos >= 1 && cfg->nodes[pos - 1].offset && !cfg->nodes[pos].offset) {
+    tmp_node = cfg->nodes[pos - 1];
+    cfg->nodes[pos - 1] = cfg->nodes[pos];
+    cfg->nodes[pos] = tmp_node;
+    pos--;
+  }
+
+  pos = cfg->nodes_num;
+
+  /* Sort nodes via offset */
+  while (pos >= 1 && cfg->nodes[pos - 1].offset > cfg->nodes[pos].offset) {
+    tmp_node = cfg->nodes[pos - 1];
+    cfg->nodes[pos - 1] = cfg->nodes[pos];
+    cfg->nodes[pos] = tmp_node;
+    pos--;
+  }
 
   (cfg->nodes_num)++;
   return BIF_SUCCESS;

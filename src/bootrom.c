@@ -271,11 +271,12 @@ int append_file_to_image(uint32_t *addr,
     fseek(cfile, 0, SEEK_SET);
     *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
 
-    if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM)
+    if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM) {
       part_hdr->attributes = BINARY_ATTR_LINUX;
+    }
 
     if (linux_img.type == FILE_LINUX_IMG_TYPE_URD)
-      part_hdr->attributes = BINARY_ATTR_RAMDISK;
+      part_hdr->attributes = 0x00; /* despite what the docs say */
 
     /* set destination device attribute */
     part_hdr->attributes |=
@@ -307,7 +308,7 @@ int append_file_to_image(uint32_t *addr,
 
   /* uImages actually require a 4B of 0x0 after the image
    * so restore that much in that case */
-  if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM) {
+  if (file_header == FILE_MAGIC_LINUX && linux_img.type == FILE_LINUX_IMG_TYPE_UIM) {
     (*img_size)++;
   }
 
@@ -367,6 +368,17 @@ int create_boot_image(uint32_t *img_ptr,
   /* Iterate through the images and write them */
   for (i = 0; i < bif_cfg->nodes_num; i++) {
 
+    if (bif_cfg->nodes[i].offset != 0 &&
+        (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < coff) {
+      fprintf(stderr, "Binary sections overlapping.\n");
+      return -BOOTROM_ERROR_SEC_OVERLAP;
+    } else {
+      /* Add 0xFF padding until this binary */
+      while (coff < (bif_cfg->nodes[i].offset / sizeof(uint32_t) + img_ptr) ) {
+        memset(coff, 0xFF, sizeof(uint32_t));
+        coff++;
+      }
+    }
     /* Append file content to memory */
     ret = append_file_to_image(coff,
                                bif_cfg->nodes[i],
@@ -545,7 +557,7 @@ int create_boot_image(uint32_t *img_ptr,
   /* Add 0x00 terminators after partition header
    * if there are more than 3 images */
   if( bif_cfg->nodes_num > 3) {
-    while ( poff - img_ptr < BOOTROM_PART_HDR_TERM_OFF / sizeof(uint32_t) ) {
+    for (i = 0; i < 15; ++i) {
       memset(poff, 0x00, sizeof(uint32_t));
       poff++;
     }

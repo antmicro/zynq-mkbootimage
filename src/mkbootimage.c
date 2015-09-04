@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Generate bin file */
-  file_data = malloc (sizeof *file_data * 10000000);
+  file_data = malloc (sizeof *file_data * 100000000);
 
   ret = create_boot_image(file_data, &cfg, &ofile_size);
 
