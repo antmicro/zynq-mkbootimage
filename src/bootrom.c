@@ -309,10 +309,15 @@ int append_file_to_image(uint32_t *addr,
     (*img_size)--;
   }
 
-  /* uImages actually require a 4B of 0x0 after the image
-   * so restore that much in that case */
-  if (file_header == FILE_MAGIC_LINUX && linux_img.type == FILE_LINUX_IMG_TYPE_UIM) {
-    (*img_size)++;
+  /* uImages actually require some undefined ammount of 0x0 padding after
+   * the image so restore some of it in that case */
+  if (file_header == FILE_MAGIC_LINUX) {
+    if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM) {
+      for (i = 0; i < 4; i++) {
+        (*img_size)++;
+        *(addr + (*img_size)) = 0x0;
+      }
+    }
   }
 
   /* The output image needs to use the actual value +1B
