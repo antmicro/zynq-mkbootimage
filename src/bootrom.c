@@ -165,6 +165,9 @@ int append_file_to_image(uint32_t *addr,
     return -BOOTROM_ERROR_NOFILE;
   }
 
+  /* Clean attribute bits */
+  part_hdr->attributes = 0;
+
   /* Check file format */
   fread(&file_header, 1, sizeof(file_header), cfile);
 
