@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
   FILE *ofile;
   uint32_t ofile_size;
   uint32_t *file_data;
+  uint32_t esize, esize_aligned;
   struct arguments arguments;
   bif_cfg_t cfg;
   int ret;
@@ -109,9 +110,18 @@ int main(int argc, char *argv[]) {
       printf("  offset: %08x\n", cfg.nodes[i].offset);
   }
 
-  /* Generate bin file */
-  file_data = malloc (sizeof *file_data * 100000000);
+  /* Estimate memory required to fit all the binaries */
+  esize = estimate_boot_image_size(&cfg);
 
+  /* Align estimated size to powers of two */
+  esize_aligned = 2;
+  while (esize_aligned < esize)
+    esize_aligned *= 2;
+
+  /* Allocate memory for output image */
+  file_data = malloc(sizeof *file_data * esize_aligned);
+
+  /* Generate bin file */
   ret = create_boot_image(file_data, &cfg, &ofile_size);
 
   if (ret != BOOTROM_SUCCESS) { /* Error */

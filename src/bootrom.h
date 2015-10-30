@@ -9,6 +9,7 @@
 #define BOOTROM_ERROR_ELF 3
 #define BOOTROM_ERROR_SEC_OVERLAP 4
 
+uint32_t estimate_boot_image_size(bif_cfg_t*);
 int create_boot_image(uint32_t*, bif_cfg_t*, uint32_t*);
 
 /* BootROM Header based on ug585 */

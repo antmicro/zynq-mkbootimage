@@ -346,6 +346,30 @@ int append_file_to_image(uint32_t *addr,
   return BOOTROM_SUCCESS;
 }
 
+/* Returns an estimation of the output image size */
+uint32_t estimate_boot_image_size(bif_cfg_t *bif_cfg)
+{
+  uint8_t i;
+  uint32_t estimated_size;
+  struct stat st_file;
+
+  estimated_size = BOOTROM_BINS_OFF;
+
+  for (i = 0; i < bif_cfg->nodes_num; i++) {
+    stat(bif_cfg->nodes[i].fname, &st_file);
+
+    if (bif_cfg->nodes[i].offset)
+      estimated_size = bif_cfg->nodes[i].offset;
+
+    estimated_size += st_file.st_size;
+  }
+
+  /* Add 3% to make sure padding is covered */
+  estimated_size *= 1.03;
+
+  return estimated_size;
+}
+
 /* Returns total size of the created image via the last argument.
  * The regular return value is the error code. */
 int create_boot_image(uint32_t *img_ptr,
