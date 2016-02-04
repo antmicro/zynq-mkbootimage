@@ -16,7 +16,8 @@ To use it, type in:
 Currently it supports creating boot image containing fsbl, bitstream
 u-boot, and linux related binary files.
 
-For loading linux related images, only the [load] attribute is supported.
+For loading linux related images, both the [load] and the [offset] attributes
+are supported.
 As opposed to the original bootgen, the file extensions are not required.
 
 For example the following .bif file:
