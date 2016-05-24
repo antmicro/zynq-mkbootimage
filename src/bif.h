@@ -10,7 +10,7 @@
 #define BIF_ERROR_UNSUPORTED_ATTR  3
 
 typedef struct bif_node_t {
-  char fname[100];
+  char fname[300]; /* TODO should be dynamic */
 
   /* supported attributes */
   uint8_t bootloader; /* boolean */
@@ -19,7 +19,7 @@ typedef struct bif_node_t {
 } bif_node_t;
 
 typedef struct bif_cfg_t {
-  char name[100];
+  char name[300]; /* TODO Shoud be dynamic */
 
   uint16_t nodes_num;
   uint16_t nodes_avail;
