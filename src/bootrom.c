@@ -159,6 +159,10 @@ int append_file_to_image(uint32_t *addr,
     fprintf(stderr, "Could not stat file: %s\n", node.fname);
     return -BOOTROM_ERROR_NOFILE;
   }
+  if (!S_ISREG(cfile_stat.st_mode)) {
+    fprintf(stderr, "Not a regular file: %s\n", node.fname);
+    return -BOOTROM_ERROR_NOFILE;
+  }
   cfile = fopen(node.fname, "rb");
 
   if (cfile == NULL) {
@@ -192,6 +196,7 @@ int append_file_to_image(uint32_t *addr,
 
     /* init elf */
     if (( elf = elf_begin(fd_elf, ELF_C_READ , NULL )) == NULL ) {
+      fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
       /* Close the file */
       fclose(cfile);
       return -BOOTROM_ERROR_ELF;
@@ -199,6 +204,7 @@ int append_file_to_image(uint32_t *addr,
 
     /* make sure it is an elf (despite magic byte check) */
     if(elf_kind(elf) != ELF_K_ELF ) {
+      fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
       /* Close the file */
       fclose(cfile);
       return -BOOTROM_ERROR_ELF;
@@ -206,6 +212,7 @@ int append_file_to_image(uint32_t *addr,
 
     /* get elf headers count */
     if(elf_getphdrnum(elf, &elf_hdr_n)!= 0) {
+      fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
       /* Close the file */
       fclose(cfile);
       return -BOOTROM_ERROR_ELF;
@@ -214,6 +221,7 @@ int append_file_to_image(uint32_t *addr,
     /* iterate through all headers to find the executable */
     for(i = 0; i < elf_hdr_n; i ++) {
       if(gelf_getphdr(elf, i, &elf_phdr) != &elf_phdr) {
+        fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
         /* Close the file */
         fclose(cfile);
         return -BOOTROM_ERROR_ELF;
@@ -248,6 +256,7 @@ int append_file_to_image(uint32_t *addr,
     /* Xilinx header is 64b, check the other half */
     fread(&file_header, 1, sizeof(file_header), cfile);
     if (file_header != FILE_MAGIC_XILINXBIT_1) {
+      fprintf(stderr, "Not a valid bitstream file: %s.\n", node.fname);
       /* Close the file */
       fclose(cfile);
       return BOOTROM_ERROR_BITSTREAM;
