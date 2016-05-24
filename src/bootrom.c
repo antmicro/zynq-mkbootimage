@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <gelf.h>
 #include <unistd.h>
+#include <libgen.h>
 
 #include "bif.h"
 #include "bootrom.h"
@@ -450,14 +451,14 @@ int create_boot_image(uint32_t *img_ptr,
     img_hdr[i].part_count = 0x0;
 
     /* filling this field as a helper */
-    img_hdr[i].name_len = strlen(bif_cfg->nodes[i].fname);
+    img_hdr[i].name_len = strlen(basename(bif_cfg->nodes[i].fname));
 
     /* Fill the name variable with zeroes */
     for (j = 0; j < BOOTROM_IMG_MAX_NAME_LEN; j++) {
       img_name[j] = 0x0;
     }
     /* Temporarily read the name */
-    memcpy(img_name, bif_cfg->nodes[i].fname, img_hdr[i].name_len);
+    memcpy(img_name, basename(bif_cfg->nodes[i].fname), img_hdr[i].name_len);
 
     /* Calculate number of string terminators, this should be 32b
      * however if the name length is divisible by 4 the bootgen
