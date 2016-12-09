@@ -12,7 +12,7 @@
 uint32_t estimate_boot_image_size(bif_cfg_t*);
 int create_boot_image(uint32_t*, bif_cfg_t*, uint32_t*);
 
-/* BootROM Header based on ug585 */
+/* BootROM Header based on ug585 and ug1095 */
 typedef struct bootrom_hdr_t {
   uint32_t interrupt_table[8];
   uint32_t width_detect;
