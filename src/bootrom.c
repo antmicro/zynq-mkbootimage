@@ -108,7 +108,7 @@ int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
   fseek(bitfile, FILE_XILINXBIT_SEC_START, SEEK_SET);
   while (1) {
     fread(&section_hdr, 1, sizeof(section_hdr), bitfile);
-    if (section_hdr[1] != 0x0) {
+    if (section_hdr[1] != 0x1 && section_hdr[1] != 0x0) {
       fclose(bitfile);
       fprintf(stderr, "Bitstream file seems to have mismatched sections.\n");
       return BOOTROM_ERROR_BITSTREAM;
