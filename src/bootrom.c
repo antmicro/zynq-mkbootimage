@@ -411,6 +411,10 @@ int create_boot_image(uint32_t *img_ptr,
   bootrom_img_hdr_t img_hdr[BIF_MAX_NODES_NUM];
   uint32_t img_size;
 
+  bootrom_img_hdr_tab_t img_hdr_tab;
+
+  img_hdr_tab.hdrs_count = 0;
+
   /* Prepare header of the image */
   bootrom_prepare_header_zynq(&hdr);
 
@@ -423,6 +427,9 @@ int create_boot_image(uint32_t *img_ptr,
     /* Skip if param will not include a file */
     if (!bif_cfg->nodes[i].is_file)
       continue;
+
+    /* If file - increment headers count */
+    img_hdr_tab.hdrs_count++;
 
     if (bif_cfg->nodes[i].offset != 0 &&
         (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < coff) {
@@ -524,10 +531,7 @@ int create_boot_image(uint32_t *img_ptr,
   }
 
   /* Prepare image header table */
-  bootrom_img_hdr_tab_t img_hdr_tab;
-
   img_hdr_tab.version = BOOTROM_IMG_VERSION;
-  img_hdr_tab.hdrs_count = i;
   img_hdr_tab.part_hdr_off = 0x0; /* filled below */
   img_hdr_tab.part_img_hdr_off = 0x0; /* filled below */
   img_hdr_tab.auth_hdr_off = 0x0; /* auth not implemented */
