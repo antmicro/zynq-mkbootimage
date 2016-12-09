@@ -371,7 +371,10 @@ uint32_t estimate_boot_image_size(bif_cfg_t *bif_cfg)
   estimated_size = BOOTROM_BINS_OFF;
 
   for (i = 0; i < bif_cfg->nodes_num; i++) {
-    stat(bif_cfg->nodes[i].fname, &st_file);
+    if (stat(bif_cfg->nodes[i].fname, &st_file)) {
+      fprintf(stderr, "Could not stat %s\n", bif_cfg->nodes[i].fname);
+      return 0;
+    }
 
     if (bif_cfg->nodes[i].offset)
       estimated_size = bif_cfg->nodes[i].offset;
