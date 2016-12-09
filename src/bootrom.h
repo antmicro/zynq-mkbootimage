@@ -8,6 +8,7 @@
 #define BOOTROM_ERROR_BITSTREAM 2
 #define BOOTROM_ERROR_ELF 3
 #define BOOTROM_ERROR_SEC_OVERLAP 4
+#define BOOTROM_ERROR_UNSUPPORTED 5
 
 uint32_t estimate_boot_image_size(bif_cfg_t*);
 int create_boot_image(uint32_t*, bif_cfg_t*, uint32_t*);
@@ -27,10 +28,13 @@ typedef struct bootrom_hdr_t {
   uint32_t reserved_0; /* set to 0 */
   union {
     uint32_t start_of_exec;
-    uint32_t fslb_img_len;
+    uint32_t fsbl_img_len;
   };
   uint32_t total_img_len;
-  uint32_t reserved_1;
+  union {
+    uint32_t reserved_1;
+    uint32_t fsbl_target_cpu;
+  };
   uint32_t checksum;
   /* The rest of the header is different for zynq and zynqmp*/
   union {
@@ -157,6 +161,9 @@ typedef struct linux_image_header_t {
 #define BOOTROM_PART_HDR_END_OFF  0x00000d7c
 #define BOOTROM_BINS_OFF          0x00001700
 
+/* The same defines as above but for zynqmp */
+#define BOOTROM_PART_HDR_OFF_ZMP  0x00000a00
+
 /* values from the documentation */
 #define BOOTROM_WIDTH_DETECT      0xAA995566
 #define BOOTROM_IMG_ID            "XNLX"
@@ -170,6 +177,10 @@ typedef struct linux_image_header_t {
 #define BOOTROM_RESERVED_1        0x00000000 /* MUST be set to 0 */
 
 #define BOOTROM_IMG_VERSION       0x01020000
+
+/* TODO find definitions for other CPUs */
+#define BOOTROM_FSBL_CPU_R5       0x001
+#define BOOTROM_FSBL_CPU_A53_64   0x800
 
 /* Other file specific files */
 #define FILE_MAGIC_ELF            0x464C457F

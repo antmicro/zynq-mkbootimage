@@ -52,10 +52,10 @@ uint32_t bootrom_calc_checksum(uint32_t *start_addr, uint32_t *end_addr ) {
   return ~sum;
 }
 
-int bootrom_prepare_header_zynq(bootrom_hdr_t *hdr) {
+int bootrom_prepare_header_common(bootrom_hdr_t *hdr) {
   int i = 0;
   for (i = 0; i < sizeof(hdr->interrupt_table); i++) {
-    hdr->interrupt_table[i]=BOOTROM_INT_TABLE_DEFAULT;
+    hdr->interrupt_table[i] = BOOTROM_INT_TABLE_DEFAULT;
   }
   hdr->width_detect = BOOTROM_WIDTH_DETECT;
   memcpy(&(hdr->img_id), BOOTROM_IMG_ID, strlen(BOOTROM_IMG_ID));
@@ -69,7 +69,18 @@ int bootrom_prepare_header_zynq(bootrom_hdr_t *hdr) {
   hdr->total_img_len = 0x0; /* Will be filled elsewhere */
   hdr->reserved_1 = BOOTROM_RESERVED_1_RL;
   hdr->checksum = bootrom_calc_checksum(&(hdr->width_detect),
-                                        &(hdr->width_detect)+ 10);
+                                        &(hdr->width_detect) + 10);
+
+  return BOOTROM_SUCCESS;
+}
+
+int bootrom_prepare_header_zynq(bootrom_hdr_t *hdr) {
+  int ret;
+  int i;
+  ret = bootrom_prepare_header_common(hdr);
+  if (ret != BOOTROM_SUCCESS)
+    return ret;
+
   memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
 
   hdr->user_defined_zynq_0[17] = 0x0;
@@ -89,7 +100,18 @@ int bootrom_prepare_header_zynq(bootrom_hdr_t *hdr) {
 }
 
 int bootrom_prepare_header_zynqmp(bootrom_hdr_t *hdr) {
-  /* TODO implement me */
+  int ret;
+  ret = bootrom_prepare_header_common(hdr);
+  if (ret != BOOTROM_SUCCESS)
+    return ret;
+
+  memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
+
+  hdr->user_defined_zynq_0[17] = 0x0;
+  hdr->user_defined_zynq_0[18] = 0x0;
+  hdr->user_defined_zynq_0[19] = BOOTROM_IMG_HDR_OFF;
+  hdr->user_defined_zynq_0[20] = BOOTROM_PART_HDR_OFF_ZMP;
+
   return BOOTROM_SUCCESS;
 }
 
@@ -179,6 +201,8 @@ int append_file_to_image(uint32_t *addr,
 
   /* Check file format */
   fread(&file_header, 1, sizeof(file_header), cfile);
+
+  printf("processing: %s\n", node.fname);
 
   switch(file_header) {
   case FILE_MAGIC_ELF:
@@ -402,6 +426,7 @@ int create_boot_image(uint32_t *img_ptr,
   uint32_t *coff = img_ptr; /* current offset/ptr */
   uint32_t *poff; /* current partiton offset */
   uint32_t *hoff; /* partition header table offset */
+  uint32_t phoff; /* partition header offset */
   uint16_t i, j;
   int ret;
   int img_term_n = 0;
@@ -415,8 +440,17 @@ int create_boot_image(uint32_t *img_ptr,
 
   img_hdr_tab.hdrs_count = 0;
 
-  /* Prepare header of the image */
-  bootrom_prepare_header_zynq(&hdr);
+  /* Predefine variables which depend on arch */
+  if (bif_cfg->arch & BIF_ARCH_ZYNQ) {
+    bootrom_prepare_header_zynq(&hdr);
+    phoff = BOOTROM_PART_HDR_OFF;
+  } else if (bif_cfg->arch & BIF_ARCH_ZYNQMP) {
+    bootrom_prepare_header_zynqmp(&hdr);
+    phoff = BOOTROM_PART_HDR_OFF_ZMP;
+  } else {
+    fprintf(stderr, "Arch unsupported.\n");
+    return -BOOTROM_ERROR_UNSUPPORTED;
+  }
 
   /* Move the offset to reserve the space for headers */
   poff = (BOOTROM_IMG_HDR_OFF) / sizeof(uint32_t) + img_ptr;
@@ -460,6 +494,10 @@ int create_boot_image(uint32_t *img_ptr,
       /* Image length needs to be in words not bytes */
       hdr.img_len = part_hdr[i].pd_word_len * sizeof(uint32_t);
       hdr.total_img_len = hdr.img_len;
+
+      /* Set target CPU if zynqmp */
+      if (bif_cfg->arch & BIF_ARCH_ZYNQMP)
+        hdr.fsbl_target_cpu = BOOTROM_FSBL_CPU_A53_64;
 
       /* Recalculate the checksum */
       hdr.checksum = bootrom_calc_checksum(&(hdr.width_detect),
@@ -567,7 +605,7 @@ int create_boot_image(uint32_t *img_ptr,
     }
 
     img_hdr[i].part_hdr_off =
-      (BOOTROM_PART_HDR_OFF / sizeof(uint32_t)) +
+      (phoff / sizeof(uint32_t)) +
       (i * sizeof(bootrom_partition_hdr_t) / sizeof(uint32_t));
 
     /* Write the actual img_hdr data */
@@ -589,13 +627,13 @@ int create_boot_image(uint32_t *img_ptr,
   }
 
   /* Fill the partition header offset in img header */
-  img_hdr_tab.part_hdr_off = BOOTROM_PART_HDR_OFF / sizeof(uint32_t);
+  img_hdr_tab.part_hdr_off = phoff / sizeof(uint32_t);
 
   /* Copy the image header as all the fields should be filled by now */
   memcpy(hoff, &(img_hdr_tab), sizeof(img_hdr_tab));
 
-  /* Add 0xFF padding until BOOTROM_PART_HDR_OFF */
-  while ( poff - img_ptr < BOOTROM_PART_HDR_OFF / sizeof(uint32_t) ) {
+  /* Add 0xFF padding until phoff */
+  while ( poff - img_ptr < phoff / sizeof(uint32_t) ) {
     memset(poff, 0xFF, sizeof(uint32_t));
     poff++;
   }
