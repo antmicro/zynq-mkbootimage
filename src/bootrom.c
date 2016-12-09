@@ -72,11 +72,10 @@ int bootrom_prepare_header_zynq(bootrom_hdr_t *hdr) {
                                         &(hdr->width_detect)+ 10);
   memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
 
-  /* TODO Not really sure what those do */
   hdr->user_defined_zynq_0[17] = 0x0;
   hdr->user_defined_zynq_0[18] = 0x0;
-  hdr->user_defined_zynq_0[19] = 0x000008c0;
-  hdr->user_defined_zynq_0[20] = 0x00000c80;
+  hdr->user_defined_zynq_0[19] = BOOTROM_IMG_HDR_OFF;
+  hdr->user_defined_zynq_0[20] = BOOTROM_PART_HDR_OFF;
 
   /* Memory acces ranges - set to full (0x0 - 0xFFFFFFFF range) */
   for (i = 0; i < 256; i++) {
