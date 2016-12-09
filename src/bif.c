@@ -112,10 +112,16 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
   bif_node_t node;
 
   do {
+    /* Clean up node */
     strcpy(node.fname, "");
     node.offset = 0;
     node.load = 0;
     node.bootloader = 0;
+    node.fsbl_config = 0;
+    strcpy(node.destination_device, "");
+    strcpy(node.destination_cpu, "");
+    strcpy(node.exception_level, "");
+    node.is_file = 1;
 
     ret = pcre_exec(re, NULL, bif_cfg, strlen(bif_cfg), soff, 0, ovec, 30);
     if (ret < 4) {
@@ -135,7 +141,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
     do {
       aret = pcre_exec(re_attr, NULL, cattr, strlen(cattr), isoff, 0, iovec, 30);
       if (aret < 1 && isoff == 0 && strlen(cattr) > 0) {
-        attr_ret  = bif_node_set_attr(&node, cattr, NULL);
+        attr_ret  = bif_node_set_attr(cfg, &node, cattr, NULL);
 
         if (attr_ret != BIF_SUCCESS)
           return attr_ret;
@@ -149,7 +155,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
         memcpy(pattr_v, cattr + iovec[(i+1)*2], iovec[2*(i+1)+1] - iovec[2*(i+1)]);
         pattr_v[iovec[2*(i+1)+1] - iovec[2*(i+1)]] = '\0';
 
-        attr_ret = bif_node_set_attr(&node, pattr_n, pattr_v);
+        attr_ret = bif_node_set_attr(cfg, &node, pattr_n, pattr_v);
 
         if (attr_ret != BIF_SUCCESS)
           return attr_ret;
@@ -173,7 +179,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
   return BIF_SUCCESS;
 }
 
-int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value) {
+int bif_node_set_attr(bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *value) {
   if (strcmp(attr_name, "bootloader") == 0) {
     node->bootloader = 0xFF;
     return BIF_SUCCESS;
@@ -187,6 +193,32 @@ int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value) {
   if (strcmp(attr_name, "offset") == 0 ) {
     sscanf(value, "0x%08x", &(node->offset));
     return BIF_SUCCESS;
+  }
+
+  /* Only handle these for zynqmp arch */
+  if (cfg->arch & BIF_ARCH_ZYNQMP) {
+    if (strcmp(attr_name, "fsbl_config") == 0) {
+      node->fsbl_config = 0xFF;
+
+      /* This attribute does not refer to file */
+      node->is_file = 0x00;
+      return BIF_SUCCESS;
+    }
+
+    if (strcmp(attr_name, "destination_device") == 0 ) {
+      sscanf(value, "%s", node->destination_device);
+      return BIF_SUCCESS;
+    }
+
+    if (strcmp(attr_name, "destination_cpu") == 0 ) {
+      sscanf(value, "%s", node->destination_cpu);
+      return BIF_SUCCESS;
+    }
+
+    if (strcmp(attr_name, "exception_level") == 0 ) {
+      sscanf(value, "%s", node->exception_level);
+      return BIF_SUCCESS;
+    }
   }
 
   fprintf(stderr, "Node attribute not supported: \"%s\"\n", attr_name);

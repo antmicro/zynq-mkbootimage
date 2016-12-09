@@ -371,6 +371,10 @@ uint32_t estimate_boot_image_size(bif_cfg_t *bif_cfg)
   estimated_size = BOOTROM_BINS_OFF;
 
   for (i = 0; i < bif_cfg->nodes_num; i++) {
+    /* Skip if param will not include a file */
+    if (!bif_cfg->nodes[i].is_file)
+      continue;
+
     if (stat(bif_cfg->nodes[i].fname, &st_file)) {
       fprintf(stderr, "Could not stat %s\n", bif_cfg->nodes[i].fname);
       return 0;
@@ -417,6 +421,9 @@ int create_boot_image(uint32_t *img_ptr,
 
   /* Iterate through the images and write them */
   for (i = 0; i < bif_cfg->nodes_num; i++) {
+    /* Skip if param will not include a file */
+    if (!bif_cfg->nodes[i].is_file)
+      continue;
 
     if (bif_cfg->nodes[i].offset != 0 &&
         (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < coff) {

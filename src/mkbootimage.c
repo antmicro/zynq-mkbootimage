@@ -34,10 +34,16 @@
 /* Prepare global variables for arg parser */
 const char *argp_program_version = MKBOOTIMAGE_VER;
 static char doc[] = "Generate bootloader images for Xilinx Zynq based platforms.";
-static char args_doc[] = "<input_bif_file> <output_bin_file>";
+static char args_doc[] = "[--zynqmp|-u] <input_bif_file> <output_bin_file>";
+
+static struct argp_option argp_options[] = {
+  {"zynqmp", 'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)" },
+  { 0 }
+};
 
 /* Prapare struct for holding parsed arguments */
 struct arguments {
+  uint8_t zynqmp;
   char *bif_filename;
   char *bin_filename;
 };
@@ -47,6 +53,9 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   struct arguments *arguments = state->input;
 
   switch (key) {
+  case 'u':
+    arguments->zynqmp = 0xFF;
+    break;
   case ARGP_KEY_ARG:
     switch(state->arg_num) {
     case 0:
@@ -70,7 +79,7 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
 }
 
 /* Finally initialize argp struct */
-static struct argp argp = { 0, argp_parser, args_doc, doc, 0, 0, 0 };
+static struct argp argp = {argp_options, argp_parser, args_doc, doc, 0, 0, 0 };
 
 /* Declare the main function */
 int main(int argc, char *argv[]) {
@@ -83,6 +92,9 @@ int main(int argc, char *argv[]) {
   int ret;
   int i;
 
+  /* Init non-string arguments */
+  arguments.zynqmp = 0;
+
   /* Parse program arguments */
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
@@ -90,6 +102,9 @@ int main(int argc, char *argv[]) {
   printf("%s\n", MKBOOTIMAGE_VER);
 
   init_bif_cfg(&cfg);
+
+  /* Give bif parser the info about arch */
+  cfg.arch = (arguments.zynqmp) ? BIF_ARCH_ZYNQMP : BIF_ARCH_ZYNQ;
 
   ret = parse_bif(arguments.bif_filename, &cfg);
   if (ret != BIF_SUCCESS || cfg.nodes_num == 0) {
