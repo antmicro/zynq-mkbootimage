@@ -25,18 +25,39 @@ typedef struct bootrom_hdr_t {
   uint32_t src_offset;
   uint32_t img_len;
   uint32_t reserved_0; /* set to 0 */
-  uint32_t start_of_exec;
+  union {
+    uint32_t start_of_exec;
+    uint32_t fslb_img_len;
+  };
   uint32_t total_img_len;
   uint32_t reserved_1;
   uint32_t checksum;
+  /* The rest of the header is different for zynq and zynqmp*/
   union {
-    uint32_t user_defined_1[21];
-    uint32_t fsbl_defined_1[21];
-  };
-  uint32_t reg_init[512];
-  union {
-    uint32_t user_defined_2[8];
-    uint32_t fsbl_defined_2[8];
+    /* This is the zynq part */
+    struct {
+      union {
+        uint32_t user_defined_zynq_0[21];
+        uint32_t fsbl_defined_zynq_0[21];
+      };
+      uint32_t reg_init_zynq[512];
+      union {
+        uint32_t user_defined_zynq_1[8];
+        uint32_t fsbl_defined_zynq_1[8];
+      };
+    };
+    /* This is the zynqmp part */
+    struct {
+      uint32_t obfuscated_key[8];
+      uint32_t reserved_zynqmp;
+      union {
+        uint32_t user_defined_zynqmp_0[12];
+        uint32_t fsbl_defined_zynqmp_0[12];
+      };
+      uint32_t sec_hdr_init_vec[3];
+      uint32_t obf_key_init_vec[3];
+      uint32_t reg_init_zynqmp[512];
+    };
   };
 } bootrom_hdr_t;
 

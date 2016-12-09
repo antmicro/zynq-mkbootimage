@@ -52,7 +52,7 @@ uint32_t bootrom_calc_checksum(uint32_t *start_addr, uint32_t *end_addr ) {
   return ~sum;
 }
 
-int bootrom_prepare_header(bootrom_hdr_t *hdr) {
+int bootrom_prepare_header_zynq(bootrom_hdr_t *hdr) {
   int i = 0;
   for (i = 0; i < sizeof(hdr->interrupt_table); i++) {
     hdr->interrupt_table[i]=BOOTROM_INT_TABLE_DEFAULT;
@@ -70,22 +70,27 @@ int bootrom_prepare_header(bootrom_hdr_t *hdr) {
   hdr->reserved_1 = BOOTROM_RESERVED_1_RL;
   hdr->checksum = bootrom_calc_checksum(&(hdr->width_detect),
                                         &(hdr->width_detect)+ 10);
-  memset(hdr->user_defined_1, 0x0, sizeof(hdr->user_defined_1));
+  memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
 
   /* TODO Not really sure what those do */
-  hdr->user_defined_1[17] = 0x0;
-  hdr->user_defined_1[18] = 0x0;
-  hdr->user_defined_1[19] = 0x000008c0;
-  hdr->user_defined_1[20] = 0x00000c80;
+  hdr->user_defined_zynq_0[17] = 0x0;
+  hdr->user_defined_zynq_0[18] = 0x0;
+  hdr->user_defined_zynq_0[19] = 0x000008c0;
+  hdr->user_defined_zynq_0[20] = 0x00000c80;
 
   /* Memory acces ranges - set to full (0x0 - 0xFFFFFFFF range) */
   for (i = 0; i < 256; i++) {
-    hdr->reg_init[2*i]   = 0xFFFFFFFF;
-    hdr->reg_init[2*i+1] = 0x0;
+    hdr->reg_init_zynq[2*i]   = 0xFFFFFFFF;
+    hdr->reg_init_zynq[2*i+1] = 0x0;
   }
 
-  memset(hdr->user_defined_2, 0xFF, sizeof(hdr->user_defined_2));
+  memset(hdr->user_defined_zynq_1, 0xFF, sizeof(hdr->user_defined_zynq_1));
 
+  return BOOTROM_SUCCESS;
+}
+
+int bootrom_prepare_header_zynqmp(bootrom_hdr_t *hdr) {
+  /* TODO implement me */
   return BOOTROM_SUCCESS;
 }
 
@@ -401,7 +406,7 @@ int create_boot_image(uint32_t *img_ptr,
   uint32_t img_size;
 
   /* Prepare header of the image */
-  bootrom_prepare_header(&hdr);
+  bootrom_prepare_header_zynq(&hdr);
 
   /* Move the offset to reserve the space for headers */
   poff = (BOOTROM_IMG_HDR_OFF) / sizeof(uint32_t) + img_ptr;
