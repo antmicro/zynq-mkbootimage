@@ -112,6 +112,8 @@ int main(int argc, char *argv[]) {
 
   /* Estimate memory required to fit all the binaries */
   esize = estimate_boot_image_size(&cfg);
+  if (!esize)
+    return EXIT_FAILURE;
 
   /* Align estimated size to powers of two */
   esize_aligned = 2;
