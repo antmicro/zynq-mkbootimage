@@ -1,7 +1,7 @@
 #ifndef BOOTROM_H
 #define BOOTROM_H
 
-#include "bif.h"
+#include <bif.h>
 
 #define BOOTROM_SUCCESS 0
 #define BOOTROM_ERROR_NOFILE 1
@@ -9,9 +9,7 @@
 #define BOOTROM_ERROR_ELF 3
 #define BOOTROM_ERROR_SEC_OVERLAP 4
 #define BOOTROM_ERROR_UNSUPPORTED 5
-
-uint32_t estimate_boot_image_size(bif_cfg_t*);
-int create_boot_image(uint32_t*, bif_cfg_t*, uint32_t*);
+#define BOOTROM_ERROR_NOMEM 6
 
 /* BootROM Header based on ug585 and ug1095 */
 typedef struct bootrom_hdr_t {
@@ -224,5 +222,41 @@ typedef struct linux_image_header_t {
 #define BINARY_ATTR_LINUX         0x00
 #define BINARY_ATTR_RAMDISK       0x02
 #define BINARY_ATTR_GENERAL       0x01
+
+typedef struct bootrom_offs_t {
+  /* pointer to the image in memory */
+  uint32_t *img_ptr;
+
+  /* offsets used as pointers */
+  uint32_t *coff; /* current offset/ptr */
+  uint32_t *poff; /* current partiton offset */
+  uint32_t *hoff; /* partition header table offset */
+
+  /* offsets used as regular values */
+  uint32_t phoff; /* partition header offset */
+} bootrom_offs_t;
+
+/* bootrom operations */
+typedef struct bootrom_ops_t {
+  /* Initialize the main bootrom header */
+  int (*init_header)(bootrom_hdr_t*);
+
+  /* Initialize offsets - image pointer should be
+   * set before this one is called */
+  int (*init_offs)(uint32_t*, bootrom_offs_t*);
+
+  /* Set the cpu that the file is going to run on */
+  /* TODO support passing target CPU as param? */
+  int (*set_target_cpu)(bootrom_hdr_t*);
+
+  /* Prepare image header table */
+  int (*init_img_hdr_tab)(bootrom_img_hdr_tab_t*,
+                          bootrom_img_hdr_t*,
+                          bootrom_partition_hdr_t*,
+                          bootrom_offs_t*);
+} bootrom_ops_t;
+
+uint32_t estimate_boot_image_size(bif_cfg_t*);
+int create_boot_image(uint32_t*, bif_cfg_t*, bootrom_ops_t*, uint32_t*);
 
 #endif /* BOOTROM_H */

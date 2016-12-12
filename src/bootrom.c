@@ -33,96 +33,10 @@
 #include <unistd.h>
 #include <libgen.h>
 
-#include "bif.h"
-#include "bootrom.h"
-
-/* This calculates the checksum up to (and including) end_addr */
-uint32_t bootrom_calc_checksum(uint32_t *start_addr, uint32_t *end_addr ) {
-  uint32_t *ptr;
-  uint32_t sum;
-
-  sum = 0;
-  ptr = start_addr;
-
-  while( ptr <= end_addr) {
-    sum += *ptr;
-    ptr++;
-  }
-
-  return ~sum;
-}
-
-int bootrom_prepare_header_common(bootrom_hdr_t *hdr) {
-  int i = 0;
-  for (i = 0; i < sizeof(hdr->interrupt_table); i++) {
-    hdr->interrupt_table[i] = BOOTROM_INT_TABLE_DEFAULT;
-  }
-  hdr->width_detect = BOOTROM_WIDTH_DETECT;
-  memcpy(&(hdr->img_id), BOOTROM_IMG_ID, strlen(BOOTROM_IMG_ID));
-  hdr->encryption_status = BOOTROM_ENCRYPTED_NONE;
-  /* BootROM does not interpret the field below */
-  hdr->src_offset = 0x0; /* Will be filled elsewhere */
-  hdr->img_len = 0x0; /* Will be filled elsewhere */
-  hdr->reserved_0 = BOOTROM_RESERVED_0;
-  hdr->start_of_exec = 0x0; /* Will be filled elsewhere */
-  hdr->total_img_len = 0x0; /* Will be filled elsewhere */
-  hdr->reserved_1 = BOOTROM_RESERVED_1_RL;
-
-  return BOOTROM_SUCCESS;
-}
-
-int bootrom_prepare_header_zynq(bootrom_hdr_t *hdr) {
-  int ret;
-  int i;
-  ret = bootrom_prepare_header_common(hdr);
-  if (ret != BOOTROM_SUCCESS)
-    return ret;
-
-  hdr->user_defined_0 = BOOTROM_USER_0;
-
-  memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
-
-  hdr->user_defined_zynq_0[17] = 0x0;
-  hdr->user_defined_zynq_0[18] = 0x0;
-  hdr->user_defined_zynq_0[19] = BOOTROM_IMG_HDR_OFF;
-  hdr->user_defined_zynq_0[20] = BOOTROM_PART_HDR_OFF;
-
-  /* Memory acces ranges - set to full (0x0 - 0xFFFFFFFF range) */
-  for (i = 0; i < 256; i++) {
-    hdr->reg_init_zynq[2*i]   = 0xFFFFFFFF;
-    hdr->reg_init_zynq[2*i+1] = 0x0;
-  }
-
-  memset(hdr->user_defined_zynq_1, 0xFF, sizeof(hdr->user_defined_zynq_1));
-
-  /* Calculate the checksum */
-  hdr->checksum = bootrom_calc_checksum(&(hdr->width_detect),
-                                        &(hdr->width_detect) + 10);
-
-  return BOOTROM_SUCCESS;
-}
-
-int bootrom_prepare_header_zynqmp(bootrom_hdr_t *hdr) {
-  int ret;
-  ret = bootrom_prepare_header_common(hdr);
-  if (ret != BOOTROM_SUCCESS)
-    return ret;
-
-  hdr->fsbl_execution_addr = BOOTROM_FSBL_EXEC_ADDR;
-
-  memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
-
-  hdr->user_defined_zynq_0[17] = 0x0;
-  hdr->user_defined_zynq_0[18] = 0x0;
-  hdr->user_defined_zynq_0[19] = BOOTROM_IMG_HDR_OFF;
-  hdr->user_defined_zynq_0[20] = BOOTROM_PART_HDR_OFF_ZMP;
-
-  /* Calculate the checksum */
-  hdr->checksum = bootrom_calc_checksum(&(hdr->width_detect),
-                                        &(hdr->width_detect) + 10);
-
-  return BOOTROM_SUCCESS;
-}
+#include <bif.h>
+#include <bootrom.h>
+#include <common.h>
+#include <arch/common.h>
 
 /* Returns the appended bitstream size via the last argument.
  * The regular return value is the error code. */
@@ -428,14 +342,11 @@ uint32_t estimate_boot_image_size(bif_cfg_t *bif_cfg)
  * The regular return value is the error code. */
 int create_boot_image(uint32_t *img_ptr,
                       bif_cfg_t *bif_cfg,
+                      bootrom_ops_t *bops,
                       uint32_t *total_size) {
   /* declare variables */
   bootrom_hdr_t hdr;
-
-  uint32_t *coff = img_ptr; /* current offset/ptr */
-  uint32_t *poff; /* current partiton offset */
-  uint32_t *hoff; /* partition header table offset */
-  uint32_t phoff; /* partition header offset */
+  bootrom_offs_t offs;
   uint16_t i, j;
   int ret;
   int img_term_n = 0;
@@ -449,21 +360,11 @@ int create_boot_image(uint32_t *img_ptr,
 
   img_hdr_tab.hdrs_count = 0;
 
-  /* Predefine variables which depend on arch */
-  if (bif_cfg->arch & BIF_ARCH_ZYNQ) {
-    bootrom_prepare_header_zynq(&hdr);
-    phoff = BOOTROM_PART_HDR_OFF;
-  } else if (bif_cfg->arch & BIF_ARCH_ZYNQMP) {
-    bootrom_prepare_header_zynqmp(&hdr);
-    phoff = BOOTROM_PART_HDR_OFF_ZMP;
-  } else {
-    fprintf(stderr, "Arch unsupported.\n");
-    return -BOOTROM_ERROR_UNSUPPORTED;
-  }
+  /* Initialize offsets */
+  bops->init_offs(img_ptr, &offs);
 
-  /* Move the offset to reserve the space for headers */
-  poff = (BOOTROM_IMG_HDR_OFF) / sizeof(uint32_t) + img_ptr;
-  coff = (BOOTROM_BINS_OFF) / sizeof(uint32_t) + img_ptr;
+  /* Initialize header */
+  bops->init_header(&hdr);
 
   /* Iterate through the images and write them */
   for (i = 0; i < bif_cfg->nodes_num; i++) {
@@ -475,18 +376,19 @@ int create_boot_image(uint32_t *img_ptr,
     img_hdr_tab.hdrs_count++;
 
     if (bif_cfg->nodes[i].offset != 0 &&
-        (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < coff) {
+        (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < offs.coff) {
       fprintf(stderr, "Binary sections overlapping.\n");
       return -BOOTROM_ERROR_SEC_OVERLAP;
     } else {
       /* Add 0xFF padding until this binary */
-      while (coff < (bif_cfg->nodes[i].offset / sizeof(uint32_t) + img_ptr) ) {
-        memset(coff, 0xFF, sizeof(uint32_t));
-        coff++;
+      while (offs.coff < (bif_cfg->nodes[i].offset / sizeof(uint32_t) + img_ptr) ) {
+        memset(offs.coff, 0xFF, sizeof(uint32_t));
+        offs.coff++;
       }
     }
+
     /* Append file content to memory */
-    ret = append_file_to_image(coff,
+    ret = append_file_to_image(offs.coff,
                                bif_cfg->nodes[i],
                                &(part_hdr[i]),
                                &img_size);
@@ -498,30 +400,27 @@ int create_boot_image(uint32_t *img_ptr,
     /* Check if dealing with bootloader */
     if (bif_cfg->nodes[i].bootloader) {
       /* If so - update the header to point at the correct bootloader */
-      hdr.src_offset = (coff - img_ptr) * sizeof(uint32_t);
+      hdr.src_offset = (offs.coff - img_ptr) * sizeof(uint32_t);
 
       /* Image length needs to be in words not bytes */
       hdr.img_len = part_hdr[i].pd_word_len * sizeof(uint32_t);
       hdr.total_img_len = hdr.img_len;
 
-      /* Set target CPU if zynqmp */
-      if (bif_cfg->arch & BIF_ARCH_ZYNQMP)
-        hdr.fsbl_target_cpu = BOOTROM_FSBL_CPU_A53_64;
+      /* Set target CPU */
+      bops->set_target_cpu(&hdr);
 
       /* Recalculate the checksum */
-      hdr.checksum = bootrom_calc_checksum(&(hdr.width_detect),
-                                           &(hdr.reserved_1));
+      bootrom_calc_hdr_checksum(&hdr);
     }
 
     /* Fill the offset */
-    part_hdr[i].data_off = (coff - img_ptr);
-
+    part_hdr[i].data_off = (offs.coff - img_ptr);
 
     /* Update the offset, skip padding for the last image */
     if (i == bif_cfg->nodes_num - 1) {
-      coff += part_hdr[i].pd_word_len;
+      offs.coff += part_hdr[i].pd_word_len;
     } else {
-      coff += img_size;
+      offs.coff += img_size;
     }
 
     /* Create image headers for all of them */
@@ -577,118 +476,54 @@ int create_boot_image(uint32_t *img_ptr,
     img_hdr[i].name_len = 0x1;
   }
 
-  /* Prepare image header table */
-  img_hdr_tab.version = BOOTROM_IMG_VERSION;
-  img_hdr_tab.part_hdr_off = 0x0; /* filled below */
-  img_hdr_tab.part_img_hdr_off = 0x0; /* filled below */
-  img_hdr_tab.auth_hdr_off = 0x0; /* auth not implemented */
-
-  /* The data will be copied to the reserved space later
-   * when we know all the required offsets,
-   * save the pointer for that */
-  hoff = poff;
-  poff += sizeof(img_hdr_tab) / sizeof(uint32_t);
-
-
-  /* Add 0xFF padding */
-  uint32_t img_hdr_size = 0;
-
-  for (i = 0; i < img_hdr_tab.hdrs_count; i++) {
-    /* Write 0xFF padding first - will use offset info later */
-    img_hdr_size = sizeof(img_hdr[i]) / sizeof(uint32_t);
-    while (img_hdr_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
-      memset(poff + img_hdr_size, 0xFF, sizeof(uint32_t));
-      img_hdr_size++;
-    }
-
-    /* calculate the next img hdr offsets */
-    if (i + 1 == img_hdr_tab.hdrs_count) {
-      img_hdr[i].next_img_off = 0x0;
-    } else {
-      img_hdr[i].next_img_off = poff + img_hdr_size - img_ptr;
-    }
-
-    img_hdr[i].part_hdr_off =
-      (phoff / sizeof(uint32_t)) +
-      (i * sizeof(bootrom_partition_hdr_t) / sizeof(uint32_t));
-
-    /* Write the actual img_hdr data */
-    memcpy(poff, &(img_hdr[i]), sizeof(img_hdr[i]));
-
-    /* Keep the offset for later use */
-    part_hdr[i].img_hdr_off = (poff - img_ptr);
-
-    /* Calculate the checksum */
-    part_hdr[i].checksum =
-      bootrom_calc_checksum(&(part_hdr[i].pd_word_len),
-                            &part_hdr[i].reserved[3]);
-
-    if (i == 0) {
-      img_hdr_tab.part_img_hdr_off = (poff - img_ptr);
-    }
-
-    poff += img_hdr_size;
-  }
-
-  /* Fill the partition header offset in img header */
-  img_hdr_tab.part_hdr_off = phoff / sizeof(uint32_t);
-
-  /* Image header complete - calculate checksum/fill padding */
-  if (bif_cfg->arch & BIF_ARCH_ZYNQ) {
-    memset(img_hdr_tab.padding, 0xffffffff, sizeof(img_hdr_tab.padding));
-  } else if (bif_cfg->arch & BIF_ARCH_ZYNQMP) {
-    /* Set boot device */
-    img_hdr_tab.boot_dev = BOOTROM_IMG_HDR_BOOT_SAME;
-
-    /* Fill reserved fields with zeroes  */
-    memset(img_hdr_tab.reserved, 0x0, sizeof(img_hdr_tab.reserved));
-    img_hdr_tab.checksum =
-      bootrom_calc_checksum((uint32_t*)&img_hdr_tab,
-                            &(img_hdr_tab.checksum) - 1);
-  }
+  /* Create the image header table */
+  bops->init_img_hdr_tab(&img_hdr_tab,
+                         img_hdr,
+                         part_hdr,
+                         &offs);
 
   /* Copy the image header as all the fields should be filled by now */
-  memcpy(hoff, &(img_hdr_tab), sizeof(img_hdr_tab));
+  memcpy(offs.hoff, &(img_hdr_tab), sizeof(img_hdr_tab));
 
   /* Add 0xFF padding until phoff */
-  while ( poff - img_ptr < phoff / sizeof(uint32_t) ) {
-    memset(poff, 0xFF, sizeof(uint32_t));
-    poff++;
+  while (offs.poff - img_ptr < offs.phoff / sizeof(uint32_t)) {
+    memset(offs.poff, 0xFF, sizeof(uint32_t));
+    offs.poff++;
   }
 
   /* Write the partition headers */
   for (i = 0; i < img_hdr_tab.hdrs_count; i++) {
-    memcpy(poff, &(part_hdr[i]), sizeof(part_hdr[i]));
+    memcpy(offs.poff, &(part_hdr[i]), sizeof(part_hdr[i]));
 
     /* Partition header is aligned, so no padding needed */
-    poff += sizeof(part_hdr[i]) / sizeof(uint32_t);
+    offs.poff += sizeof(part_hdr[i]) / sizeof(uint32_t);
   }
 
   /* Add 0x00 padding until BOOTROM_PART_HDR_END_OFF */
-  while ( poff - img_ptr < BOOTROM_PART_HDR_END_OFF / sizeof(uint32_t) ) {
-    memset(poff, 0x00, sizeof(uint32_t));
-    poff++;
+  while (offs.poff - img_ptr < BOOTROM_PART_HDR_END_OFF / sizeof(uint32_t) ) {
+    memset(offs.poff, 0x00, sizeof(uint32_t));
+    offs.poff++;
   }
 
   /* Add 0x00 terminators after partition header
    * if there are more than 3 images */
-  if( bif_cfg->nodes_num > 3) {
+  if (bif_cfg->nodes_num > 3) {
     for (i = 0; i < 15; ++i) {
-      memset(poff, 0x00, sizeof(uint32_t));
-      poff++;
+      memset(offs.poff, 0x00, sizeof(uint32_t));
+      offs.poff++;
     }
   }
 
   /* Add 0xFF padding until BOOTROM_BINS_OFF */
-  while ( poff - img_ptr < BOOTROM_BINS_OFF / sizeof(uint32_t) ) {
-    memset(poff, 0xFF, sizeof(uint32_t));
-    poff++;
+  while (offs.poff - img_ptr < BOOTROM_BINS_OFF / sizeof(uint32_t) ) {
+    memset(offs.poff, 0xFF, sizeof(uint32_t));
+    offs.poff++;
   }
 
   /* Finally write the header to the image */
   memcpy(img_ptr, &(hdr), sizeof(hdr));
 
-  *total_size = coff - img_ptr;
+  *total_size = offs.coff - img_ptr;
 
   return BOOTROM_SUCCESS;
 }

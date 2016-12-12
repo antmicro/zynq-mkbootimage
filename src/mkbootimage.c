@@ -28,8 +28,11 @@
 #include <stdio.h>
 #include <argp.h>
 
-#include "bif.h"
-#include "bootrom.h"
+#include <bif.h>
+#include <bootrom.h>
+
+#include <arch/zynq.h>
+#include <arch/zynqmp.h>
 
 /* Prepare global variables for arg parser */
 const char *argp_program_version = MKBOOTIMAGE_VER;
@@ -88,6 +91,7 @@ int main(int argc, char *argv[]) {
   uint32_t *file_data;
   uint32_t esize, esize_aligned;
   struct arguments arguments;
+  bootrom_ops_t *bops;
   bif_cfg_t cfg;
   int ret;
   int i;
@@ -105,6 +109,7 @@ int main(int argc, char *argv[]) {
 
   /* Give bif parser the info about arch */
   cfg.arch = (arguments.zynqmp) ? BIF_ARCH_ZYNQMP : BIF_ARCH_ZYNQ;
+  bops = (arguments.zynqmp) ? &zynqmp_bops : &zynq_bops;
 
   ret = parse_bif(arguments.bif_filename, &cfg);
   if (ret != BIF_SUCCESS || cfg.nodes_num == 0) {
@@ -139,7 +144,7 @@ int main(int argc, char *argv[]) {
   file_data = malloc(sizeof *file_data * esize_aligned);
 
   /* Generate bin file */
-  ret = create_boot_image(file_data, &cfg, &ofile_size);
+  ret = create_boot_image(file_data, &cfg, bops, &ofile_size);
 
   if (ret != BOOTROM_SUCCESS) { /* Error */
     free(file_data);

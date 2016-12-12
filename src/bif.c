@@ -29,7 +29,7 @@
 #include <string.h>
 #include <pcre.h>
 
-#include "bif.h"
+#include <bif.h>
 
 int init_bif_cfg(bif_cfg_t *cfg) {
   cfg->nodes_num = 0;

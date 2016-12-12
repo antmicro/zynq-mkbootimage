@@ -1,6 +1,9 @@
 #ifndef BIF_PARSER_H
-
 #define BIF_PARSER_H
+
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
 
 #define BIF_MAX_NODES_NUM 10
 
