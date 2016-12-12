@@ -66,13 +66,24 @@ typedef struct bootrom_hdr_t {
   };
 } bootrom_hdr_t;
 
-/* BootROM image header table based on ug821 */
+/* BootROM image header table based on ug821 and ug1137 */
 typedef struct bootrom_img_hdr_tab_t {
   uint32_t version;
   uint32_t hdrs_count;
   uint32_t part_hdr_off; /* word offset to the partition header */
   uint32_t part_img_hdr_off; /* word offset to first image header */
   uint32_t auth_hdr_off; /* word offset to header authentication */
+  union {
+    /* just padding for zynq */
+    uint32_t padding[11];
+
+    /* zynqmp additions */
+    struct {
+      uint32_t boot_dev;
+      uint32_t reserved[9];
+      uint32_t checksum;
+    };
+  };
 } bootrom_img_hdr_tab_t;
 
 /* BootROM partition header based on ug821 */
@@ -181,6 +192,16 @@ typedef struct linux_image_header_t {
 #define BOOTROM_RESERVED_1        0x00000000 /* MUST be set to 0 */
 
 #define BOOTROM_IMG_VERSION       0x01020000
+
+#define BOOTROM_IMG_HDR_BOOT_SAME 0x0
+#define BOOTROM_IMG_HDR_BOOT_QSPI 0x1
+#define BOOTROM_IMG_HDR_BOOT_NAND 0x2
+#define BOOTROM_IMG_HDR_BOOT_SD   0x3
+#define BOOTROM_IMG_HDR_BOOT_MMC  0x4
+#define BOOTROM_IMG_HDR_BOOT_USB  0x5
+#define BOOTROM_IMG_HDR_BOOT_ETH  0x6
+#define BOOTROM_IMG_HDR_BOOT_PCIE 0x7
+#define BOOTROM_IMG_HDR_BOOT_SATA 0x8
 
 /* TODO find definitions for other CPUs */
 #define BOOTROM_FSBL_CPU_R5       0x001

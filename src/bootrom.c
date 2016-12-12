@@ -587,16 +587,11 @@ int create_boot_image(uint32_t *img_ptr,
    * when we know all the required offsets,
    * save the pointer for that */
   hoff = poff;
+  poff += sizeof(img_hdr_tab) / sizeof(uint32_t);
+
 
   /* Add 0xFF padding */
   uint32_t img_hdr_size = 0;
-  img_hdr_size = sizeof(img_hdr_tab) / sizeof(uint32_t);
-  while (img_hdr_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
-    memset(poff + img_hdr_size, 0xFF, sizeof(uint32_t));
-    img_hdr_size++;
-  }
-
-  poff += img_hdr_size;
 
   for (i = 0; i < img_hdr_tab.hdrs_count; i++) {
     /* Write 0xFF padding first - will use offset info later */
@@ -637,6 +632,20 @@ int create_boot_image(uint32_t *img_ptr,
 
   /* Fill the partition header offset in img header */
   img_hdr_tab.part_hdr_off = phoff / sizeof(uint32_t);
+
+  /* Image header complete - calculate checksum/fill padding */
+  if (bif_cfg->arch & BIF_ARCH_ZYNQ) {
+    memset(img_hdr_tab.padding, 0xffffffff, sizeof(img_hdr_tab.padding));
+  } else if (bif_cfg->arch & BIF_ARCH_ZYNQMP) {
+    /* Set boot device */
+    img_hdr_tab.boot_dev = BOOTROM_IMG_HDR_BOOT_SAME;
+
+    /* Fill reserved fields with zeroes  */
+    memset(img_hdr_tab.reserved, 0x0, sizeof(img_hdr_tab.reserved));
+    img_hdr_tab.checksum =
+      bootrom_calc_checksum((uint32_t*)&img_hdr_tab,
+                            &(img_hdr_tab.checksum) - 1);
+  }
 
   /* Copy the image header as all the fields should be filled by now */
   memcpy(hoff, &(img_hdr_tab), sizeof(img_hdr_tab));
