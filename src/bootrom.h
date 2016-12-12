@@ -22,6 +22,7 @@ typedef struct bootrom_hdr_t {
   union {
     uint32_t user_defined_0;
     uint32_t fsbl_defined_0;
+    uint32_t fsbl_execution_addr;
   };
   uint32_t src_offset;
   uint32_t img_len;
@@ -149,8 +150,11 @@ typedef struct linux_image_header_t {
 
 /* values taken from boot.bin generated with bootgen */
 #define BOOTROM_INT_TABLE_DEFAULT 0xEAFFFFFE
-#define BOOTROM_USER_0            0x01010000 /* probably not needed */
 #define BOOTROM_RESERVED_1_RL     0x00000001 /* MUST be set to 0 but is not */
+
+/* user defined 0 / fsbl execution address */
+#define BOOTROM_USER_0            0x01010000 /* used by zynq */
+#define BOOTROM_FSBL_EXEC_ADDR    0xfffc0000 /* used by zynqmp */
 
 /* these values are also taken from bootm.bin
  * however these might not be the only valid

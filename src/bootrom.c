@@ -61,15 +61,12 @@ int bootrom_prepare_header_common(bootrom_hdr_t *hdr) {
   memcpy(&(hdr->img_id), BOOTROM_IMG_ID, strlen(BOOTROM_IMG_ID));
   hdr->encryption_status = BOOTROM_ENCRYPTED_NONE;
   /* BootROM does not interpret the field below */
-  hdr->user_defined_0 = BOOTROM_USER_0;
   hdr->src_offset = 0x0; /* Will be filled elsewhere */
   hdr->img_len = 0x0; /* Will be filled elsewhere */
   hdr->reserved_0 = BOOTROM_RESERVED_0;
   hdr->start_of_exec = 0x0; /* Will be filled elsewhere */
   hdr->total_img_len = 0x0; /* Will be filled elsewhere */
   hdr->reserved_1 = BOOTROM_RESERVED_1_RL;
-  hdr->checksum = bootrom_calc_checksum(&(hdr->width_detect),
-                                        &(hdr->width_detect) + 10);
 
   return BOOTROM_SUCCESS;
 }
@@ -80,6 +77,8 @@ int bootrom_prepare_header_zynq(bootrom_hdr_t *hdr) {
   ret = bootrom_prepare_header_common(hdr);
   if (ret != BOOTROM_SUCCESS)
     return ret;
+
+  hdr->user_defined_0 = BOOTROM_USER_0;
 
   memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
 
@@ -96,6 +95,10 @@ int bootrom_prepare_header_zynq(bootrom_hdr_t *hdr) {
 
   memset(hdr->user_defined_zynq_1, 0xFF, sizeof(hdr->user_defined_zynq_1));
 
+  /* Calculate the checksum */
+  hdr->checksum = bootrom_calc_checksum(&(hdr->width_detect),
+                                        &(hdr->width_detect) + 10);
+
   return BOOTROM_SUCCESS;
 }
 
@@ -105,12 +108,18 @@ int bootrom_prepare_header_zynqmp(bootrom_hdr_t *hdr) {
   if (ret != BOOTROM_SUCCESS)
     return ret;
 
+  hdr->fsbl_execution_addr = BOOTROM_FSBL_EXEC_ADDR;
+
   memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
 
   hdr->user_defined_zynq_0[17] = 0x0;
   hdr->user_defined_zynq_0[18] = 0x0;
   hdr->user_defined_zynq_0[19] = BOOTROM_IMG_HDR_OFF;
   hdr->user_defined_zynq_0[20] = BOOTROM_PART_HDR_OFF_ZMP;
+
+  /* Calculate the checksum */
+  hdr->checksum = bootrom_calc_checksum(&(hdr->width_detect),
+                                        &(hdr->width_detect) + 10);
 
   return BOOTROM_SUCCESS;
 }
