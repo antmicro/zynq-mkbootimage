@@ -430,9 +430,8 @@ int create_boot_image(uint32_t *img_ptr,
     img_hdr[i].name_len = strlen(basename(bif_cfg->nodes[i].fname));
 
     /* Fill the name variable with zeroes */
-    for (j = 0; j < BOOTROM_IMG_MAX_NAME_LEN; j++) {
-      img_name[j] = 0x0;
-    }
+    memset(img_name, 0x0, BOOTROM_IMG_MAX_NAME_LEN);
+
     /* Temporarily read the name */
     memcpy(img_name, basename(bif_cfg->nodes[i].fname), img_hdr[i].name_len);
 
