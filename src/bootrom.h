@@ -161,7 +161,7 @@ typedef struct linux_image_header_t {
  * so there is no understanding of them yet */
 #define BOOTROM_INT_TABLE_DEFAULT 0xEAFFFFFE
 #define BOOTROM_RESERVED_1_RL     0x00000001 /* MUST be set to 0 but is not */
-#define BOOTROM_RESERVED_ZMP_RL   0x01000020
+#define BOOTROM_RESERVED_ZMP_RL   0x01000020 /* The same as img version? */
 
 /* user defined 0 / fsbl execution address */
 #define BOOTROM_USER_0            0x01010000 /* used by zynq */
