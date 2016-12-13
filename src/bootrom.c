@@ -347,7 +347,7 @@ int create_boot_image(uint32_t *img_ptr,
   /* declare variables */
   bootrom_hdr_t hdr;
   bootrom_offs_t offs;
-  uint16_t i, j;
+  uint16_t i, j, f;
   int ret;
   int img_term_n = 0;
   uint8_t img_name[BOOTROM_IMG_MAX_NAME_LEN];
@@ -367,13 +367,18 @@ int create_boot_image(uint32_t *img_ptr,
   bops->init_header(&hdr);
 
   /* Iterate through the images and write them */
-  for (i = 0; i < bif_cfg->nodes_num; i++) {
+  for (i = 0, f = 0; i < bif_cfg->nodes_num; i++) {
+    /* i - index of all bif nodes
+     * f - index of bif node excluding non-file ones */
+
     /* Skip if param will not include a file */
     if (!bif_cfg->nodes[i].is_file)
       continue;
 
     /* If file - increment headers count */
     img_hdr_tab.hdrs_count++;
+
+    f = img_hdr_tab.hdrs_count - 1;
 
     if (bif_cfg->nodes[i].offset != 0 &&
         (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < offs.coff) {
@@ -390,7 +395,7 @@ int create_boot_image(uint32_t *img_ptr,
     /* Append file content to memory */
     ret = append_file_to_image(offs.coff,
                                bif_cfg->nodes[i],
-                               &(part_hdr[i]),
+                               &(part_hdr[f]),
                                &img_size);
 
     if (ret != BOOTROM_SUCCESS) {
@@ -403,7 +408,7 @@ int create_boot_image(uint32_t *img_ptr,
       hdr.src_offset = (offs.coff - img_ptr) * sizeof(uint32_t);
 
       /* Image length needs to be in words not bytes */
-      hdr.img_len = part_hdr[i].pd_word_len * sizeof(uint32_t);
+      hdr.img_len = part_hdr[f].pd_word_len * sizeof(uint32_t);
       hdr.total_img_len = hdr.img_len;
 
       /* Set target CPU */
@@ -414,26 +419,26 @@ int create_boot_image(uint32_t *img_ptr,
     }
 
     /* Fill the offset */
-    part_hdr[i].data_off = (offs.coff - img_ptr);
+    part_hdr[f].data_off = (offs.coff - img_ptr);
 
     /* Update the offset, skip padding for the last image */
     if (i == bif_cfg->nodes_num - 1) {
-      offs.coff += part_hdr[i].pd_word_len;
+      offs.coff += part_hdr[f].pd_word_len;
     } else {
       offs.coff += img_size;
     }
 
     /* Create image headers for all of them */
-    img_hdr[i].part_count = 0x0;
+    img_hdr[f].part_count = 0x0;
 
     /* filling this field as a helper */
-    img_hdr[i].name_len = strlen(basename(bif_cfg->nodes[i].fname));
+    img_hdr[f].name_len = strlen(basename(bif_cfg->nodes[i].fname));
 
     /* Fill the name variable with zeroes */
     memset(img_name, 0x0, BOOTROM_IMG_MAX_NAME_LEN);
 
     /* Temporarily read the name */
-    memcpy(img_name, basename(bif_cfg->nodes[i].fname), img_hdr[i].name_len);
+    memcpy(img_name, basename(bif_cfg->nodes[i].fname), img_hdr[f].name_len);
 
     /* Calculate number of string terminators, this should be 32b
      * however if the name length is divisible by 4 the bootgen
@@ -445,34 +450,34 @@ int create_boot_image(uint32_t *img_ptr,
     }
 
     /* Make the name len be divisible by 4 */
-    while(img_hdr[i].name_len % 4)
-      img_hdr[i].name_len++;
+    while(img_hdr[f].name_len % 4)
+      img_hdr[f].name_len++;
 
     /* The name is packed in big-endian order. To reconstruct
      * the string, unpack 4 bytes at a time, reverse
      * the order, and concatenate. */
-    for (j = 0; j < img_hdr[i].name_len; j+=4) {
-      img_hdr[i].name[j+0] = img_name[j+3];
-      img_hdr[i].name[j+1] = img_name[j+2];
-      img_hdr[i].name[j+2] = img_name[j+1];
-      img_hdr[i].name[j+3] = img_name[j+0];
+    for (j = 0; j < img_hdr[f].name_len; j += 4) {
+      img_hdr[f].name[j + 0] = img_name[j + 3];
+      img_hdr[f].name[j + 1] = img_name[j + 2];
+      img_hdr[f].name[j + 2] = img_name[j + 1];
+      img_hdr[f].name[j + 3] = img_name[j + 0];
     }
 
     /* Append the actual terminators */
-    memset(&(img_hdr[i].name[img_hdr[i].name_len]),
+    memset(&(img_hdr[f].name[img_hdr[f].name_len]),
            0x00, img_term_n * sizeof(uint32_t));
 
     /* Fill the rest with 0xFF padding */
-    for (j = img_hdr[i].name_len + img_term_n * sizeof(uint32_t);
+    for (j = img_hdr[f].name_len + img_term_n * sizeof(uint32_t);
          j < BOOTROM_IMG_MAX_NAME_LEN; j++) {
-      img_hdr[i].name[j] = 0xFF;
+      img_hdr[f].name[j] = 0xFF;
     }
 
     /* Name length is not really the length of the name.
      * According to the documentation it is the value of the
      * actual partition count, however the bootgen binary
      * always sets this field to 1. */
-    img_hdr[i].name_len = 0x1;
+    img_hdr[f].name_len = 0x1;
   }
 
   /* Create the image header table */
