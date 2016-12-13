@@ -1,14 +1,33 @@
-CC=gcc
-FILES=src/mkbootimage.c src/bif.c src/bootrom.c
-PROGRAM_NAME=mkbootimage
-VERSION_MAJOR=1.0
-VERSION_MINOR=${shell git rev-parse --short HEAD}
-CFLAGS=-lpcre -lelf -Wall \
-	-DMKBOOTIMAGE_VER=\"${PROGRAM_NAME}\ ${VERSION_MAJOR}-${VERSION_MINOR}\"
-TARGET=mkbootimage
+.PHONY: all clean distclean
 
-all:
-	${CC} ${FILES} ${CFLAGS} -o ${TARGET}
+CC=gcc
+
+MKBOOTIMAGE_NAME:=mkbootimage
+
+VERSION_MAJOR:=1.0
+VERSION_MINOR:=${shell git rev-parse --short HEAD}
+
+VERSION:=${MKBOOTIMAGE_NAME} ${VERSION_MAJOR}-${VERSION_MINOR}
+
+MKBOOTIMAGE_SRCS:=$(wildcard src/*.c) $(wildcard src/arch/*c)
+MKBOOTIMAGE_OBJS:=${MKBOOTIMAGE_SRCS:.c=.o}
+
+MKBOOTIMAGE_INCLUDE_DIRS:=src
+
+CFLAGS += $(foreach includedir,$(MKBOOTIMAGE_INCLUDE_DIRS),-I$(includedir)) \
+	-DMKBOOTIMAGE_VER="\"$(VERSION)\"" \
+	-lpcre -lelf -Wall
+
+all: $(MKBOOTIMAGE_NAME)
+
+$(MKBOOTIMAGE_NAME): $(MKBOOTIMAGE_OBJS)
+	$(CC) $(CFLAGS) $(MKBOOTIMAGE_OBJS) -o $(MKBOOTIMAGE_NAME)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm ${TARGET}
+	@- $(RM) $(MKBOOTIMAGE_NAME)
+	@- $(RM) $(MKBOOTIMAGE_OBJS)
+
+distclean: clean
