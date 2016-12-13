@@ -29,6 +29,7 @@ int zynqmp_bootrom_init_offs(uint32_t *img_ptr, bootrom_offs_t *offs) {
 }
 
 int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr) {
+  int i;
   int ret;
 
   /* Call the common init */
@@ -38,12 +39,24 @@ int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr) {
 
   hdr->fsbl_execution_addr = BOOTROM_FSBL_EXEC_ADDR;
 
-  memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
+  /* Obfuscated keys not yet supported */
+  memset(hdr->obfuscated_key, 0x0, sizeof(hdr->obfuscated_key));
 
-  hdr->user_defined_zynq_0[17] = 0x0;
-  hdr->user_defined_zynq_0[18] = 0x0;
-  hdr->user_defined_zynq_0[19] = BOOTROM_IMG_HDR_OFF;
-  hdr->user_defined_zynq_0[20] = BOOTROM_PART_HDR_OFF_ZMP;
+  hdr->reserved_zynqmp = BOOTROM_RESERVED_ZMP_RL;
+
+  memset(hdr->user_defined_zynqmp_0, 0x0, sizeof(hdr->user_defined_zynqmp_0));
+
+  hdr->user_defined_zynqmp_0[10] = BOOTROM_IMG_HDR_OFF;
+  hdr->user_defined_zynqmp_0[11] = BOOTROM_PART_HDR_OFF_ZMP;
+
+  memset(hdr->sec_hdr_init_vec, 0x0, sizeof(hdr->sec_hdr_init_vec));
+  memset(hdr->obf_key_init_vec, 0x0, sizeof(hdr->obf_key_init_vec));
+
+  /* Memory acces ranges - set to full (0x0 - 0xFFFFFFFF range) */
+  for (i = 0; i < 256; i++) {
+    hdr->reg_init_zynqmp[2 * i] = 0xFFFFFFFF;
+    hdr->reg_init_zynqmp[(2 * i) + 1] = 0x0;
+  }
 
   /* Calculate the checksum */
   bootrom_calc_hdr_checksum(hdr);
