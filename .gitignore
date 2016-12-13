@@ -4,4 +4,5 @@ mkbootimage
 *.bit
 *.elf
 *.dtb
+*.o
 tags
