@@ -47,7 +47,7 @@ int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
   char old_val[4];
   char new_val[4];
   char section_hdr[2];
-  int i;
+  unsigned int i;
 
   /* Skip the header - it is already checked */
   fseek(bitfile, FILE_XILINXBIT_SEC_START, SEEK_SET);
@@ -100,7 +100,7 @@ int append_file_to_image(uint32_t *addr,
   GElf_Phdr elf_phdr;
   linux_image_header_t linux_img;
   int ret;
-  int i;
+  unsigned int i;
 
   *img_size = 0;
 
@@ -492,7 +492,7 @@ int create_boot_image(uint32_t *img_ptr,
   memcpy(offs.hoff, &(img_hdr_tab), sizeof(img_hdr_tab));
 
   /* Add 0xFF padding until partition header offset */
-  while (offs.poff - img_ptr < offs.part_hdr_off / sizeof(uint32_t)) {
+  while ((uint32_t)(offs.poff - img_ptr) < offs.part_hdr_off / sizeof(uint32_t)) {
     memset(offs.poff, 0xFF, sizeof(uint32_t));
     offs.poff++;
   }
@@ -521,7 +521,7 @@ int create_boot_image(uint32_t *img_ptr,
   }
 
   /* Add 0xFF padding until BOOTROM_BINS_OFF */
-  while (offs.poff - img_ptr < offs.bins_off / sizeof(uint32_t) ) {
+  while ((uint32_t)(offs.poff - img_ptr) < offs.bins_off / sizeof(uint32_t) ) {
     memset(offs.poff, 0xFF, sizeof(uint32_t));
     offs.poff++;
   }

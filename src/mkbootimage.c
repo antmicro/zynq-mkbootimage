@@ -40,7 +40,7 @@ static char doc[] = "Generate bootloader images for Xilinx Zynq based platforms.
 static char args_doc[] = "[--zynqmp|-u] <input_bif_file> <output_bin_file>";
 
 static struct argp_option argp_options[] = {
-  {"zynqmp", 'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)" },
+  {"zynqmp", 'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)", 0},
   { 0 }
 };
 

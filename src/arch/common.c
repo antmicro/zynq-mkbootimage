@@ -9,7 +9,7 @@
 /* This calculates the checksum up to (and including) end_addr */
 
 int bootrom_init_header(bootrom_hdr_t *hdr) {
-  int i = 0;
+  unsigned int i = 0;
   for (i = 0; i < sizeof(hdr->interrupt_table); i++) {
     hdr->interrupt_table[i] = BOOTROM_INT_TABLE_DEFAULT;
   }
@@ -39,7 +39,7 @@ int bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
                              bootrom_img_hdr_t *img_hdr,
                              bootrom_partition_hdr_t *part_hdr,
                              bootrom_offs_t *offs) {
-  int i;
+  unsigned int i;
   uint32_t img_hdr_size = 0;
 
   /* Prepare image header table */

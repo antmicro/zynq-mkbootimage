@@ -63,6 +63,8 @@ int zynq_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
 }
 
 int zynq_bootrom_set_target_cpu(bootrom_hdr_t *hdr) {
+  (void) hdr;
+
   /* Not required for zynq */
   return BOOTROM_SUCCESS;
 }
