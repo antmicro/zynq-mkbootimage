@@ -60,6 +60,8 @@ typedef struct bootrom_hdr_t {
       uint32_t sec_hdr_init_vec[3];
       uint32_t obf_key_init_vec[3];
       uint32_t reg_init_zynqmp[512];
+      /* 0xFF padding ?? */
+      uint32_t padding[2];
     };
   };
 } bootrom_hdr_t;

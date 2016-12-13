@@ -58,6 +58,9 @@ int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr) {
     hdr->reg_init_zynqmp[(2 * i) + 1] = 0x0;
   }
 
+  /* Fill padding */
+  memset(hdr->padding, 0xFFFFFFFF, sizeof(hdr->padding));
+
   /* Calculate the checksum */
   bootrom_calc_hdr_checksum(hdr);
 
