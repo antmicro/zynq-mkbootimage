@@ -181,7 +181,7 @@ typedef struct linux_image_header_t {
 #define BOOTROM_WIDTH_DETECT      0xAA995566
 #define BOOTROM_IMG_ID            "XNLX"
 #define BOOTROM_ENCRYPTED_EFUSE   0xA5C3C5A3
-#define BOOTROM_ENCRYPTED_OEFUSE  0xA5C3C5A7 /* obfuscated keu in eFUSE */
+#define BOOTROM_ENCRYPTED_OEFUSE  0xA5C3C5A7 /* obfuscated key in eFUSE */
 #define BOOTROM_ENCRYPTED_RAMKEY  0x3A5C3C5A /* bram */
 #define BOOTROM_ENCRYPTED_OBHDR   0xA35C7CA5 /* obfuscated key in boot hdr */
 #define BOOTROM_ENCRYPTED_NONE    0x00000000 /* anything but efuse, ramkey*/
