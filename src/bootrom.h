@@ -180,6 +180,7 @@ typedef struct linux_image_header_t {
 
 /* The same defines as above but for zynqmp */
 #define BOOTROM_PART_HDR_OFF_ZMP  0x00000a00
+#define BOOTROM_BINS_OFF_ZMP      0x00000b40
 
 /* values from the documentation */
 #define BOOTROM_WIDTH_DETECT      0xAA995566
@@ -237,17 +238,20 @@ typedef struct bootrom_offs_t {
   uint32_t *hoff; /* partition header table offset */
 
   /* offsets used as regular values */
-  uint32_t phoff; /* partition header offset */
+  uint32_t img_hdr_off;
+  uint32_t part_hdr_off;
+  uint32_t part_hdr_end_off;
+  uint32_t bins_off;
 } bootrom_offs_t;
 
 /* bootrom operations */
 typedef struct bootrom_ops_t {
-  /* Initialize the main bootrom header */
-  int (*init_header)(bootrom_hdr_t*);
-
   /* Initialize offsets - image pointer should be
    * set before this one is called */
   int (*init_offs)(uint32_t*, bootrom_offs_t*);
+
+  /* Initialize the main bootrom header */
+  int (*init_header)(bootrom_hdr_t*, bootrom_offs_t*);
 
   /* Set the cpu that the file is going to run on */
   /* TODO support passing target CPU as param? */

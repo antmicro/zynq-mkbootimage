@@ -314,6 +314,8 @@ uint32_t estimate_boot_image_size(bif_cfg_t *bif_cfg)
   uint32_t estimated_size;
   struct stat st_file;
 
+  /* TODO the offset used hereshould be more
+   * dependent on the target architecture */
   estimated_size = BOOTROM_BINS_OFF;
 
   for (i = 0; i < bif_cfg->nodes_num; i++) {
@@ -364,7 +366,7 @@ int create_boot_image(uint32_t *img_ptr,
   bops->init_offs(img_ptr, &offs);
 
   /* Initialize header */
-  bops->init_header(&hdr);
+  bops->init_header(&hdr, &offs);
 
   /* Iterate through the images and write them */
   for (i = 0, f = 0; i < bif_cfg->nodes_num; i++) {
@@ -489,8 +491,8 @@ int create_boot_image(uint32_t *img_ptr,
   /* Copy the image header as all the fields should be filled by now */
   memcpy(offs.hoff, &(img_hdr_tab), sizeof(img_hdr_tab));
 
-  /* Add 0xFF padding until phoff */
-  while (offs.poff - img_ptr < offs.phoff / sizeof(uint32_t)) {
+  /* Add 0xFF padding until partition header offset */
+  while (offs.poff - img_ptr < offs.part_hdr_off / sizeof(uint32_t)) {
     memset(offs.poff, 0xFF, sizeof(uint32_t));
     offs.poff++;
   }
@@ -503,8 +505,8 @@ int create_boot_image(uint32_t *img_ptr,
     offs.poff += sizeof(part_hdr[i]) / sizeof(uint32_t);
   }
 
-  /* Add 0x00 padding until BOOTROM_PART_HDR_END_OFF */
-  while (offs.poff - img_ptr < BOOTROM_PART_HDR_END_OFF / sizeof(uint32_t) ) {
+  /* Add 0x00 padding until end of partition header */
+  while ((uint32_t)(offs.poff - img_ptr) < offs.part_hdr_end_off / sizeof(uint32_t) ) {
     memset(offs.poff, 0x00, sizeof(uint32_t));
     offs.poff++;
   }
@@ -519,7 +521,7 @@ int create_boot_image(uint32_t *img_ptr,
   }
 
   /* Add 0xFF padding until BOOTROM_BINS_OFF */
-  while (offs.poff - img_ptr < BOOTROM_BINS_OFF / sizeof(uint32_t) ) {
+  while (offs.poff - img_ptr < offs.bins_off / sizeof(uint32_t) ) {
     memset(offs.poff, 0xFF, sizeof(uint32_t));
     offs.poff++;
   }

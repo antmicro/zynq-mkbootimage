@@ -70,7 +70,7 @@ int bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
     }
 
     img_hdr[i].part_hdr_off =
-      (offs->phoff / sizeof(uint32_t)) +
+      (offs->part_hdr_off / sizeof(uint32_t)) +
       (i * sizeof(bootrom_partition_hdr_t) / sizeof(uint32_t));
 
     /* Write the actual img_hdr data */
@@ -91,7 +91,7 @@ int bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   }
 
   /* Fill the partition header offset in img header */
-  img_hdr_tab->part_hdr_off = offs->phoff / sizeof(uint32_t);
+  img_hdr_tab->part_hdr_off = offs->part_hdr_off / sizeof(uint32_t);
 
   return BOOTROM_SUCCESS;
 }

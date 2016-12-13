@@ -19,16 +19,23 @@ int zynqmp_bootrom_init_offs(uint32_t *img_ptr, bootrom_offs_t *offs) {
   /* Copy the image pointer */
   offs->img_ptr = img_ptr;
 
-  /* Move the offset to reserve the space for headers */
-  offs->poff = (BOOTROM_IMG_HDR_OFF) / sizeof(uint32_t) + img_ptr;
-  offs->coff = (BOOTROM_BINS_OFF) / sizeof(uint32_t) + img_ptr;
+  /* Init constant offsets */
+  /* Common offsets */
+  offs->img_hdr_off = BOOTROM_IMG_HDR_OFF;
+  offs->part_hdr_end_off = BOOTROM_PART_HDR_END_OFF;
 
-  offs->phoff = BOOTROM_PART_HDR_OFF_ZMP;
+  /* Zynqmp specific offsets */
+  offs->part_hdr_off = BOOTROM_PART_HDR_OFF_ZMP;
+  offs->bins_off = BOOTROM_BINS_OFF_ZMP;
+
+  /* Move the offset to reserve the space for headers */
+  offs->poff = (offs->img_hdr_off) / sizeof(uint32_t) + img_ptr;
+  offs->coff = (offs->bins_off) / sizeof(uint32_t) + img_ptr;
 
   return BOOTROM_SUCCESS;
 }
 
-int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr) {
+int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
   int i;
   int ret;
 
@@ -46,8 +53,8 @@ int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr) {
 
   memset(hdr->user_defined_zynqmp_0, 0x0, sizeof(hdr->user_defined_zynqmp_0));
 
-  hdr->user_defined_zynqmp_0[10] = BOOTROM_IMG_HDR_OFF;
-  hdr->user_defined_zynqmp_0[11] = BOOTROM_PART_HDR_OFF_ZMP;
+  hdr->user_defined_zynqmp_0[10] = offs->img_hdr_off;
+  hdr->user_defined_zynqmp_0[11] = offs->part_hdr_off;
 
   memset(hdr->sec_hdr_init_vec, 0x0, sizeof(hdr->sec_hdr_init_vec));
   memset(hdr->obf_key_init_vec, 0x0, sizeof(hdr->obf_key_init_vec));
