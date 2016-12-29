@@ -117,10 +117,50 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   return BOOTROM_SUCCESS;
 }
 
+int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *hdr,
+                                 uint32_t load_addr) {
+  (void)hdr;
+  (void)load_addr;
+  return BOOTROM_SUCCESS;
+}
+
+int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *hdr,
+                           GElf_Phdr *elf_phdr) {
+  (void)hdr;
+  (void)elf_phdr;
+  return BOOTROM_SUCCESS;
+}
+
+int zynqmp_init_part_hdr_bitstream(bootrom_partition_hdr_t *hdr) {
+  (void)hdr;
+  return BOOTROM_SUCCESS;
+}
+
+int zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *hdr,
+                               linux_image_header_t *img,
+                               uint32_t load_addr) {
+  (void)hdr;
+  (void)img;
+  (void)load_addr;
+  return BOOTROM_SUCCESS;
+}
+
+int zynqmp_finish_part_hdr(bootrom_partition_hdr_t *hdr,
+                           uint32_t img_size) {
+  (void)hdr;
+  (void)img_size;
+  return BOOTROM_SUCCESS;
+}
+
 /* Define ops */
 bootrom_ops_t zynqmp_bops = {
   .init_offs = zynqmp_bootrom_init_offs,
   .init_header = zynqmp_bootrom_init_header,
   .setup_fsbl_at_curr_off = zynqmp_bootrom_setup_fsbl_at_curr_off,
-  .init_img_hdr_tab = zynqmp_bootrom_init_img_hdr_tab
+  .init_img_hdr_tab = zynqmp_bootrom_init_img_hdr_tab,
+  .init_part_hdr_default = zynqmp_init_part_hdr_default,
+  .init_part_hdr_elf = zynqmp_init_part_hdr_elf,
+  .init_part_hdr_bitstream = zynqmp_init_part_hdr_bitstream,
+  .init_part_hdr_linux = zynqmp_init_part_hdr_linux,
+  .finish_part_hdr = zynqmp_finish_part_hdr
 };

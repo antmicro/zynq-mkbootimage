@@ -1,6 +1,7 @@
 #ifndef BOOTROM_H
 #define BOOTROM_H
 
+#include <gelf.h>
 #include <bif.h>
 
 #define BOOTROM_SUCCESS 0
@@ -263,6 +264,20 @@ typedef struct bootrom_ops_t {
                           bootrom_img_hdr_t*,
                           bootrom_partition_hdr_t*,
                           bootrom_offs_t*);
+
+  /* Partition header related callbacks */
+  int (*init_part_hdr_default)(bootrom_partition_hdr_t*,
+                               uint32_t load_addr);
+  int (*init_part_hdr_elf)(bootrom_partition_hdr_t*,
+                           GElf_Phdr*);
+  int (*init_part_hdr_bitstream)(bootrom_partition_hdr_t*);
+  int (*init_part_hdr_linux)(bootrom_partition_hdr_t*,
+                             linux_image_header_t*,
+                             uint32_t load_addr);
+  /* The finish function is common for all partition types */
+  int (*finish_part_hdr)(bootrom_partition_hdr_t*,
+                         uint32_t img_size);
+
 } bootrom_ops_t;
 
 uint32_t estimate_boot_image_size(bif_cfg_t*);

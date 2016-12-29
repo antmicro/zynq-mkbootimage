@@ -91,10 +91,89 @@ int zynq_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   return BOOTROM_SUCCESS;
 }
 
+int zynq_init_part_hdr_default(bootrom_partition_hdr_t *hdr,
+                               uint32_t load_addr) {
+  /* set destination device as the only attribute */
+  hdr->attributes =
+    (0x1 << BOOTROM_PART_ATTR_DEST_DEV_OFF) | BINARY_ATTR_GENERAL;
+
+  /* No load/execution address */
+  hdr->dest_load_addr = load_addr;
+  hdr->dest_exec_addr = 0x0;
+  return BOOTROM_SUCCESS;
+}
+
+int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *hdr,
+                           GElf_Phdr *elf_phdr) {
+  /* set the load and execution address */
+  hdr->dest_load_addr = elf_phdr->p_vaddr;
+  hdr->dest_exec_addr = elf_phdr->p_vaddr;
+
+  /* set destination device as the only attribute */
+  hdr->attributes =
+    BOOTROM_PART_ATTR_DEST_DEV_PS << BOOTROM_PART_ATTR_DEST_DEV_OFF;
+
+  return BOOTROM_SUCCESS;
+}
+
+int zynq_init_part_hdr_bitstream(bootrom_partition_hdr_t *hdr) {
+  /* Set destination device as the only attribute */
+  hdr->attributes =
+    BOOTROM_PART_ATTR_DEST_DEV_PL << BOOTROM_PART_ATTR_DEST_DEV_OFF;
+
+  /* No execution address for bitstream */
+  hdr->dest_load_addr = 0x0;
+  hdr->dest_exec_addr = 0x0;
+  return BOOTROM_SUCCESS;
+}
+
+int zynq_init_part_hdr_linux(bootrom_partition_hdr_t *hdr,
+                             linux_image_header_t *img,
+                             uint32_t load_addr) {
+  if (img->type == FILE_LINUX_IMG_TYPE_UIM) {
+    hdr->attributes = BINARY_ATTR_LINUX;
+  }
+
+  if (img->type == FILE_LINUX_IMG_TYPE_URD)
+    hdr->attributes = 0x00; /* despite what the docs say */
+
+  /* set destination device attribute */
+  hdr->attributes |=
+    (BOOTROM_PART_ATTR_DEST_DEV_PS << BOOTROM_PART_ATTR_DEST_DEV_OFF);
+
+  /* No load/execution address */
+  hdr->dest_load_addr = load_addr;
+  hdr->dest_exec_addr = 0x0;
+  return BOOTROM_SUCCESS;
+}
+
+int zynq_finish_part_hdr(bootrom_partition_hdr_t *hdr, uint32_t img_size) {
+  /* The output image needs to use the actual value +1B
+   * for some reason */
+  hdr->pd_word_len = img_size + 1;
+  hdr->ed_word_len = img_size + 1;
+  hdr->total_word_len = img_size + 1;
+
+  /* Section count is always set to 1 */
+  hdr->section_count = 0x1;
+
+  /* Fill remaining fields that don't seem to be used */
+  hdr->checksum_off = 0x0;
+  hdr->cert_off = 0x0;
+  memset(hdr->reserved, 0x00, sizeof(hdr->reserved));
+
+  return BOOTROM_SUCCESS;
+}
+
 /* Define ops */
 bootrom_ops_t zynq_bops = {
   .init_offs = zynq_bootrom_init_offs,
   .init_header = zynq_bootrom_init_header,
   .setup_fsbl_at_curr_off = zynq_bootrom_setup_fsbl_at_curr_off,
-  .init_img_hdr_tab = zynq_bootrom_init_img_hdr_tab
+  .init_img_hdr_tab = zynq_bootrom_init_img_hdr_tab,
+  .init_part_hdr_default = zynq_init_part_hdr_default,
+  .init_part_hdr_elf = zynq_init_part_hdr_elf,
+  .init_part_hdr_bitstream = zynq_init_part_hdr_bitstream,
+  .init_part_hdr_linux = zynq_init_part_hdr_linux,
+  .finish_part_hdr = zynq_finish_part_hdr
 };
