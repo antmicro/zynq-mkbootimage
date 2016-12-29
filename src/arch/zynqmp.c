@@ -111,7 +111,7 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   memset(img_hdr_tab->reserved, 0x0, sizeof(img_hdr_tab->reserved));
 
   /* Recalculate the checksum */
-  img_hdr_tab->checksum = calc_checksum((uint32_t*)&img_hdr_tab,
+  img_hdr_tab->checksum = calc_checksum(&img_hdr_tab->version,
                                         &(img_hdr_tab->checksum) - 1);
 
   return BOOTROM_SUCCESS;
