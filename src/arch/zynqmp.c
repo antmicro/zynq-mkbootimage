@@ -74,10 +74,25 @@ int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
   return BOOTROM_SUCCESS;
 }
 
-int zynqmp_bootrom_set_target_cpu(bootrom_hdr_t *hdr) {
-  /* For now we always set it to arm a54 */
-  /* TODO support other CPUs */
+int zynqmp_bootrom_setup_fsbl_at_curr_off(bootrom_hdr_t* hdr,
+                                          bootrom_offs_t* offs,
+                                          uint32_t img_len) {
+  /* Update the header to point at the bootloader */
+  hdr->src_offset = (offs->coff - offs->img_ptr) * sizeof(uint32_t);
+
+  /* Zynqmp seems to round out the len to 8B */
+  while (img_len % 8)
+    img_len++;
+
+  /* Image length needs to be in words not bytes */
+  hdr->fsbl_img_len = img_len;
+  hdr->total_img_len = img_len;
+
+  /* Set target cpu */
   hdr->fsbl_target_cpu = BOOTROM_FSBL_CPU_A53_64;
+
+  /* Recalculate the checksum */
+  bootrom_calc_hdr_checksum(hdr);
 
   return BOOTROM_SUCCESS;
 }
@@ -106,6 +121,6 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
 bootrom_ops_t zynqmp_bops = {
   .init_offs = zynqmp_bootrom_init_offs,
   .init_header = zynqmp_bootrom_init_header,
-  .set_target_cpu = zynqmp_bootrom_set_target_cpu,
+  .setup_fsbl_at_curr_off = zynqmp_bootrom_setup_fsbl_at_curr_off,
   .init_img_hdr_tab = zynqmp_bootrom_init_img_hdr_tab
 };

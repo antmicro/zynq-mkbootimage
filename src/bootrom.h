@@ -253,9 +253,10 @@ typedef struct bootrom_ops_t {
   /* Initialize the main bootrom header */
   int (*init_header)(bootrom_hdr_t*, bootrom_offs_t*);
 
-  /* Set the cpu that the file is going to run on */
-  /* TODO support passing target CPU as param? */
-  int (*set_target_cpu)(bootrom_hdr_t*);
+  /* Setup bootloader at the current offset */
+  int (*setup_fsbl_at_curr_off)(bootrom_hdr_t*,
+                                bootrom_offs_t*,
+                                uint32_t img_len);
 
   /* Prepare image header table */
   int (*init_img_hdr_tab)(bootrom_img_hdr_tab_t*,

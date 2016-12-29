@@ -62,10 +62,19 @@ int zynq_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
   return BOOTROM_SUCCESS;
 }
 
-int zynq_bootrom_set_target_cpu(bootrom_hdr_t *hdr) {
-  (void) hdr;
+int zynq_bootrom_setup_fsbl_at_curr_off(bootrom_hdr_t* hdr,
+                                        bootrom_offs_t* offs,
+                                        uint32_t img_len) {
+  /* Update the header to point at the bootloader */
+  hdr->src_offset = (offs->coff - offs->img_ptr) * sizeof(uint32_t);
 
-  /* Not required for zynq */
+  /* Image length needs to be in words not bytes */
+  hdr->img_len = img_len;
+  hdr->total_img_len = hdr->img_len;
+
+  /* Recalculate the checksum */
+  bootrom_calc_hdr_checksum(hdr);
+
   return BOOTROM_SUCCESS;
 }
 
@@ -86,6 +95,6 @@ int zynq_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
 bootrom_ops_t zynq_bops = {
   .init_offs = zynq_bootrom_init_offs,
   .init_header = zynq_bootrom_init_header,
-  .set_target_cpu = zynq_bootrom_set_target_cpu,
+  .setup_fsbl_at_curr_off = zynq_bootrom_setup_fsbl_at_curr_off,
   .init_img_hdr_tab = zynq_bootrom_init_img_hdr_tab
 };

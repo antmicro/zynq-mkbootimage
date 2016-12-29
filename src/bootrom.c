@@ -406,18 +406,9 @@ int create_boot_image(uint32_t *img_ptr,
 
     /* Check if dealing with bootloader */
     if (bif_cfg->nodes[i].bootloader) {
-      /* If so - update the header to point at the correct bootloader */
-      hdr.src_offset = (offs.coff - img_ptr) * sizeof(uint32_t);
-
-      /* Image length needs to be in words not bytes */
-      hdr.img_len = part_hdr[f].pd_word_len * sizeof(uint32_t);
-      hdr.total_img_len = hdr.img_len;
-
-      /* Set target CPU */
-      bops->set_target_cpu(&hdr);
-
-      /* Recalculate the checksum */
-      bootrom_calc_hdr_checksum(&hdr);
+      bops->setup_fsbl_at_curr_off(&hdr,
+                                   &offs,
+                                   part_hdr[f].pd_word_len * sizeof(uint32_t));
     }
 
     /* Fill the offset */
