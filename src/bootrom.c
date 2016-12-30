@@ -43,10 +43,9 @@
  * The regular return value is the error code. */
 int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
   uint32_t *dest = addr;
+  uint32_t chunk, rchunk;
   uint8_t section_size;
   char section_data[255];
-  char old_val[4];
-  char new_val[4];
   char section_hdr[2];
   unsigned int i;
 
@@ -67,15 +66,15 @@ int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
     fread(&section_data, 1, section_size, bitfile);
   }
 
-  for (i = 0; i <= *img_size; i+=sizeof(old_val)) {
-    fread(&old_val, 1, sizeof(old_val), bitfile);
-    new_val[0] = old_val[3];
-    new_val[1] = old_val[2];
-    new_val[2] = old_val[1];
-    new_val[3] = old_val[0];
-    memcpy(dest, new_val, 4);
   fseek(bitfile, -1, SEEK_CUR);
   fread(img_size, 1, 4, bitfile);
+
+  *img_size = __bswap_32(*img_size);
+
+  for (i = 0; i <= *img_size; i+= sizeof(chunk)) {
+    fread(&chunk, 1, sizeof(chunk), bitfile);
+    rchunk = __bswap_32(chunk);
+    memcpy(dest, &rchunk, sizeof(rchunk));
     dest++;
   }
 
