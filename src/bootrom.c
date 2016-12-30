@@ -192,7 +192,7 @@ int append_file_to_image(uint32_t *addr,
         }
 
         /* init partition header */
-        bops->init_part_hdr_elf(part_hdr, &node, &elf_ehdr);
+        bops->init_part_hdr_elf(part_hdr, &node, &elf_phdr, &elf_ehdr);
 
         /* exit loop */
         break;

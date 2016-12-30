@@ -159,9 +159,11 @@ int zynq_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
 
 int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                            bif_node_t *node,
+                           GElf_Phdr *elf_phdr,
                            GElf_Ehdr *elf_ehdr) {
   /* Handle unused parameters warning */
   (void) node;
+  (void) elf_phdr;
 
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;

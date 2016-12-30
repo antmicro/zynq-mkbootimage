@@ -288,6 +288,7 @@ typedef struct bootrom_ops_t {
                                uint32_t load_addr);
   int (*init_part_hdr_elf)(bootrom_partition_hdr_t*,
                            bif_node_t*,
+                           GElf_Phdr*,
                            GElf_Ehdr*);
   int (*init_part_hdr_bitstream)(bootrom_partition_hdr_t*,
                                  bif_node_t*);

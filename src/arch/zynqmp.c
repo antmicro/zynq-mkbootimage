@@ -245,6 +245,7 @@ int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
 
 int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                              bif_node_t *node,
+                             GElf_Phdr *elf_phdr,
                              GElf_Ehdr *elf_ehdr) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
@@ -253,6 +254,10 @@ int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
   /* Set the load and execution address */
   hdr->dest_load_addr_lo = elf_ehdr->e_entry;
   hdr->dest_exec_addr_lo = elf_ehdr->e_entry;
+
+  hdr->pd_len = elf_phdr->p_filesz / 4;
+  hdr->ed_len = elf_phdr->p_filesz / 4;
+  hdr->total_len = elf_phdr->p_filesz / 4;
 
   /* Set destination device as the only attribute */
   hdr->attributes = zynqmp_calc_part_hdr_attr(node);
@@ -311,11 +316,15 @@ int zynqmp_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
   bootrom_partition_hdr_zynqmp_t *hdr;
   hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
 
-  /* The output image needs to use the actual value +2B
-   * for some reason */
-  hdr->pd_len = img_size + 2;
-  hdr->ed_len = img_size + 2;
-  hdr->total_len = img_size + 2;
+  /* Set lengths to basic img_len if not set earlier */
+  if (hdr->pd_len == 0)
+    hdr->pd_len = img_size;
+
+  if (hdr->ed_len == 0)
+    hdr->ed_len = img_size;
+
+  if (hdr->total_len == 0)
+    hdr->total_len = img_size;
 
   /* Fill remaining fields that don't seem to be used */
   hdr->checksum_off = 0x0;
