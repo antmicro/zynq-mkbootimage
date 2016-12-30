@@ -177,7 +177,7 @@ int append_file_to_image(uint32_t *addr,
       }
 
       /* check if the current one has executable flag set */
-      if (elf_phdr.p_flags & PF_X) {
+      if (elf_phdr.p_type & PT_LOAD) {
         /* this is the one - prepare file for reading */
         fseek(cfile, elf_phdr.p_offset, SEEK_SET);
 
