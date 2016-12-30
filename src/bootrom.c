@@ -89,6 +89,7 @@ int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
  * The regular return value is the error code. */
 int append_file_to_image(uint32_t *addr,
                          bootrom_ops_t *bops,
+                         bootrom_offs_t *offs,
                          bif_node_t node,
                          bootrom_partition_hdr_t *part_hdr,
                          uint32_t *img_size) {
@@ -99,9 +100,13 @@ int append_file_to_image(uint32_t *addr,
   int fd_elf;
   size_t elf_hdr_n;
   GElf_Phdr elf_phdr;
+  GElf_Ehdr elf_ehdr;
   linux_image_header_t linux_img;
   int ret;
   unsigned int i;
+
+  /* Initialize header with zeroes */
+  memset(part_hdr, 0x0, sizeof(*part_hdr));
 
   *img_size = 0;
 
@@ -122,8 +127,6 @@ int append_file_to_image(uint32_t *addr,
 
   /* Check file format */
   fread(&file_header, 1, sizeof(file_header), cfile);
-
-  printf("processing: %s\n", node.fname);
 
   switch(file_header) {
   case FILE_MAGIC_ELF:
@@ -184,8 +187,15 @@ int append_file_to_image(uint32_t *addr,
         /* append the data */
         *img_size = fread(addr, 1, elf_phdr.p_filesz, cfile);
 
+        if(gelf_getehdr(elf, &elf_ehdr) != &elf_ehdr) {
+          fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
+          /* Close the file */
+          fclose(cfile);
+          return -BOOTROM_ERROR_ELF;
+        }
+
         /* init partition header */
-        bops->init_part_hdr_elf(part_hdr, &elf_phdr);
+        bops->init_part_hdr_elf(part_hdr, &node, &elf_ehdr);
 
         /* exit loop */
         break;
@@ -213,7 +223,7 @@ int append_file_to_image(uint32_t *addr,
     }
 
     /* init partition header */
-    bops->init_part_hdr_bitstream(part_hdr);
+    bops->init_part_hdr_bitstream(part_hdr, &node);
 
     break;
   case FILE_MAGIC_LINUX:
@@ -224,7 +234,7 @@ int append_file_to_image(uint32_t *addr,
     *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
 
     /* Init partition header */
-    bops->init_part_hdr_linux(part_hdr, &linux_img, node.load);
+    bops->init_part_hdr_linux(part_hdr, &node, &linux_img, node.load);
 
     break;
   default: /* Treat as a binary file */
@@ -232,7 +242,7 @@ int append_file_to_image(uint32_t *addr,
     fseek(cfile, 0, SEEK_SET);
     *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
 
-    bops->init_part_hdr_default(part_hdr, node.load);
+    bops->init_part_hdr_default(part_hdr, &node, node.load);
   };
 
   /* remove trailing zeroes */
@@ -252,7 +262,7 @@ int append_file_to_image(uint32_t *addr,
   }
 
   /* Finish partition header */
-  bops->finish_part_hdr(part_hdr, *img_size);
+  bops->finish_part_hdr(part_hdr, *img_size, offs);
 
   /* Add 0xFF padding */
   while (*img_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
@@ -356,6 +366,7 @@ int create_boot_image(uint32_t *img_ptr,
     /* Append file content to memory */
     ret = append_file_to_image(offs.coff,
                                bops,
+                               &offs,
                                bif_cfg->nodes[i],
                                &(part_hdr[f]),
                                &img_size);
@@ -368,15 +379,12 @@ int create_boot_image(uint32_t *img_ptr,
     if (bif_cfg->nodes[i].bootloader) {
       bops->setup_fsbl_at_curr_off(&hdr,
                                    &offs,
-                                   part_hdr[f].pd_word_len * sizeof(uint32_t));
+                                   part_hdr[f].pd_len * sizeof(uint32_t));
     }
-
-    /* Fill the offset */
-    part_hdr[f].data_off = (offs.coff - img_ptr);
 
     /* Update the offset, skip padding for the last image */
     if (i == bif_cfg->nodes_num - 1) {
-      offs.coff += part_hdr[f].pd_word_len;
+      offs.coff += part_hdr[f].pd_len;
     } else {
       offs.coff += img_size;
     }

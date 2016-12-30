@@ -90,22 +90,11 @@ typedef struct bootrom_img_hdr_tab_t {
 /* BootROM partition header based on ug821 */
 /* All offsets are relative to the start of the boot image */
 typedef struct bootrom_partition_hdr_t {
-  uint32_t pd_word_len; /* encrypted partiton data length */
-  uint32_t ed_word_len; /* unecrypted data length */
-  uint32_t total_word_len; /* total encrypted,padding,expansion, auth length */
+  uint32_t pd_len;
+  uint32_t ed_len;
+  uint32_t total_len;
 
-  uint32_t dest_load_addr; /* RAM addr where the part will be loaded */
-  uint32_t dest_exec_addr;
-
-  uint32_t data_off;
-  uint32_t attributes;
-  uint32_t section_count;
-
-  uint32_t checksum_off;
-  uint32_t img_hdr_off;
-  uint32_t cert_off;
-
-  uint32_t reserved[4]; /* set to 0 */
+  uint32_t arch_specific[12];
 
   uint32_t checksum;
 } bootrom_partition_hdr_t;
@@ -295,17 +284,21 @@ typedef struct bootrom_ops_t {
 
   /* Partition header related callbacks */
   int (*init_part_hdr_default)(bootrom_partition_hdr_t*,
+                               bif_node_t*,
                                uint32_t load_addr);
   int (*init_part_hdr_elf)(bootrom_partition_hdr_t*,
-                           GElf_Phdr*);
-  int (*init_part_hdr_bitstream)(bootrom_partition_hdr_t*);
+                           bif_node_t*,
+                           GElf_Ehdr*);
+  int (*init_part_hdr_bitstream)(bootrom_partition_hdr_t*,
+                                 bif_node_t*);
   int (*init_part_hdr_linux)(bootrom_partition_hdr_t*,
+                             bif_node_t*,
                              linux_image_header_t*,
                              uint32_t load_addr);
   /* The finish function is common for all partition types */
   int (*finish_part_hdr)(bootrom_partition_hdr_t*,
-                         uint32_t img_size);
-
+                         uint32_t img_size,
+                         bootrom_offs_t*);
 } bootrom_ops_t;
 
 uint32_t estimate_boot_image_size(bif_cfg_t*);
