@@ -32,6 +32,7 @@
 #include <gelf.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <byteswap.h>
 
 #include <bif.h>
 #include <bootrom.h>
@@ -66,11 +67,6 @@ int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
     fread(&section_data, 1, section_size, bitfile);
   }
 
-  fread(img_size, 1, 3, bitfile);
-  *img_size = ((*img_size >> 16) & 0xFF) |
-               (*img_size & 0xFF00) |
-               ((*img_size << 16) & 0xFF0000);
-
   for (i = 0; i <= *img_size; i+=sizeof(old_val)) {
     fread(&old_val, 1, sizeof(old_val), bitfile);
     new_val[0] = old_val[3];
@@ -78,6 +74,8 @@ int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
     new_val[2] = old_val[1];
     new_val[3] = old_val[0];
     memcpy(dest, new_val, 4);
+  fseek(bitfile, -1, SEEK_CUR);
+  fread(img_size, 1, 4, bitfile);
     dest++;
   }
 
