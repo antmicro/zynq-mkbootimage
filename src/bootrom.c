@@ -445,6 +445,14 @@ int create_boot_image(uint32_t *img_ptr,
     offs.poff++;
   }
 
+  /* Add null partition at the end */
+  if (bops->append_null_part) {
+    bootrom_partition_hdr_t *null_hdr = &part_hdr[img_hdr_tab.hdrs_count++];
+
+    memset(null_hdr, 0x0, sizeof(bootrom_partition_hdr_t));
+    null_hdr->checksum = 0xffffffff;
+  }
+
   /* Write the partition headers */
   for (i = 0; i < img_hdr_tab.hdrs_count; i++) {
     memcpy(offs.poff, &(part_hdr[i]), sizeof(part_hdr[i]));

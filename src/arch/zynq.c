@@ -263,5 +263,6 @@ bootrom_ops_t zynq_bops = {
   .init_part_hdr_elf = zynq_init_part_hdr_elf,
   .init_part_hdr_bitstream = zynq_init_part_hdr_bitstream,
   .init_part_hdr_linux = zynq_init_part_hdr_linux,
-  .finish_part_hdr = zynq_finish_part_hdr
+  .finish_part_hdr = zynq_finish_part_hdr,
+  .append_null_part = 0 /* Zynq does not use null part */
 };

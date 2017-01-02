@@ -300,6 +300,9 @@ typedef struct bootrom_ops_t {
   int (*finish_part_hdr)(bootrom_partition_hdr_t*,
                          uint32_t img_size,
                          bootrom_offs_t*);
+
+  /* Some archs require a null partition at the end */
+  uint8_t append_null_part;
 } bootrom_ops_t;
 
 uint32_t estimate_boot_image_size(bif_cfg_t*);

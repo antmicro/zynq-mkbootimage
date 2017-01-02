@@ -348,5 +348,6 @@ bootrom_ops_t zynqmp_bops = {
   .init_part_hdr_elf = zynqmp_init_part_hdr_elf,
   .init_part_hdr_bitstream = zynqmp_init_part_hdr_bitstream,
   .init_part_hdr_linux = zynqmp_init_part_hdr_linux,
-  .finish_part_hdr = zynqmp_finish_part_hdr
+  .finish_part_hdr = zynqmp_finish_part_hdr,
+  .append_null_part = 1 /* yes */
 };
