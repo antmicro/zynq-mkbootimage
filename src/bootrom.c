@@ -95,9 +95,10 @@ int append_file_to_image(uint32_t *addr,
   FILE *cfile;
   Elf *elf;
   int fd_elf;
-  size_t elf_hdr_n;
-  GElf_Phdr elf_phdr;
+  Elf_Scn *elf_scn;
+  GElf_Shdr elf_shdr;
   GElf_Ehdr elf_ehdr;
+  uint32_t elf_start;
   linux_image_header_t linux_img;
   int ret;
   unsigned int i;
@@ -159,46 +160,37 @@ int append_file_to_image(uint32_t *addr,
       return -BOOTROM_ERROR_ELF;
     }
 
-    /* get elf headers count */
-    if(elf_getphdrnum(elf, &elf_hdr_n)!= 0) {
+    elf_scn = NULL;
+    elf_start = 0;
+    while ((elf_scn = elf_nextscn(elf, elf_scn)) != NULL) {
+      if (gelf_getshdr(elf_scn, &elf_shdr) != &elf_shdr)
+        printf("err\n");
+
+      if (elf_start == 0)
+        elf_start = elf_shdr.sh_offset;
+
+      if (elf_shdr.sh_type == SHT_NOBITS || !(elf_shdr.sh_flags & SHF_ALLOC)) {
+        /* Set the final size */
+        *img_size = elf_shdr.sh_offset - elf_start;
+        break;
+      }
+    }
+
+    if(gelf_getehdr(elf, &elf_ehdr) != &elf_ehdr) {
       fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
       /* Close the file */
       fclose(cfile);
       return -BOOTROM_ERROR_ELF;
     }
 
-    /* iterate through all headers to find the executable */
-    for(i = 0; i < elf_hdr_n; i ++) {
-      if(gelf_getphdr(elf, i, &elf_phdr) != &elf_phdr) {
-        fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
-        /* Close the file */
-        fclose(cfile);
-        return -BOOTROM_ERROR_ELF;
-      }
+    /* Read the actual content of the file */
+    fseek(cfile, elf_start, SEEK_SET);
+    *img_size = fread(addr, 1, *img_size, cfile);
 
-      /* check if the current one has executable flag set */
-      if (elf_phdr.p_type & PT_LOAD) {
-        /* this is the one - prepare file for reading */
-        fseek(cfile, elf_phdr.p_offset, SEEK_SET);
+    /* Init partition header */
+    bops->init_part_hdr_elf(part_hdr, &node, *img_size, elf_ehdr.e_entry);
 
-        /* append the data */
-        *img_size = fread(addr, 1, elf_phdr.p_filesz, cfile);
-
-        if(gelf_getehdr(elf, &elf_ehdr) != &elf_ehdr) {
-          fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
-          /* Close the file */
-          fclose(cfile);
-          return -BOOTROM_ERROR_ELF;
-        }
-
-        /* init partition header */
-        bops->init_part_hdr_elf(part_hdr, &node, &elf_phdr, &elf_ehdr);
-
-        /* exit loop */
-        break;
-      }
-    }
-    /* close the elf file descriptor */
+    /* Close the elf file descriptor */
     elf_end(elf);
     close(fd_elf);
 

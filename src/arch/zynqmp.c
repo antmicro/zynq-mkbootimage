@@ -4,7 +4,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <gelf.h>
 #include <unistd.h>
 #include <libgen.h>
 
@@ -245,19 +244,20 @@ int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
 
 int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                              bif_node_t *node,
-                             GElf_Phdr *elf_phdr,
-                             GElf_Ehdr *elf_ehdr) {
+                             uint32_t size,
+                             uint32_t entry) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
   hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
 
   /* Set the load and execution address */
-  hdr->dest_load_addr_lo = elf_ehdr->e_entry;
-  hdr->dest_exec_addr_lo = elf_ehdr->e_entry;
+  hdr->dest_load_addr_lo = entry;
+  hdr->dest_exec_addr_lo = entry;
 
-  hdr->pd_len = elf_phdr->p_filesz / 4;
-  hdr->ed_len = elf_phdr->p_filesz / 4;
-  hdr->total_len = elf_phdr->p_filesz / 4;
+  /* Set sizes (in words) */
+  hdr->pd_len = size / 4;
+  hdr->ed_len = size / 4;
+  hdr->total_len = size / 4;
 
   /* Set destination device as the only attribute */
   hdr->attributes = zynqmp_calc_part_hdr_attr(node);
