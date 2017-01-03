@@ -19,11 +19,8 @@ int zynqmp_bootrom_init_offs(uint32_t *img_ptr, bootrom_offs_t *offs) {
   offs->img_ptr = img_ptr;
 
   /* Init constant offsets */
-  /* Common offsets */
   offs->img_hdr_off = BOOTROM_IMG_HDR_OFF;
-  offs->part_hdr_end_off = BOOTROM_PART_HDR_END_OFF;
-
-  /* Zynqmp specific offsets */
+  offs->part_hdr_end_off = 0; /* Not needed by zynqmp */
   offs->part_hdr_off = BOOTROM_PART_HDR_OFF_ZMP;
   offs->bins_off = BOOTROM_BINS_OFF_ZMP;
 

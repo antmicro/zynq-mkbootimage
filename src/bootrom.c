@@ -462,14 +462,15 @@ int create_boot_image(uint32_t *img_ptr,
   }
 
   /* Add 0x00 padding until end of partition header */
-  while ((uint32_t)(offs.poff - img_ptr) < offs.part_hdr_end_off / sizeof(uint32_t) ) {
+  while ((uint32_t)(offs.poff - img_ptr) < offs.part_hdr_end_off / sizeof(uint32_t)) {
     memset(offs.poff, 0x00, sizeof(uint32_t));
     offs.poff++;
   }
 
-  /* Add 0x00 terminators after partition header
-   * if there are more than 3 images */
-  if (bif_cfg->nodes_num > 3) {
+  /* Add 0x00 terminators after partition header if there are more
+   * than 3 images and we did not reach binaries offset yet */
+  if (bif_cfg->nodes_num > 3
+      && ((uint32_t)(offs.poff - img_ptr) < offs.bins_off / sizeof(uint32_t))) {
     for (i = 0; i < 15; ++i) {
       memset(offs.poff, 0x00, sizeof(uint32_t));
       offs.poff++;
