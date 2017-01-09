@@ -171,7 +171,7 @@ int append_file_to_image(uint32_t *addr,
 
       if (elf_shdr.sh_type == SHT_NOBITS || !(elf_shdr.sh_flags & SHF_ALLOC)) {
         /* Set the final size */
-        *img_size = elf_shdr.sh_offset - elf_start;
+        *img_size = elf_shdr.sh_offset - elf_start + 1;
         break;
       }
     }
