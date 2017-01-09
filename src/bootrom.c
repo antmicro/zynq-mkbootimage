@@ -69,7 +69,7 @@ int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
   fseek(bitfile, -1, SEEK_CUR);
   fread(img_size, 1, 4, bitfile);
 
-  *img_size = __bswap_32(*img_size);
+  *img_size = __bswap_32(*img_size) + 1;
 
   for (i = 0; i <= *img_size; i+= sizeof(chunk)) {
     fread(&chunk, 1, sizeof(chunk), bitfile);
