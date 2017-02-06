@@ -253,13 +253,7 @@ int append_file_to_image(uint32_t *addr,
   }
 
   /* Finish partition header */
-  bops->finish_part_hdr(part_hdr, *img_size, offs);
-
-  /* Add 0xFF padding */
-  while (*img_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
-    (*img_size)++;
-    memset(addr + (*img_size), 0xFF, sizeof(uint32_t));
-  }
+  bops->finish_part_hdr(part_hdr, img_size, offs);
 
   /* Close the file */
   fclose(cfile);

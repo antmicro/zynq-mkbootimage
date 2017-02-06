@@ -298,7 +298,7 @@ typedef struct bootrom_ops_t {
                              uint32_t load_addr);
   /* The finish function is common for all partition types */
   int (*finish_part_hdr)(bootrom_partition_hdr_t*,
-                         uint32_t img_size,
+                         uint32_t *img_size,
                          bootrom_offs_t*);
 
   /* Some archs require a null partition at the end */

@@ -309,7 +309,7 @@ int zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
 }
 
 int zynqmp_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
-                           uint32_t img_size,
+                           uint32_t *img_size,
                            bootrom_offs_t *offs) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
@@ -317,13 +317,13 @@ int zynqmp_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
 
   /* Set lengths to basic img_len if not set earlier */
   if (hdr->pd_len == 0)
-    hdr->pd_len = img_size;
+    hdr->pd_len = *img_size;
 
   if (hdr->ed_len == 0)
-    hdr->ed_len = img_size;
+    hdr->ed_len = *img_size;
 
   if (hdr->total_len == 0)
-    hdr->total_len = img_size;
+    hdr->total_len = *img_size;
 
   /* Fill remaining fields that don't seem to be used */
   hdr->checksum_off = 0x0;
@@ -333,6 +333,12 @@ int zynqmp_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
 
   hdr->next_part_hdr_off = 0x0;
   hdr->actual_part_off = (offs->coff - offs->img_ptr);
+
+  /* Add 0xFF padding */
+  while (*img_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
+    memset(offs->coff + (*img_size), 0xFF, sizeof(uint32_t));
+    (*img_size)++;
+  }
 
   return BOOTROM_SUCCESS;
 }

@@ -227,7 +227,7 @@ int zynq_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
 }
 
 int zynq_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
-                         uint32_t img_size,
+                         uint32_t *img_size,
                          bootrom_offs_t *offs) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;
@@ -235,9 +235,9 @@ int zynq_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
 
   /* The output image needs to use the actual value +1B
    * for some reason */
-  hdr->pd_len = img_size + 1;
-  hdr->ed_len = img_size + 1;
-  hdr->total_len = img_size + 1;
+  hdr->pd_len = *img_size + 1;
+  hdr->ed_len = *img_size + 1;
+  hdr->total_len = *img_size + 1;
 
   /* Section count is always set to 1 */
   hdr->section_count = 0x1;
@@ -249,6 +249,12 @@ int zynq_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
 
   /* Fill the offset */
   hdr->data_off = (offs->coff - offs->img_ptr);
+
+  /* Add 0xFF padding */
+  while (*img_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
+    (*img_size)++;
+    memset(offs->coff + (*img_size), 0xFF, sizeof(uint32_t));
+  }
 
   return BOOTROM_SUCCESS;
 }
