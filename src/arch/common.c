@@ -6,8 +6,6 @@
 #include <common.h>
 #include <arch/common.h>
 
-/* This calculates the checksum up to (and including) end_addr */
-
 int bootrom_init_header(bootrom_hdr_t *hdr) {
   unsigned int i = 0;
   for (i = 0; i < sizeof(hdr->interrupt_table); i++) {
