@@ -163,8 +163,10 @@ int append_file_to_image(uint32_t *addr,
     elf_scn = NULL;
     elf_start = 0;
     while ((elf_scn = elf_nextscn(elf, elf_scn)) != NULL) {
-      if (gelf_getshdr(elf_scn, &elf_shdr) != &elf_shdr)
-        printf("err\n");
+      if (gelf_getshdr(elf_scn, &elf_shdr) != &elf_shdr) {
+        fprintf(stderr, "Could not get elf section header\n");
+        continue;
+      }
 
       if (elf_start == 0)
         elf_start = elf_shdr.sh_offset;
