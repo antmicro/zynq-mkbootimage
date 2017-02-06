@@ -241,7 +241,7 @@ int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
 
 int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                              bif_node_t *node,
-                             uint32_t size,
+                             uint32_t *size,
                              uint32_t entry) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
@@ -251,10 +251,12 @@ int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
   hdr->dest_load_addr_lo = entry;
   hdr->dest_exec_addr_lo = entry;
 
+  /* zynqmp requires the actual size + 1 */
+  (*size)++;
   /* Set sizes (in words) */
-  hdr->pd_len = size / 4;
-  hdr->ed_len = size / 4;
-  hdr->total_len = size / 4;
+  hdr->pd_len = *size / 4;
+  hdr->ed_len = *size / 4;
+  hdr->total_len = *size / 4;
 
   /* Set destination device as the only attribute */
   hdr->attributes = zynqmp_calc_part_hdr_attr(node);

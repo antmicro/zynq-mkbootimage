@@ -171,7 +171,7 @@ int append_file_to_image(uint32_t *addr,
 
       if (elf_shdr.sh_type == SHT_NOBITS || !(elf_shdr.sh_flags & SHF_ALLOC)) {
         /* Set the final size */
-        *img_size = elf_shdr.sh_offset - elf_start + 1;
+        *img_size = elf_shdr.sh_offset - elf_start;
         break;
       }
     }
@@ -183,12 +183,12 @@ int append_file_to_image(uint32_t *addr,
       return -BOOTROM_ERROR_ELF;
     }
 
+    /* Init partition header */
+    bops->init_part_hdr_elf(part_hdr, &node, img_size, elf_ehdr.e_entry);
+
     /* Read the actual content of the file */
     fseek(cfile, elf_start, SEEK_SET);
     *img_size = fread(addr, 1, *img_size, cfile);
-
-    /* Init partition header */
-    bops->init_part_hdr_elf(part_hdr, &node, *img_size, elf_ehdr.e_entry);
 
     /* Close the elf file descriptor */
     elf_end(elf);

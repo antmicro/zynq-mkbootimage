@@ -159,7 +159,7 @@ int zynq_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
 
 int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                            bif_node_t *node,
-                           uint32_t size,
+                           uint32_t *size,
                            uint32_t entry) {
   /* Handle unused parameters warning */
   (void) node;
