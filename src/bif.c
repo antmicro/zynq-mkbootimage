@@ -28,21 +28,29 @@
 #include <stdint.h>
 #include <string.h>
 #include <pcre.h>
+#include <errno.h>
 
 #include <bif.h>
 
 int init_bif_cfg(bif_cfg_t *cfg) {
+  /* Initially setup 8 nodes */
   cfg->nodes_num = 0;
-  cfg->nodes_avail = BIF_MAX_NODES_NUM;
-  /* TODO make it dynamic */
+  cfg->nodes_avail = 8;
+
+  /* Alloc memory for it */
+  cfg->nodes = malloc(sizeof (bif_node_t) * cfg->nodes_avail);
+  if (!cfg->nodes) {
+    return -ENOMEM;
+  }
 
   return BIF_SUCCESS;
 }
 
 int deinit_bif_cfg(bif_cfg_t *cfg) {
   cfg->nodes_num = 0;
-  cfg->nodes_avail = BIF_MAX_NODES_NUM;
-  /* TODO make it dynamic */
+  cfg->nodes_avail = 0;
+
+  free(cfg->nodes);
 
   return BIF_SUCCESS;
 }
@@ -233,9 +241,13 @@ int bif_node_set_attr(bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *v
 }
 
 int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
-  /* TODO check node availability */
   uint16_t pos;
   bif_node_t tmp_node;
+
+  /* Check if initialized */
+  if (cfg->nodes_avail == 0) {
+    return BIF_ERROR_UNINITIALIZED;
+  }
 
   pos = cfg->nodes_num;
   cfg->nodes[pos] = *node;
@@ -259,5 +271,14 @@ int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
   }
 
   (cfg->nodes_num)++;
+
+  /* Allocate more space if needed */
+  if (cfg->nodes_num >= cfg->nodes_avail) {
+    cfg->nodes_avail *= 2;
+    cfg->nodes = realloc(cfg->nodes, sizeof (bif_node_t) * cfg->nodes_avail);
+    if (!cfg->nodes) {
+      return -ENOMEM;
+    }
+  }
   return BIF_SUCCESS;
 }

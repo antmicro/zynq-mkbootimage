@@ -308,8 +308,8 @@ int create_boot_image(uint32_t *img_ptr,
   int img_term_n = 0;
   uint8_t img_name[BOOTROM_IMG_MAX_NAME_LEN];
 
-  bootrom_partition_hdr_t part_hdr[BIF_MAX_NODES_NUM];
-  bootrom_img_hdr_t img_hdr[BIF_MAX_NODES_NUM];
+  bootrom_partition_hdr_t part_hdr[bif_cfg->nodes_num];
+  bootrom_img_hdr_t img_hdr[bif_cfg->nodes_num];
   uint32_t img_size;
 
   bootrom_img_hdr_tab_t img_hdr_tab;

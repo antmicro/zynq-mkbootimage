@@ -6,12 +6,11 @@
 #include <string.h>
 #include <linux/limits.h>
 
-#define BIF_MAX_NODES_NUM 10
-
 #define BIF_SUCCESS                0
 #define BIF_ERROR_NOFILE           1
 #define BIF_ERROR_PARSER           2
 #define BIF_ERROR_UNSUPORTED_ATTR  3
+#define BIF_ERROR_UNINITIALIZED    4
 
 #define BIF_ARCH_ZYNQ              (1 << 0)
 #define BIF_ARCH_ZYNQMP            (1 << 1)
@@ -40,7 +39,7 @@ typedef struct bif_cfg_t {
   uint16_t nodes_num;
   uint16_t nodes_avail;
 
-  bif_node_t nodes[BIF_MAX_NODES_NUM]; /* TODO make it dynamic */
+  bif_node_t *nodes;
 } bif_cfg_t;
 
 int init_bif_cfg(bif_cfg_t *cfg);
