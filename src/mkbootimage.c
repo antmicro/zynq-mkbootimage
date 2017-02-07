@@ -142,6 +142,9 @@ int main(int argc, char *argv[]) {
 
   /* Allocate memory for output image */
   file_data = malloc(sizeof *file_data * esize_aligned);
+  if (!file_data) {
+    return -ENOMEM;
+  }
 
   /* Generate bin file */
   ret = create_boot_image(file_data, &cfg, bops, &ofile_size);

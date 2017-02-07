@@ -72,6 +72,9 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
 
   /* allocate memory and read the whole file */
   bif_content = malloc(bif_size + 1);
+  if (!bif_content) {
+    return -ENOMEM;
+  }
   fread(bif_content, bif_size, 1, bif_file);
 
   /* Find the beginning and the end */
@@ -88,6 +91,10 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
 
   /* extract the actual config */
   char *bif_cfg = malloc(sizeof *bif_cfg * (end-beg));
+  if (!bif_cfg) {
+    free(bif_content);
+    return -ENOMEM;
+  }
   memcpy(bif_cfg, beg+1, end-beg-1);
   bif_cfg[end - beg - 1] = '\0';
 
@@ -188,6 +195,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
   } while (ret >3);
 
 
+  free(bif_cfg);
   free(bif_content);
   fclose(bif_file);
 
