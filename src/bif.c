@@ -164,8 +164,15 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
     } while (aret > 3);
 
     /* set filename of the node */
-    memcpy(node.fname, bif_cfg + ovec[6], ovec[7] - ovec[6]);
-    node.fname[ovec[7] - ovec[6]] = '\0';
+    if (ovec[7] - ovec[6] < PATH_MAX) {
+      memcpy(node.fname, bif_cfg + ovec[6], ovec[7] - ovec[6]);
+      node.fname[ovec[7] - ovec[6]] = '\0';
+    } else {
+      fprintf(stderr,
+              "File path too long, maximum supported on your system is %d",
+              PATH_MAX);
+      return BIF_ERROR_PARSER;
+    }
 
     bif_cfg_add_node(cfg, &node);
 

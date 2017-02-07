@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <linux/limits.h>
 
 #define BIF_MAX_NODES_NUM 10
 
@@ -16,7 +17,7 @@
 #define BIF_ARCH_ZYNQMP            (1 << 1)
 
 typedef struct bif_node_t {
-  char fname[300]; /* TODO should be dynamic */
+  char fname[PATH_MAX];
 
   /* supported common attributes */
   uint8_t bootloader; /* boolean */
@@ -34,8 +35,6 @@ typedef struct bif_node_t {
 } bif_node_t;
 
 typedef struct bif_cfg_t {
-  char name[300]; /* TODO Shoud be dynamic */
-
   uint8_t arch;
 
   uint16_t nodes_num;
