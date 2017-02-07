@@ -16,7 +16,7 @@ MKBOOTIMAGE_INCLUDE_DIRS:=src
 
 CFLAGS += $(foreach includedir,$(MKBOOTIMAGE_INCLUDE_DIRS),-I$(includedir)) \
 	-DMKBOOTIMAGE_VER="\"$(VERSION)\"" \
-	-lpcre -lelf -Wall -Wextra
+	-lpcre -lelf -Wall -Wextra -Wpedantic
 
 all: $(MKBOOTIMAGE_NAME)
 
