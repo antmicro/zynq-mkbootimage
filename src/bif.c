@@ -28,21 +28,29 @@
 #include <stdint.h>
 #include <string.h>
 #include <pcre.h>
+#include <errno.h>
 
-#include "bif.h"
+#include <bif.h>
 
 int init_bif_cfg(bif_cfg_t *cfg) {
+  /* Initially setup 8 nodes */
   cfg->nodes_num = 0;
-  cfg->nodes_avail = BIF_MAX_NODES_NUM;
-  /* TODO make it dynamic */
+  cfg->nodes_avail = 8;
+
+  /* Alloc memory for it */
+  cfg->nodes = malloc(sizeof (bif_node_t) * cfg->nodes_avail);
+  if (!cfg->nodes) {
+    return -ENOMEM;
+  }
 
   return BIF_SUCCESS;
 }
 
 int deinit_bif_cfg(bif_cfg_t *cfg) {
   cfg->nodes_num = 0;
-  cfg->nodes_avail = BIF_MAX_NODES_NUM;
-  /* TODO make it dynamic */
+  cfg->nodes_avail = 0;
+
+  free(cfg->nodes);
 
   return BIF_SUCCESS;
 }
@@ -64,6 +72,9 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
 
   /* allocate memory and read the whole file */
   bif_content = malloc(bif_size + 1);
+  if (!bif_content) {
+    return -ENOMEM;
+  }
   fread(bif_content, bif_size, 1, bif_file);
 
   /* Find the beginning and the end */
@@ -80,11 +91,15 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
 
   /* extract the actual config */
   char *bif_cfg = malloc(sizeof *bif_cfg * (end-beg));
+  if (!bif_cfg) {
+    free(bif_content);
+    return -ENOMEM;
+  }
   memcpy(bif_cfg, beg+1, end-beg-1);
   bif_cfg[end - beg - 1] = '\0';
 
   /* First extract the name and the parameter group if exists */
-  char *pcre_regex = "\\s*(\\[(.*)\\])?([-/ a-zA-Z._0-9]+)";
+  char *pcre_regex = "\\s*(\\[(.*)\\])?\\s*([-/ a-zA-Z._0-9]+)";
   const char *pcre_err;
   int pcre_err_off;
   re = pcre_compile(pcre_regex, 0, &pcre_err, &pcre_err_off, NULL);
@@ -95,7 +110,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
 
   /* Attributes regex */
   pcre *re_attr;
-  char *pcre_attr_regex = "((\\w+)=(\\w+))+";
+  char *pcre_attr_regex = "((\\w+)=([\\w-]+))+";
   re_attr = pcre_compile(pcre_attr_regex, 0, &pcre_err, &pcre_err_off, NULL);
 
   /* TODO cleanup */
@@ -112,10 +127,16 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
   bif_node_t node;
 
   do {
+    /* Clean up node */
     strcpy(node.fname, "");
     node.offset = 0;
     node.load = 0;
     node.bootloader = 0;
+    node.fsbl_config = 0;
+    strcpy(node.destination_device, "");
+    strcpy(node.destination_cpu, "");
+    strcpy(node.exception_level, "");
+    node.is_file = 1;
 
     ret = pcre_exec(re, NULL, bif_cfg, strlen(bif_cfg), soff, 0, ovec, 30);
     if (ret < 4) {
@@ -135,7 +156,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
     do {
       aret = pcre_exec(re_attr, NULL, cattr, strlen(cattr), isoff, 0, iovec, 30);
       if (aret < 1 && isoff == 0 && strlen(cattr) > 0) {
-        attr_ret  = bif_node_set_attr(&node, cattr, NULL);
+        attr_ret  = bif_node_set_attr(cfg, &node, cattr, NULL);
 
         if (attr_ret != BIF_SUCCESS)
           return attr_ret;
@@ -149,7 +170,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
         memcpy(pattr_v, cattr + iovec[(i+1)*2], iovec[2*(i+1)+1] - iovec[2*(i+1)]);
         pattr_v[iovec[2*(i+1)+1] - iovec[2*(i+1)]] = '\0';
 
-        attr_ret = bif_node_set_attr(&node, pattr_n, pattr_v);
+        attr_ret = bif_node_set_attr(cfg, &node, pattr_n, pattr_v);
 
         if (attr_ret != BIF_SUCCESS)
           return attr_ret;
@@ -158,8 +179,15 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
     } while (aret > 3);
 
     /* set filename of the node */
-    memcpy(node.fname, bif_cfg + ovec[6], ovec[7] - ovec[6]);
-    node.fname[ovec[7] - ovec[6]] = '\0';
+    if (ovec[7] - ovec[6] < PATH_MAX) {
+      memcpy(node.fname, bif_cfg + ovec[6], ovec[7] - ovec[6]);
+      node.fname[ovec[7] - ovec[6]] = '\0';
+    } else {
+      fprintf(stderr,
+              "File path too long, maximum supported on your system is %d",
+              PATH_MAX);
+      return BIF_ERROR_PARSER;
+    }
 
     bif_cfg_add_node(cfg, &node);
 
@@ -167,13 +195,14 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
   } while (ret >3);
 
 
+  free(bif_cfg);
   free(bif_content);
   fclose(bif_file);
 
   return BIF_SUCCESS;
 }
 
-int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value) {
+int bif_node_set_attr(bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *value) {
   if (strcmp(attr_name, "bootloader") == 0) {
     node->bootloader = 0xFF;
     return BIF_SUCCESS;
@@ -189,14 +218,44 @@ int bif_node_set_attr(bif_node_t *node, char *attr_name, char *value) {
     return BIF_SUCCESS;
   }
 
+  /* Only handle these for zynqmp arch */
+  if (cfg->arch & BIF_ARCH_ZYNQMP) {
+    if (strcmp(attr_name, "fsbl_config") == 0) {
+      node->fsbl_config = 0xFF;
+
+      /* This attribute does not refer to file */
+      node->is_file = 0x00;
+      return BIF_SUCCESS;
+    }
+
+    if (strcmp(attr_name, "destination_device") == 0 ) {
+      sscanf(value, "%s", node->destination_device);
+      return BIF_SUCCESS;
+    }
+
+    if (strcmp(attr_name, "destination_cpu") == 0 ) {
+      sscanf(value, "%s", node->destination_cpu);
+      return BIF_SUCCESS;
+    }
+
+    if (strcmp(attr_name, "exception_level") == 0 ) {
+      sscanf(value, "%s", node->exception_level);
+      return BIF_SUCCESS;
+    }
+  }
+
   fprintf(stderr, "Node attribute not supported: \"%s\"\n", attr_name);
   return BIF_ERROR_UNSUPORTED_ATTR;
 }
 
 int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
-  /* TODO check node availability */
   uint16_t pos;
   bif_node_t tmp_node;
+
+  /* Check if initialized */
+  if (cfg->nodes_avail == 0) {
+    return BIF_ERROR_UNINITIALIZED;
+  }
 
   pos = cfg->nodes_num;
   cfg->nodes[pos] = *node;
@@ -220,5 +279,14 @@ int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
   }
 
   (cfg->nodes_num)++;
+
+  /* Allocate more space if needed */
+  if (cfg->nodes_num >= cfg->nodes_avail) {
+    cfg->nodes_avail *= 2;
+    cfg->nodes = realloc(cfg->nodes, sizeof (bif_node_t) * cfg->nodes_avail);
+    if (!cfg->nodes) {
+      return -ENOMEM;
+    }
+  }
   return BIF_SUCCESS;
 }

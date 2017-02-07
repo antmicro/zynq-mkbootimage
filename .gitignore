@@ -4,3 +4,6 @@ mkbootimage
 *.bit
 *.elf
 *.dtb
+*.o
+*.vim
+tags

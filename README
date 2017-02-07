@@ -11,9 +11,10 @@ To build this application run:
 make
 
 To use it, type in:
-./mkbootimage <in_bif_file> <out_bin_file>
+./mkbootimage [--zynqmp|-u] <input_bif_file> <output_bin_file>
 
-Currently it supports creating boot image containing fsbl, bitstream
+Zynq Support:
+Currently it supports creating boot image containing fsbl, bitstream,
 u-boot, and linux related binary files.
 
 For loading linux related images, both the [load] and the [offset] attributes
@@ -32,7 +33,32 @@ the_ROM_image:
   [load=0x3000000]uImage
 }
 
+Used as follows:
+./mkbootimage boot.bif boot.bin
+
 will generate a bin image which can be used in u-boot, as follows:
 bootm 0x3000000 0x2000000 0x2a00000
+
+Zynq Ultrascale+ support:
+Currently it supports creating boot image containing fsbl, bitstream,
+u-boot and the arm trusted software.
+Linux related images are not yet supported.
+
+For example the following .bif file:
+
+the_ROM_image:
+{
+  [fsbl_config] a53_x64
+  [bootloader] fsbl.elf
+  [destination_device=pl] fpga.bit
+  [, destination_cpu=a53-0, exception_level=el-2] bl31.elf
+  [, destination_cpu=a53-0, exception_level=el-2] u-boot.elf
+}
+
+Used as follows:
+./mkbootimage --zynqmp boot.bif boot.bin
+
+will generate a bin image, which can be used to successfully boot a Zynq
+Ultrascale+ machine.
 
 Encryption certificates are not supported.

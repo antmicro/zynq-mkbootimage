@@ -28,16 +28,25 @@
 #include <stdio.h>
 #include <argp.h>
 
-#include "bif.h"
-#include "bootrom.h"
+#include <bif.h>
+#include <bootrom.h>
+
+#include <arch/zynq.h>
+#include <arch/zynqmp.h>
 
 /* Prepare global variables for arg parser */
 const char *argp_program_version = MKBOOTIMAGE_VER;
 static char doc[] = "Generate bootloader images for Xilinx Zynq based platforms.";
-static char args_doc[] = "<input_bif_file> <output_bin_file>";
+static char args_doc[] = "[--zynqmp|-u] <input_bif_file> <output_bin_file>";
+
+static struct argp_option argp_options[] = {
+  {"zynqmp", 'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)", 0},
+  { 0 }
+};
 
 /* Prapare struct for holding parsed arguments */
 struct arguments {
+  uint8_t zynqmp;
   char *bif_filename;
   char *bin_filename;
 };
@@ -47,6 +56,9 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   struct arguments *arguments = state->input;
 
   switch (key) {
+  case 'u':
+    arguments->zynqmp = 0xFF;
+    break;
   case ARGP_KEY_ARG:
     switch(state->arg_num) {
     case 0:
@@ -70,7 +82,7 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
 }
 
 /* Finally initialize argp struct */
-static struct argp argp = { 0, argp_parser, args_doc, doc, 0, 0, 0 };
+static struct argp argp = {argp_options, argp_parser, args_doc, doc, 0, 0, 0 };
 
 /* Declare the main function */
 int main(int argc, char *argv[]) {
@@ -79,9 +91,13 @@ int main(int argc, char *argv[]) {
   uint32_t *file_data;
   uint32_t esize, esize_aligned;
   struct arguments arguments;
+  bootrom_ops_t *bops;
   bif_cfg_t cfg;
   int ret;
   int i;
+
+  /* Init non-string arguments */
+  arguments.zynqmp = 0;
 
   /* Parse program arguments */
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
@@ -90,6 +106,10 @@ int main(int argc, char *argv[]) {
   printf("%s\n", MKBOOTIMAGE_VER);
 
   init_bif_cfg(&cfg);
+
+  /* Give bif parser the info about arch */
+  cfg.arch = (arguments.zynqmp) ? BIF_ARCH_ZYNQMP : BIF_ARCH_ZYNQ;
+  bops = (arguments.zynqmp) ? &zynqmp_bops : &zynq_bops;
 
   ret = parse_bif(arguments.bif_filename, &cfg);
   if (ret != BIF_SUCCESS || cfg.nodes_num == 0) {
@@ -112,6 +132,8 @@ int main(int argc, char *argv[]) {
 
   /* Estimate memory required to fit all the binaries */
   esize = estimate_boot_image_size(&cfg);
+  if (!esize)
+    return EXIT_FAILURE;
 
   /* Align estimated size to powers of two */
   esize_aligned = 2;
@@ -120,9 +142,12 @@ int main(int argc, char *argv[]) {
 
   /* Allocate memory for output image */
   file_data = malloc(sizeof *file_data * esize_aligned);
+  if (!file_data) {
+    return -ENOMEM;
+  }
 
   /* Generate bin file */
-  ret = create_boot_image(file_data, &cfg, &ofile_size);
+  ret = create_boot_image(file_data, &cfg, bops, &ofile_size);
 
   if (ret != BOOTROM_SUCCESS) { /* Error */
     free(file_data);
