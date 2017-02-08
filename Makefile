@@ -18,15 +18,15 @@ CFLAGS += $(foreach includedir,$(MKBOOTIMAGE_INCLUDE_DIRS),-I$(includedir)) \
 	-DMKBOOTIMAGE_VER="\"$(VERSION)\"" \
 	-Wall -Wextra -Wpedantic
 
-CFLAGS2 = -lpcre -lelf
+LDLIBS = -lpcre -lelf
 
 all: $(MKBOOTIMAGE_NAME)
 
 $(MKBOOTIMAGE_NAME): $(MKBOOTIMAGE_OBJS)
-	$(CC) $(CFLAGS) $(MKBOOTIMAGE_OBJS) -o $(MKBOOTIMAGE_NAME) $(CFLAGS2)
+	$(CC) $(CFLAGS) $(MKBOOTIMAGE_OBJS) -o $(MKBOOTIMAGE_NAME) $(LDLIBS)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $< $(CFLAGS2)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	@- $(RM) $(MKBOOTIMAGE_NAME)
