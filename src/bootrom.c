@@ -457,6 +457,14 @@ int create_boot_image(uint32_t *img_ptr,
     offs.poff += sizeof(part_hdr[i]) / sizeof(uint32_t);
   }
 
+  /* Recalculate partition hdr end offset/padding */
+  if (offs.part_hdr_end_off) {
+    offs.part_hdr_end_off =
+      BOOTROM_PART_HDR_OFF
+      + (img_hdr_tab.hdrs_count * sizeof(struct bootrom_partition_hdr_t))
+      + BOOTROM_PART_HDR_END_PADD;
+  }
+
   /* Add 0x00 padding until end of partition header */
   while ((uint32_t)(offs.poff - img_ptr) < offs.part_hdr_end_off / sizeof(uint32_t)) {
     memset(offs.poff, 0x00, sizeof(uint32_t));

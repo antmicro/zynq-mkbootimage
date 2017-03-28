@@ -193,7 +193,7 @@ typedef struct linux_image_header_t {
  * dynamic */
 #define BOOTROM_IMG_HDR_OFF       0x000008c0
 #define BOOTROM_PART_HDR_OFF      0x00000c80
-#define BOOTROM_PART_HDR_END_OFF  0x00000d7c
+#define BOOTROM_PART_HDR_END_PADD 0x0000003c
 #define BOOTROM_BINS_OFF          0x00001700
 
 /* The same defines as above but for zynqmp */

@@ -22,7 +22,7 @@ int zynq_bootrom_init_offs(uint32_t *img_ptr, bootrom_offs_t *offs) {
   /* Init constant offsets */
   offs->img_hdr_off = BOOTROM_IMG_HDR_OFF;
   offs->part_hdr_off = BOOTROM_PART_HDR_OFF;
-  offs->part_hdr_end_off = BOOTROM_PART_HDR_END_OFF;
+  offs->part_hdr_end_off = BOOTROM_PART_HDR_END_PADD;
   offs->bins_off = BOOTROM_BINS_OFF;
 
   /* Move the offset to reserve the space for headers */
