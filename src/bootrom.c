@@ -29,7 +29,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <gelf.h>
 #include <unistd.h>
 #include <libgen.h>
 #include <byteswap.h>
@@ -39,6 +38,7 @@
 #include <common.h>
 #include <arch/common.h>
 
+#include <file/elf.h>
 #include <file/bitstream.h>
 
 /* Returns the offset by which the addr parameter should be moved
@@ -53,12 +53,8 @@ int append_file_to_image(uint32_t *addr,
   uint32_t file_header;
   struct stat cfile_stat;
   FILE *cfile;
-  Elf *elf;
-  int fd_elf;
-  Elf_Scn *elf_scn;
-  GElf_Shdr elf_shdr;
-  GElf_Ehdr elf_ehdr;
   uint32_t elf_start;
+  uint32_t elf_entry;
   linux_image_header_t linux_img;
   int ret;
   unsigned int i;
@@ -88,73 +84,28 @@ int append_file_to_image(uint32_t *addr,
 
   switch(file_header) {
   case FILE_MAGIC_ELF:
-    /* init elf library */
-    if(elf_version(EV_CURRENT) == EV_NONE ) {
-      fprintf(stderr, "ELF library initialization failed\n");
+    /* Init elf file */
+    ret = elf_find_offsets(node.fname, &elf_start, &elf_entry, img_size);
+    if (ret) {
+      fprintf(stderr, "ELF file initialization failed\n");
+
       /* Close the file */
       fclose(cfile);
-      return -BOOTROM_ERROR_ELF;
-    }
-
-    /* open file descriptor used by elf library */
-    if (( fd_elf = open(node.fname, O_RDONLY , 0)) < 0) {
-      fprintf(stderr, "Could not open file %s.", node.fname);
-      /* Close the file */
-      fclose(cfile);
-      return -BOOTROM_ERROR_ELF;
-    }
-
-    /* init elf */
-    if (( elf = elf_begin(fd_elf, ELF_C_READ , NULL )) == NULL ) {
-      fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
-      /* Close the file */
-      fclose(cfile);
-      return -BOOTROM_ERROR_ELF;
-    }
-
-    /* make sure it is an elf (despite magic byte check) */
-    if(elf_kind(elf) != ELF_K_ELF ) {
-      fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
-      /* Close the file */
-      fclose(cfile);
-      return -BOOTROM_ERROR_ELF;
-    }
-
-    elf_scn = NULL;
-    elf_start = 0;
-    while ((elf_scn = elf_nextscn(elf, elf_scn)) != NULL) {
-      if (gelf_getshdr(elf_scn, &elf_shdr) != &elf_shdr) {
-        fprintf(stderr, "Could not get elf section header\n");
-        continue;
-      }
-
-      if (elf_start == 0)
-        elf_start = elf_shdr.sh_offset;
-
-      if (elf_shdr.sh_type == SHT_NOBITS || !(elf_shdr.sh_flags & SHF_ALLOC)) {
-        /* Set the final size */
-        *img_size = elf_shdr.sh_offset - elf_start;
-        break;
-      }
-    }
-
-    if(gelf_getehdr(elf, &elf_ehdr) != &elf_ehdr) {
-      fprintf(stderr, "Not a valid elf file: %s.\n", node.fname);
-      /* Close the file */
-      fclose(cfile);
-      return -BOOTROM_ERROR_ELF;
+      return ret;
     }
 
     /* Init partition header */
-    bops->init_part_hdr_elf(part_hdr, &node, img_size, elf_ehdr.e_entry);
+    bops->init_part_hdr_elf(part_hdr, &node, img_size, elf_entry);
 
     /* Read the actual content of the file */
-    fseek(cfile, elf_start, SEEK_SET);
-    *img_size = fread(addr, 1, *img_size, cfile);
+    ret = elf_append(addr, cfile, img_size, elf_start);
+    if (ret) {
+      fprintf(stderr, "ELF file reading failed\n");
 
-    /* Close the elf file descriptor */
-    elf_end(elf);
-    close(fd_elf);
+      /* Close the file */
+      fclose(cfile);
+      return ret;
+    }
 
     break;
   case FILE_MAGIC_XILINXBIT_0:
