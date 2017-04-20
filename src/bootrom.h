@@ -12,7 +12,7 @@
 #define BOOTROM_ERROR_UNSUPPORTED 5
 #define BOOTROM_ERROR_NOMEM 6
 
-/* BootROM Header based on ug585 and ug1095 */
+/* BootROM Header based on ug585 and ug1085 */
 typedef struct bootrom_hdr_t {
   uint32_t interrupt_table[8];
   uint32_t width_detect;
@@ -24,8 +24,16 @@ typedef struct bootrom_hdr_t {
     uint32_t fsbl_execution_addr;
   };
   uint32_t src_offset;
-  uint32_t img_len;
-  uint32_t reserved_0; /* set to 0 */
+  union {
+    struct {
+      uint32_t img_len;
+      uint32_t reserved_0; /* set to 0 */
+    };
+    struct {
+      uint32_t pmufw_len;
+      uint32_t pmufw_total_len;
+    };
+  };
   union {
     uint32_t start_of_exec;
     uint32_t fsbl_img_len;
@@ -186,6 +194,12 @@ typedef struct linux_image_header_t {
 /* user defined 0 / fsbl execution address */
 #define BOOTROM_USER_0            0x01010000 /* used by zynq */
 #define BOOTROM_FSBL_EXEC_ADDR    0xfffc0000 /* used by zynqmp */
+
+/* PMU firmware related */
+/* The maximum PMU FW size should be 0x00020000 (128kB)
+ * according to the TRM, but for some reason bootgen uses
+ * the value used below */
+#define BOOTROM_PMUFW_MAX_SIZE    0x0001fae0
 
 /* these values are also taken from bootm.bin
  * however these might not be the only valid

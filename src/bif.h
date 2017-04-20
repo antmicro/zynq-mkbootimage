@@ -25,6 +25,7 @@ typedef struct bif_node_t {
 
   /* supported zynqmp attributes */
   uint8_t fsbl_config; /* boolean */
+  uint8_t pmufw_image; /* boolean */
   char destination_device[100];
   char destination_cpu[100];
   char exception_level[100];

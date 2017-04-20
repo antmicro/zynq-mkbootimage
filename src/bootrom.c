@@ -55,6 +55,7 @@ int append_file_to_image(uint32_t *addr,
   FILE *cfile;
   uint32_t elf_start;
   uint32_t elf_entry;
+  uint32_t img_size_init;
   linux_image_header_t linux_img;
   int ret;
   unsigned int i;
@@ -62,6 +63,7 @@ int append_file_to_image(uint32_t *addr,
   /* Initialize header with zeroes */
   memset(part_hdr, 0x0, sizeof(*part_hdr));
 
+  img_size_init = *img_size;
   *img_size = 0;
 
   if(stat(node.fname, &cfile_stat)) {
@@ -94,11 +96,20 @@ int append_file_to_image(uint32_t *addr,
       return ret;
     }
 
-    /* Init partition header */
+    /* Init partition header, the img_size_init is non-zero only if this file
+     * is a bootloader, and we have the PMU firmware waiting. In this case, the
+     * partition header has to take the PMU size into account. That's why the
+     * 'init' size is added before initializing the partition header and
+     * subtracted after the initialization is done */
+    *img_size += img_size_init;
     bops->init_part_hdr_elf(part_hdr, &node, img_size, elf_entry);
+    *img_size -= img_size_init;
 
-    /* Read the actual content of the file */
-    ret = elf_append(addr, cfile, img_size, elf_start);
+    /* Read the actual content of the file, here the address is also moved by
+     * the 'init' size (which again, is non-zero only if this elf is a
+     * bootloader with PMU firmware */
+    ret = elf_append(addr + img_size_init / sizeof(uint32_t),
+                     cfile, img_size, elf_start);
     if (ret) {
       fprintf(stderr, "ELF file reading failed\n");
 
@@ -218,6 +229,13 @@ int create_boot_image(uint32_t *img_ptr,
   int ret;
   int img_term_n = 0;
   uint8_t img_name[BOOTROM_IMG_MAX_NAME_LEN];
+  uint8_t pmufw_img[BOOTROM_PMUFW_MAX_SIZE];
+  uint32_t pmufw_img_start;
+  uint32_t pmufw_img_entry;
+  uint32_t pmufw_img_size;
+  struct stat pmufile_stat;
+  FILE *pmufile;
+
 
   bootrom_partition_hdr_t part_hdr[bif_cfg->nodes_num];
   bootrom_img_hdr_t img_hdr[bif_cfg->nodes_num];
@@ -242,6 +260,46 @@ int create_boot_image(uint32_t *img_ptr,
     if (!bif_cfg->nodes[i].is_file)
       continue;
 
+    if (bif_cfg->nodes[i].pmufw_image) {
+      /* For now just assume the firmware is always the maximum length */
+      hdr.pmufw_len = BOOTROM_PMUFW_MAX_SIZE;
+      hdr.pmufw_total_len = hdr.pmufw_len;
+
+      /* Load the file to a temporary place */
+      ret = elf_find_offsets(bif_cfg->nodes[i].fname,
+                             &pmufw_img_start,
+                             &pmufw_img_entry,
+                             &pmufw_img_size);
+
+      if (ret != BOOTROM_SUCCESS) {
+        return -BOOTROM_ERROR_ELF;
+      }
+
+      /* Prepare the array for the firmware */
+      memset(pmufw_img, 0x00, sizeof(pmufw_img));
+
+      /* Open pmu file */
+      if(stat(bif_cfg->nodes[i].fname, &pmufile_stat)) {
+        fprintf(stderr, "Could not stat file: %s\n", bif_cfg->nodes[i].fname);
+        return -BOOTROM_ERROR_NOFILE;
+      }
+      if (!S_ISREG(pmufile_stat.st_mode)) {
+        fprintf(stderr, "Not a regular file: %s\n", bif_cfg->nodes[i].fname);
+        return -BOOTROM_ERROR_NOFILE;
+      }
+      pmufile = fopen(bif_cfg->nodes[i].fname, "rb");
+
+      if (pmufile == NULL) {
+        fprintf(stderr, "Could not open file: %s\n", bif_cfg->nodes[i].fname);
+        return -BOOTROM_ERROR_NOFILE;
+      }
+
+      elf_append((uint32_t*)pmufw_img, pmufile,
+                 &pmufw_img_size, pmufw_img_start);
+      fclose(pmufile);
+      continue;
+    }
+
     /* If file - increment headers count */
     img_hdr_tab.hdrs_count++;
 
@@ -260,6 +318,14 @@ int create_boot_image(uint32_t *img_ptr,
     }
 
     /* Append file content to memory */
+    if (bif_cfg->nodes[i].bootloader && hdr.pmufw_len) {
+      /* This is a bootloader image and we have a pmu fw waiting */
+      memcpy(offs.coff, pmufw_img, hdr.pmufw_len);
+      img_size = hdr.pmufw_len;
+    } else {
+      img_size = 0;
+    }
+
     ret = append_file_to_image(offs.coff,
                                bops,
                                &offs,
@@ -271,11 +337,11 @@ int create_boot_image(uint32_t *img_ptr,
       return ret;
     }
 
-    /* Check if dealing with bootloader */
+    /* Check if dealing with bootloader (size is in words - thus x 4) */
     if (bif_cfg->nodes[i].bootloader) {
       bops->setup_fsbl_at_curr_off(&hdr,
                                    &offs,
-                                   part_hdr[f].pd_len * sizeof(uint32_t));
+                                   (part_hdr[f].pd_len * 4) - hdr.pmufw_len);
     }
 
     /* Update the offset, skip padding for the last image */

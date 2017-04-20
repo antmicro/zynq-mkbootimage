@@ -133,6 +133,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
     node.load = 0;
     node.bootloader = 0;
     node.fsbl_config = 0;
+    node.pmufw_image = 0;
     strcpy(node.destination_device, "");
     strcpy(node.destination_cpu, "");
     strcpy(node.exception_level, "");
@@ -228,6 +229,11 @@ int bif_node_set_attr(bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *v
       return BIF_SUCCESS;
     }
 
+    if (strcmp(attr_name, "pmufw_image") == 0) {
+      node->pmufw_image = 0xFF;
+      return BIF_SUCCESS;
+    }
+
     if (strcmp(attr_name, "destination_device") == 0 ) {
       sscanf(value, "%s", node->destination_device);
       return BIF_SUCCESS;
@@ -262,6 +268,16 @@ int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
 
   /* Move nodes without offset to the top */
   while (pos >= 1 && cfg->nodes[pos - 1].offset && !cfg->nodes[pos].offset) {
+    tmp_node = cfg->nodes[pos - 1];
+    cfg->nodes[pos - 1] = cfg->nodes[pos];
+    cfg->nodes[pos] = tmp_node;
+    pos--;
+  }
+
+  pos = cfg->nodes_num;
+
+  /* Move special nodes to the top as well */
+  while (pos && (cfg->nodes[pos].fsbl_config || cfg->nodes[pos].pmufw_image)) {
     tmp_node = cfg->nodes[pos - 1];
     cfg->nodes[pos - 1] = cfg->nodes[pos];
     cfg->nodes[pos] = tmp_node;
