@@ -251,8 +251,10 @@ int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
   hdr->dest_load_addr_lo = entry;
   hdr->dest_exec_addr_lo = entry;
 
-  /* zynqmp requires the actual size + 1 */
-  (*size)++;
+  /* Size needs to be rounded after conversion to words  */
+  while ((*size + 1) % 4)
+    (*size)++;
+
   /* Set sizes (in words) */
   hdr->pd_len = *size / 4;
   hdr->ed_len = *size / 4;
