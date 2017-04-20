@@ -9,7 +9,7 @@ VERSION_MINOR:=${shell git rev-parse --short HEAD}
 
 VERSION:=${MKBOOTIMAGE_NAME} ${VERSION_MAJOR}-${VERSION_MINOR}
 
-MKBOOTIMAGE_SRCS:=$(wildcard src/*.c) $(wildcard src/arch/*c)
+MKBOOTIMAGE_SRCS:=$(wildcard src/*.c) $(wildcard src/arch/*c) $(wildcard src/file/*c)
 MKBOOTIMAGE_OBJS:=${MKBOOTIMAGE_SRCS:.c=.o}
 
 MKBOOTIMAGE_INCLUDE_DIRS:=src

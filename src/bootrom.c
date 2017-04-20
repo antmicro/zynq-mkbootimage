@@ -39,47 +39,7 @@
 #include <common.h>
 #include <arch/common.h>
 
-/* Returns the appended bitstream size via the last argument.
- * The regular return value is the error code. */
-int append_bitstream(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
-  uint32_t *dest = addr;
-  uint32_t chunk, rchunk;
-  uint8_t section_size;
-  char section_data[255];
-  char section_hdr[2];
-  unsigned int i;
-
-  /* Skip the header - it is already checked */
-  fseek(bitfile, FILE_XILINXBIT_SEC_START, SEEK_SET);
-  while (1) {
-    fread(&section_hdr, 1, sizeof(section_hdr), bitfile);
-    if (section_hdr[1] != 0x1 && section_hdr[1] != 0x0) {
-      fclose(bitfile);
-      fprintf(stderr, "Bitstream file seems to have mismatched sections.\n");
-      return BOOTROM_ERROR_BITSTREAM;
-    }
-
-    if (section_hdr[0] == FILE_XILINXBIT_SEC_DATA)
-      break;
-
-    fread(&section_size, 1, sizeof(uint8_t), bitfile);
-    fread(&section_data, 1, section_size, bitfile);
-  }
-
-  fseek(bitfile, -1, SEEK_CUR);
-  fread(img_size, 1, 4, bitfile);
-
-  *img_size = __bswap_32(*img_size) + 1;
-
-  for (i = 0; i <= *img_size; i+= sizeof(chunk)) {
-    fread(&chunk, 1, sizeof(chunk), bitfile);
-    rchunk = __bswap_32(chunk);
-    memcpy(dest, &rchunk, sizeof(rchunk));
-    dest++;
-  }
-
-  return BOOTROM_SUCCESS;
-}
+#include <file/bitstream.h>
 
 /* Returns the offset by which the addr parameter should be moved
  * and partition header info via argument pointers.
@@ -198,22 +158,22 @@ int append_file_to_image(uint32_t *addr,
 
     break;
   case FILE_MAGIC_XILINXBIT_0:
-    /* Xilinx header is 64b, check the other half */
-    fread(&file_header, 1, sizeof(file_header), cfile);
-    if (file_header != FILE_MAGIC_XILINXBIT_1) {
+    /* Verify file */
+    if (bitstream_verify(cfile) != BOOTROM_SUCCESS) {
       fprintf(stderr, "Not a valid bitstream file: %s.\n", node.fname);
+
       /* Close the file */
       fclose(cfile);
-      return BOOTROM_ERROR_BITSTREAM;
+      return -BOOTROM_ERROR_BITSTREAM;
     }
 
     /* It matches, append it to the image */
-    ret = append_bitstream(addr, cfile, img_size);
-    if (ret != BOOTROM_SUCCESS) {
-      return ret;
-    }
+    ret = bitstream_append(addr, cfile, img_size);
 
-    /* init partition header */
+    if (ret != BOOTROM_SUCCESS)
+      return ret;
+
+    /* Init partition header */
     bops->init_part_hdr_bitstream(part_hdr, &node);
 
     break;
