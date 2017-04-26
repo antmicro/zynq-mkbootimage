@@ -32,6 +32,7 @@ typedef struct bif_node_t {
 
   /* special, non-bootgen features */
   uint8_t is_file; /* for now equal to !fsbl_config */
+  uint8_t numbits;
 } bif_node_t;
 
 typedef struct bif_cfg_t {

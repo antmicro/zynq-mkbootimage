@@ -55,6 +55,7 @@ int append_file_to_image(uint32_t *addr,
   FILE *cfile;
   uint32_t elf_start;
   uint32_t elf_entry;
+  uint8_t elf_nbits;
   uint32_t img_size_init;
   linux_image_header_t linux_img;
   int ret;
@@ -87,7 +88,8 @@ int append_file_to_image(uint32_t *addr,
   switch(file_header) {
   case FILE_MAGIC_ELF:
     /* Init elf file */
-    ret = elf_find_offsets(node.fname, &elf_start, &elf_entry, img_size);
+    ret = elf_find_offsets(node.fname, &elf_nbits,
+                           &elf_start, &elf_entry, img_size);
     if (ret) {
       fprintf(stderr, "ELF file initialization failed\n");
 
@@ -102,7 +104,7 @@ int append_file_to_image(uint32_t *addr,
      * 'init' size is added before initializing the partition header and
      * subtracted after the initialization is done */
     *img_size += img_size_init;
-    bops->init_part_hdr_elf(part_hdr, &node, img_size, elf_entry);
+    bops->init_part_hdr_elf(part_hdr, &node, img_size, elf_entry, elf_nbits);
     *img_size -= img_size_init;
 
     /* Read the actual content of the file, here the address is also moved by
@@ -233,6 +235,7 @@ int create_boot_image(uint32_t *img_ptr,
   uint32_t pmufw_img_start;
   uint32_t pmufw_img_entry;
   uint32_t pmufw_img_size;
+  uint8_t pmufw_img_nbits;
   struct stat pmufile_stat;
   FILE *pmufile;
 
@@ -267,6 +270,7 @@ int create_boot_image(uint32_t *img_ptr,
 
       /* Load the file to a temporary place */
       ret = elf_find_offsets(bif_cfg->nodes[i].fname,
+                             &pmufw_img_nbits,
                              &pmufw_img_start,
                              &pmufw_img_entry,
                              &pmufw_img_size);

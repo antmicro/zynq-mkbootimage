@@ -5,6 +5,7 @@
  * file.
  * Returns the error code */
 int elf_find_offsets(const char *fname,
+                     uint8_t *elf_nbits,
                      uint32_t *elf_start,
                      uint32_t *elf_entry,
                      uint32_t *img_size);

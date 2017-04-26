@@ -176,6 +176,7 @@ typedef struct linux_image_header_t {
 #define BOOTROM_PART_ATTR_A5X_EXEC_S_32  (1 << BOOTROM_PART_ATTR_A5X_EXEC_S_OFF)
 
 #define BOOTROM_PART_ATTR_EXC_LVL_OFF    1
+#define BOOTROM_PART_ATTR_EXC_LVL_MASK   (0x3 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
 #define BOOTROM_PART_ATTR_EXC_LVL_EL0    (0 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
 #define BOOTROM_PART_ATTR_EXC_LVL_EL1    (1 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
 #define BOOTROM_PART_ATTR_EXC_LVL_EL2    (2 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
@@ -303,7 +304,8 @@ typedef struct bootrom_ops_t {
   int (*init_part_hdr_elf)(bootrom_partition_hdr_t*,
                            bif_node_t*,
                            uint32_t *size,
-                           uint32_t entry);
+                           uint32_t entry,
+                           uint8_t nbits);
   int (*init_part_hdr_bitstream)(bootrom_partition_hdr_t*,
                                  bif_node_t*);
   int (*init_part_hdr_linux)(bootrom_partition_hdr_t*,

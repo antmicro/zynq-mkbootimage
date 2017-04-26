@@ -160,10 +160,12 @@ int zynq_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
 int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                            bif_node_t *node,
                            uint32_t *size,
-                           uint32_t entry) {
+                           uint32_t entry,
+                           uint8_t nbits) {
   /* Handle unused parameters warning */
   (void) node;
   (void) size;
+  (void) nbits;
 
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;

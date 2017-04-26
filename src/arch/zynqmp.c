@@ -234,7 +234,8 @@ int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
 int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                              bif_node_t *node,
                              uint32_t *size,
-                             uint32_t entry) {
+                             uint32_t entry,
+                             uint8_t nbits) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
   hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
@@ -254,6 +255,17 @@ int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
 
   /* Set destination device as the only attribute */
   hdr->attributes = zynqmp_calc_part_hdr_attr(node);
+
+  /* Set the execution state arguments */
+  if (nbits == 32) {
+    hdr->attributes |= BOOTROM_PART_ATTR_A5X_EXEC_S_32;
+    /* Additionally, for some reason, 32bit elfs seem to always overwrite
+     * the exception level to EL2 */
+    hdr->attributes &= (~BOOTROM_PART_ATTR_EXC_LVL_MASK);
+    hdr->attributes |= BOOTROM_PART_ATTR_EXC_LVL_EL2;
+  } else if (nbits == 64) {
+    hdr->attributes |= BOOTROM_PART_ATTR_A5X_EXEC_S_64;
+  }
 
   return BOOTROM_SUCCESS;
 }

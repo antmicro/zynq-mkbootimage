@@ -33,6 +33,7 @@
 #include <file/elf.h>
 
 int elf_find_offsets(const char *fname,
+                     uint8_t *elf_nbits,
                      uint32_t *elf_start,
                      uint32_t *elf_entry,
                      uint32_t *img_size) {
@@ -89,6 +90,7 @@ int elf_find_offsets(const char *fname,
   }
 
   *elf_entry = elf_ehdr.e_entry;
+  *elf_nbits = (elf_ehdr.e_ident[EI_CLASS] == ELFCLASS64) ? 64 : 32;
 
   return BOOTROM_SUCCESS;
 }
