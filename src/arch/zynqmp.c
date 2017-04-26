@@ -178,8 +178,7 @@ uint32_t zynqmp_calc_part_hdr_attr(bif_node_t *node) {
 
   if (strlen(p) == 2) {
     if (strncmp(p, "pl", 2) == 0) {
-      attr |=
-        BOOTROM_PART_ATTR_DEST_DEV_PL << BOOTROM_PART_ATTR_DEST_DEV_OFF;
+      attr |= BOOTROM_PART_ATTR_DEST_DEV_PL;
     }
   }
 
@@ -187,25 +186,19 @@ uint32_t zynqmp_calc_part_hdr_attr(bif_node_t *node) {
 
   if(strlen(p) == 5) {
     if (strncmp(p, "a53-0", 5) == 0) {
-      attr |=
-        BOOTROM_PART_ATTR_DEST_CPU_A53_0 << BOOTROM_PART_ATTR_DEST_CPU_OFF;
+      attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_0;
     } else if (strncmp(p, "a53-1", 5) == 0) {
-      attr |=
-        BOOTROM_PART_ATTR_DEST_CPU_A53_1 << BOOTROM_PART_ATTR_DEST_CPU_OFF;
+      attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_1;
     } else if (strncmp(p, "a53-2", 5) == 0) {
-      attr |=
-        BOOTROM_PART_ATTR_DEST_CPU_A53_2 << BOOTROM_PART_ATTR_DEST_CPU_OFF;
+      attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_2;
     } else if (strncmp(p, "a53-3", 5) == 0) {
-      attr |=
-        BOOTROM_PART_ATTR_DEST_CPU_A53_3 << BOOTROM_PART_ATTR_DEST_CPU_OFF;
+      attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_3;
     }
   } else if (strlen(p) == 4) {
     if (strncmp(p, "r5-0", 4) == 0) {
-      attr |=
-        BOOTROM_PART_ATTR_DEST_CPU_R5_0 << BOOTROM_PART_ATTR_DEST_CPU_OFF;
+      attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_0;
     } else if (strncmp(p, "r5-1", 4) == 0) {
-      attr |=
-        BOOTROM_PART_ATTR_DEST_CPU_R5_1 << BOOTROM_PART_ATTR_DEST_CPU_OFF;
+      attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_1;
     }
   }
 
@@ -217,8 +210,7 @@ uint32_t zynqmp_calc_part_hdr_attr(bif_node_t *node) {
   }
 
   if (elvl) {
-    attr |=
-      (elvl) << BOOTROM_PART_ATTR_EXC_LVL_OFF;
+    attr |= ((elvl) << BOOTROM_PART_ATTR_EXC_LVL_OFF);
   }
 
   return attr;

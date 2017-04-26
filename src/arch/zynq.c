@@ -174,8 +174,7 @@ int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
   hdr->dest_exec_addr = entry;
 
   /* set destination device as the only attribute */
-  hdr->attributes =
-    BOOTROM_PART_ATTR_DEST_DEV_PS << BOOTROM_PART_ATTR_DEST_DEV_OFF;
+  hdr->attributes = BOOTROM_PART_ATTR_DEST_DEV_PS;
 
   return BOOTROM_SUCCESS;
 }
@@ -190,8 +189,7 @@ int zynq_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr,
   hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
 
   /* Set destination device as the only attribute */
-  hdr->attributes =
-    BOOTROM_PART_ATTR_DEST_DEV_PL << BOOTROM_PART_ATTR_DEST_DEV_OFF;
+  hdr->attributes = BOOTROM_PART_ATTR_DEST_DEV_PL;
 
   /* No execution address for bitstream */
   hdr->dest_load_addr = 0x0;
@@ -217,8 +215,7 @@ int zynq_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
     hdr->attributes = 0x00; /* despite what the doc says */
 
   /* Set destination device attribute */
-  hdr->attributes |=
-    (BOOTROM_PART_ATTR_DEST_DEV_PS << BOOTROM_PART_ATTR_DEST_DEV_OFF);
+  hdr->attributes |= BOOTROM_PART_ATTR_DEST_DEV_PS;
 
   /* No load/execution address */
   hdr->dest_load_addr = load_addr;
