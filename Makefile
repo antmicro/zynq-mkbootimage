@@ -16,7 +16,8 @@ MKBOOTIMAGE_INCLUDE_DIRS:=src
 
 CFLAGS += $(foreach includedir,$(MKBOOTIMAGE_INCLUDE_DIRS),-I$(includedir)) \
 	-DMKBOOTIMAGE_VER="\"$(VERSION)\"" \
-	-Wall -Wextra -Wpedantic
+	-Wall -Wextra -Wpedantic \
+	--std=c11
 
 LDLIBS = -lpcre -lelf
 
