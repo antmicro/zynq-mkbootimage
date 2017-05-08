@@ -4,7 +4,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <limits.h>
+#ifdef __linux__
 #include <linux/limits.h>
+#endif
 
 #define BIF_SUCCESS                0
 #define BIF_ERROR_NOFILE           1

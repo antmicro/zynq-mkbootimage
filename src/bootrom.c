@@ -31,7 +31,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <libgen.h>
-#include <byteswap.h>
 
 #include <bif.h>
 #include <bootrom.h>

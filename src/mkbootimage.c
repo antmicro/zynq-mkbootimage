@@ -23,10 +23,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <argp.h>
+
+#include <getopt.h>
 
 #include <bif.h>
 #include <bootrom.h>
@@ -34,100 +37,95 @@
 #include <arch/zynq.h>
 #include <arch/zynqmp.h>
 
-/* Prepare global variables for arg parser */
-const char *argp_program_version = MKBOOTIMAGE_VER;
+/* Program info */
+const char *program_version = MKBOOTIMAGE_VER;
 static char doc[] = "Generate bootloader images for Xilinx Zynq based platforms.";
-static char args_doc[] = "[--zynqmp|-u] <input_bif_file> <output_bin_file>";
+static char args_doc[] = "[--zynqmp|-u] [--quiet|-q] <input_bif_file> <output_bin_file>";
 
-static struct argp_option argp_options[] = {
-  {"zynqmp", 'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)", 0},
-  { 0 }
+static struct option longopts[] = {
+  { "zynqmp",  no_argument,  NULL,  'u' },
+  { "quiet",   no_argument,  NULL,  'q' },
+  { NULL,      0,            NULL,  0 }
 };
 
-/* Prapare struct for holding parsed arguments */
-struct arguments {
-  uint8_t zynqmp;
-  char *bif_filename;
-  char *bin_filename;
-};
-
-/* Define argument parser */
-static error_t argp_parser(int key, char *arg, struct argp_state *state) {
-  struct arguments *arguments = state->input;
-
-  switch (key) {
-  case 'u':
-    arguments->zynqmp = 0xFF;
-    break;
-  case ARGP_KEY_ARG:
-    switch(state->arg_num) {
-    case 0:
-      arguments->bif_filename = arg;
-      break;
-    case 1:
-      arguments->bin_filename = arg;
-      break;
-    default:
-      argp_usage(state);
-    }
-    break;
-  case ARGP_KEY_END:
-    if (state->arg_num < 2)
-      argp_usage (state);
-    break;
-  default:
-    return ARGP_ERR_UNKNOWN;
-  }
-  return 0;
+void usage(const char* prog) {
+  fprintf(stderr, "%s %s\n", prog, args_doc);
+  fprintf(stderr, "%s\n (%s)\n", doc, program_version);
+  fprintf(stderr, "  -u : Generate files for ZyqnMP (default is Zynq). Also --zynqmp.\n");
+  fprintf(stderr, "  -q : Quiet, no status output (default prints status). Also --quiet.\n");
+  exit(1);
 }
-
-/* Finally initialize argp struct */
-static struct argp argp = {argp_options, argp_parser, args_doc, doc, 0, 0, 0 };
 
 /* Declare the main function */
 int main(int argc, char *argv[]) {
   FILE *ofile;
+  const char* prog_name;
+  const char *bif_filename, *bin_filename;
   uint32_t ofile_size;
   uint32_t *file_data;
   uint32_t esize, esize_aligned;
-  struct arguments arguments;
   bootrom_ops_t *bops;
   bif_cfg_t cfg;
+  bool quiet = false;
   int ret;
   int i;
+  int ch;
 
-  /* Init non-string arguments */
-  arguments.zynqmp = 0;
+  /* Defaults for the parser the info about arch */
+  cfg.arch = BIF_ARCH_ZYNQ;
+  bops = &zynq_bops;
+
+  prog_name = argv[0];
 
   /* Parse program arguments */
-  argp_parse(&argp, argc, argv, 0, 0, &arguments);
+  while ((ch = getopt_long(argc, argv, "uq", longopts, NULL)) != -1) {
+    switch (ch) {
+      case 'u':
+        cfg.arch = BIF_ARCH_ZYNQMP;
+        bops = &zynqmp_bops;
+        break;
+      case 'q':
+        quiet = true;
+        break;
+      default:
+        usage(prog_name);
+    }
+  }
+
+  argc -= optind;
+  argv += optind;
+
+  if (argc != 2)
+    usage(prog_name);
+
+  bif_filename = argv[0];
+  bin_filename = argv[1];
 
   /* Print program version info */
-  printf("%s\n", MKBOOTIMAGE_VER);
+  if (!quiet)
+    printf("%s\n", MKBOOTIMAGE_VER);
 
   init_bif_cfg(&cfg);
 
-  /* Give bif parser the info about arch */
-  cfg.arch = (arguments.zynqmp) ? BIF_ARCH_ZYNQMP : BIF_ARCH_ZYNQ;
-  bops = (arguments.zynqmp) ? &zynqmp_bops : &zynq_bops;
-
-  ret = parse_bif(arguments.bif_filename, &cfg);
+  ret = parse_bif(bif_filename, &cfg);
   if (ret != BIF_SUCCESS || cfg.nodes_num == 0) {
-    fprintf(stderr, "Error parsing %s file.\n", arguments.bif_filename);
+    fprintf(stderr, "Error parsing %s file.\n", bif_filename);
     return EXIT_FAILURE;
   }
 
-  printf("Nodes found in the %s file:\n", arguments.bif_filename);
-  for (i = 0; i < cfg.nodes_num; i++) {
-    printf(" %s", cfg.nodes[i].fname);
-    if (cfg.nodes[i].bootloader)
-      printf(" (bootloader)\n");
-    else
-      printf("\n");
-    if (cfg.nodes[i].load)
-      printf("  load:   %08x\n", cfg.nodes[i].load);
-    if (cfg.nodes[i].offset)
-      printf("  offset: %08x\n", cfg.nodes[i].offset);
+  if (!quiet) {
+    printf("Nodes found in the %s file:\n", bif_filename);
+    for (i = 0; i < cfg.nodes_num; i++) {
+      printf(" %s", cfg.nodes[i].fname);
+      if (cfg.nodes[i].bootloader)
+        printf(" (bootloader)\n");
+      else
+        printf("\n");
+      if (cfg.nodes[i].load)
+        printf("  load:   %08x\n", cfg.nodes[i].load);
+      if (cfg.nodes[i].offset)
+        printf("  offset: %08x\n", cfg.nodes[i].offset);
+    }
   }
 
   /* Estimate memory required to fit all the binaries */
@@ -154,10 +152,10 @@ int main(int argc, char *argv[]) {
     return ofile_size;
   }
 
-  ofile = fopen(arguments.bin_filename, "wb");
+  ofile = fopen(bin_filename, "wb");
 
   if (ofile == NULL ) {
-    fprintf(stderr, "Could not open output file: %s\n", arguments.bin_filename);
+    fprintf(stderr, "Could not open output file: %s\n", bin_filename);
     return EXIT_FAILURE;
   }
 
@@ -167,7 +165,7 @@ int main(int argc, char *argv[]) {
   free(file_data);
   deinit_bif_cfg(&cfg);
 
-  printf("All done, quitting\n");
+  if (!quiet)
+    printf("All done, quitting\n");
   return EXIT_SUCCESS;
 }
-
