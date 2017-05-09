@@ -7,11 +7,23 @@ It is written entirely in C.
 
 Required C libraries: pcre, libelf.
 
-To build this application run:
-make
+Supports Linux and FreeBSD host platforms.
+
+To build this application on Linux run:
+
+ make
+
+and on FreeBSD run:
+
+ gmake CC=cc EXTRA_INCLUDES=/usr/local/include LDPATHS=-L/usr/local/lib
+
+If you need a stand alone executable to move to different versions of your
+operating system add to the make command line:
+
+ LDFLAGS=-static
 
 To use it, type in:
-./mkbootimage [--zynqmp|-u] <input_bif_file> <output_bin_file>
+./mkbootimage [--zynqmp|-u] [--quiet|-q] <input_bif_file> <output_bin_file>
 
 Zynq Support:
 Currently it supports creating boot image containing fsbl, bitstream,
