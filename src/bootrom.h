@@ -250,6 +250,7 @@ typedef struct linux_image_header_t {
 #define FILE_MAGIC_XILINXBIT_1    0xf00ff00f
 
 #define FILE_MAGIC_LINUX          0x56190527
+#define FILE_MAGIC_DTB            0xedfe0dd0
 
 #define FILE_XILINXBIT_SEC_START  13
 #define FILE_XILINXBIT_SEC_DATA   'e'
@@ -301,6 +302,8 @@ typedef struct bootrom_ops_t {
   /* Partition header related callbacks */
   int (*init_part_hdr_default)(bootrom_partition_hdr_t*,
                                bif_node_t*);
+  int (*init_part_hdr_dtb)(bootrom_partition_hdr_t*,
+                           bif_node_t*);
   int (*init_part_hdr_elf)(bootrom_partition_hdr_t*,
                            bif_node_t*,
                            uint32_t *size,

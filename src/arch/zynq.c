@@ -137,20 +137,31 @@ int zynq_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   return BOOTROM_SUCCESS;
 }
 
-int zynq_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
-                               bif_node_t *node) {
+int zynq_init_part_hdr_generic(bootrom_partition_hdr_t *ihdr,
+                               bif_node_t *node,
+                               uint32_t extra_args) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;
   hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
 
   /* set destination device as the only attribute */
   hdr->attributes =
-    (0x1 << BOOTROM_PART_ATTR_DEST_DEV_OFF) | BINARY_ATTR_GENERAL;
+    (0x1 << BOOTROM_PART_ATTR_DEST_DEV_OFF) | extra_args;
 
   /* No load/execution address */
   hdr->dest_load_addr = node->load;
   hdr->dest_exec_addr = 0x0;
   return BOOTROM_SUCCESS;
+}
+
+int zynq_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
+                               bif_node_t *node) {
+  return zynq_init_part_hdr_generic(ihdr, node, BINARY_ATTR_GENERAL);
+}
+
+int zynq_init_part_hdr_dtb(bootrom_partition_hdr_t *ihdr,
+                           bif_node_t *node) {
+  return zynq_init_part_hdr_generic(ihdr, node, BINARY_ATTR_RAMDISK);
 }
 
 int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
@@ -260,6 +271,7 @@ bootrom_ops_t zynq_bops = {
   .setup_fsbl_at_curr_off = zynq_bootrom_setup_fsbl_at_curr_off,
   .init_img_hdr_tab = zynq_bootrom_init_img_hdr_tab,
   .init_part_hdr_default = zynq_init_part_hdr_default,
+  .init_part_hdr_dtb = zynq_init_part_hdr_dtb,
   .init_part_hdr_elf = zynq_init_part_hdr_elf,
   .init_part_hdr_bitstream = zynq_init_part_hdr_bitstream,
   .init_part_hdr_linux = zynq_init_part_hdr_linux,

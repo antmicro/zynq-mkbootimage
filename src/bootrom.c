@@ -152,6 +152,12 @@ int append_file_to_image(uint32_t *addr,
     bops->init_part_hdr_linux(part_hdr, &node, &linux_img);
 
     break;
+  case FILE_MAGIC_DTB:
+    fseek(cfile, 0, SEEK_SET);
+    *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
+
+    bops->init_part_hdr_dtb(part_hdr, &node);
+    break;
   default: /* Treat as a binary file */
 
     fseek(cfile, 0, SEEK_SET);

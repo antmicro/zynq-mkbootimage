@@ -353,6 +353,7 @@ bootrom_ops_t zynqmp_bops = {
   .setup_fsbl_at_curr_off = zynqmp_bootrom_setup_fsbl_at_curr_off,
   .init_img_hdr_tab = zynqmp_bootrom_init_img_hdr_tab,
   .init_part_hdr_default = zynqmp_init_part_hdr_default,
+  .init_part_hdr_dtb = zynqmp_init_part_hdr_default, /* XXX unsupported yet */
   .init_part_hdr_elf = zynqmp_init_part_hdr_elf,
   .init_part_hdr_bitstream = zynqmp_init_part_hdr_bitstream,
   .init_part_hdr_linux = zynqmp_init_part_hdr_linux,
