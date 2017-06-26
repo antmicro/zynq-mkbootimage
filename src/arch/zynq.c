@@ -138,11 +138,7 @@ int zynq_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
 }
 
 int zynq_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
-                               bif_node_t *node,
-                               uint32_t load_addr) {
-  /* Handle unused parameters warning */
-  (void) node;
-
+                               bif_node_t *node) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;
   hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
@@ -152,7 +148,7 @@ int zynq_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
     (0x1 << BOOTROM_PART_ATTR_DEST_DEV_OFF) | BINARY_ATTR_GENERAL;
 
   /* No load/execution address */
-  hdr->dest_load_addr = load_addr;
+  hdr->dest_load_addr = node->load;
   hdr->dest_exec_addr = 0x0;
   return BOOTROM_SUCCESS;
 }
@@ -201,11 +197,7 @@ int zynq_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr,
 
 int zynq_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
                              bif_node_t *node,
-                             linux_image_header_t *img,
-                             uint32_t load_addr) {
-  /* Handle unused parameters warning */
-  (void) node;
-
+                             linux_image_header_t *img) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;
   hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
@@ -223,7 +215,7 @@ int zynq_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
   hdr->attributes |= BOOTROM_PART_ATTR_DEST_DEV_PS;
 
   /* No load/execution address */
-  hdr->dest_load_addr = load_addr;
+  hdr->dest_load_addr = node->load;
   hdr->dest_exec_addr = 0x0;
   return BOOTROM_SUCCESS;
 }

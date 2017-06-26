@@ -149,7 +149,7 @@ int append_file_to_image(uint32_t *addr,
     *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
 
     /* Init partition header */
-    bops->init_part_hdr_linux(part_hdr, &node, &linux_img, node.load);
+    bops->init_part_hdr_linux(part_hdr, &node, &linux_img);
 
     break;
   default: /* Treat as a binary file */
@@ -157,7 +157,7 @@ int append_file_to_image(uint32_t *addr,
     fseek(cfile, 0, SEEK_SET);
     *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
 
-    bops->init_part_hdr_default(part_hdr, &node, node.load);
+    bops->init_part_hdr_default(part_hdr, &node);
   };
 
   /* remove trailing zeroes */

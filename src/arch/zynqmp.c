@@ -217,8 +217,7 @@ uint32_t zynqmp_calc_part_hdr_attr(bif_node_t *node) {
 }
 
 int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
-                                 bif_node_t *node,
-                                 uint32_t load_addr) {
+                                 bif_node_t *node) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
   hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
@@ -226,7 +225,7 @@ int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
   /* set destination device as the only attribute */
   hdr->attributes = zynqmp_calc_part_hdr_attr(node);
 
-  hdr->dest_load_addr_lo = load_addr;
+  hdr->dest_load_addr_lo = node->load;
   hdr->dest_exec_addr_hi = 0x0;
   return BOOTROM_SUCCESS;
 }
@@ -290,11 +289,9 @@ int zynqmp_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr,
 
 int zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
                                bif_node_t *node,
-                               linux_image_header_t *img,
-                               uint32_t load_addr) {
+                               linux_image_header_t *img) {
   /* Handle unused parameters warning */
   (void) node;
-  (void) load_addr;
 
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;

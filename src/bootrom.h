@@ -300,8 +300,7 @@ typedef struct bootrom_ops_t {
 
   /* Partition header related callbacks */
   int (*init_part_hdr_default)(bootrom_partition_hdr_t*,
-                               bif_node_t*,
-                               uint32_t load_addr);
+                               bif_node_t*);
   int (*init_part_hdr_elf)(bootrom_partition_hdr_t*,
                            bif_node_t*,
                            uint32_t *size,
@@ -311,8 +310,7 @@ typedef struct bootrom_ops_t {
                                  bif_node_t*);
   int (*init_part_hdr_linux)(bootrom_partition_hdr_t*,
                              bif_node_t*,
-                             linux_image_header_t*,
-                             uint32_t load_addr);
+                             linux_image_header_t*);
   /* The finish function is common for all partition types */
   int (*finish_part_hdr)(bootrom_partition_hdr_t*,
                          uint32_t *img_size,
