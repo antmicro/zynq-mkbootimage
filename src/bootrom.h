@@ -256,6 +256,7 @@ typedef struct linux_image_header_t {
 
 #define FILE_LINUX_IMG_TYPE_UIM   2
 #define FILE_LINUX_IMG_TYPE_URD   3
+#define FILE_LINUX_IMG_TYPE_SCR   6
 
 #define BINARY_ATTR_LINUX         0x00
 #define BINARY_ATTR_RAMDISK       0x02

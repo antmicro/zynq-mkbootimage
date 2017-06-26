@@ -216,6 +216,9 @@ int zynq_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
   if (img->type == FILE_LINUX_IMG_TYPE_URD)
     hdr->attributes = 0x00; /* despite what the doc says */
 
+  if (img->type == FILE_LINUX_IMG_TYPE_SCR)
+    hdr->attributes = BINARY_ATTR_GENERAL;
+
   /* Set destination device attribute */
   hdr->attributes |= BOOTROM_PART_ATTR_DEST_DEV_PS;
 
