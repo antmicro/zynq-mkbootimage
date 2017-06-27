@@ -172,12 +172,15 @@ int append_file_to_image(uint32_t *addr,
   }
 
   /* uImages actually require some undefined ammount of 0x0 padding after
-   * the image so restore some of it in that case */
+   * the image. Analysis shows that it is one or two bytes, while keeping
+   * the image size divisible by two. */
   if (file_header == FILE_MAGIC_LINUX) {
     if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM) {
-      for (i = 0; i < 4; i++) {
+      for (i = 0; i < 2; i++) {
         (*img_size)++;
         *(addr + (*img_size)) = 0x0;
+        if ((((*img_size) + 1) % 2) == 0)
+          break;
       }
     }
   }
@@ -456,16 +459,6 @@ int create_boot_image(uint32_t *img_ptr,
   while ((uint32_t)(offs.poff - img_ptr) < offs.part_hdr_end_off / sizeof(uint32_t)) {
     memset(offs.poff, 0x00, sizeof(uint32_t));
     offs.poff++;
-  }
-
-  /* Add 0x00 terminators after partition header if there are more
-   * than 3 images and we did not reach binaries offset yet */
-  if (bif_cfg->nodes_num > 3
-      && ((uint32_t)(offs.poff - img_ptr) < offs.bins_off / sizeof(uint32_t))) {
-    for (i = 0; i < 15; ++i) {
-      memset(offs.poff, 0x00, sizeof(uint32_t));
-      offs.poff++;
-    }
   }
 
   /* Add 0xFF padding until BOOTROM_BINS_OFF */

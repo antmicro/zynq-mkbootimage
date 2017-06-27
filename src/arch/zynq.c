@@ -255,7 +255,13 @@ int zynq_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
   /* Fill the offset */
   hdr->data_off = (offs->coff - offs->img_ptr);
 
-  /* Add 0xFF padding */
+  /* Add 0xFF padding - make sure to add at least one word of padding*/
+  if (!(*img_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t)))) {
+    (*img_size)++;
+    memset(offs->coff + (*img_size), 0xFF, sizeof(uint32_t));
+  }
+
+  /* Continue adding padding util it hits the correct alignement */
   while (*img_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
     (*img_size)++;
     memset(offs->coff + (*img_size), 0xFF, sizeof(uint32_t));
