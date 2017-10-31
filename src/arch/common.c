@@ -8,7 +8,7 @@
 
 int bootrom_init_header(bootrom_hdr_t *hdr) {
   unsigned int i = 0;
-  for (i = 0; i < sizeof(hdr->interrupt_table); i++) {
+  for (i = 0; i < sizeof(hdr->interrupt_table) / sizeof(hdr->interrupt_table[0]); i++) {
     hdr->interrupt_table[i] = BOOTROM_INT_TABLE_DEFAULT;
   }
   hdr->width_detect = BOOTROM_WIDTH_DETECT;
