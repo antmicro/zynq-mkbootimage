@@ -1,6 +1,9 @@
 #ifndef ARCH_ZYNQ_H
 #define ARCH_ZYNQ_H
 
+#include <stdint.h>
+#include "bootrom.h"
+
 bootrom_ops_t zynq_bops;
 
 typedef struct bootrom_partition_hdr_zynq_t {
