@@ -283,7 +283,7 @@ typedef struct bootrom_offs_t {
 typedef struct bootrom_ops_t {
   /* Initialize offsets - image pointer should be
    * set before this one is called */
-  int (*init_offs)(uint32_t*, bootrom_offs_t*);
+  int (*init_offs)(uint32_t*, int, bootrom_offs_t*);
 
   /* Initialize the main bootrom header */
   int (*init_header)(bootrom_hdr_t*, bootrom_offs_t*);

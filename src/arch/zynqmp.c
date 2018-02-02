@@ -14,7 +14,7 @@
 #include <arch/common.h>
 #include <arch/zynqmp.h>
 
-int zynqmp_bootrom_init_offs(uint32_t *img_ptr, bootrom_offs_t *offs) {
+int zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *offs) {
   /* Copy the image pointer */
   offs->img_ptr = img_ptr;
 

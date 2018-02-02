@@ -256,9 +256,13 @@ int create_boot_image(uint32_t *img_ptr,
   bootrom_img_hdr_tab_t img_hdr_tab;
 
   img_hdr_tab.hdrs_count = 0;
+  for (i = 0; i < bif_cfg->nodes_num; i++) {
+    if (bif_cfg->nodes[i].is_file && !bif_cfg->nodes[i].pmufw_image)
+      img_hdr_tab.hdrs_count++;
+  }
 
   /* Initialize offsets */
-  bops->init_offs(img_ptr, &offs);
+  bops->init_offs(img_ptr, img_hdr_tab.hdrs_count, &offs);
 
   /* Initialize header */
   bops->init_header(&hdr, &offs);
@@ -313,10 +317,6 @@ int create_boot_image(uint32_t *img_ptr,
       continue;
     }
 
-    /* If file - increment headers count */
-    img_hdr_tab.hdrs_count++;
-
-    f = img_hdr_tab.hdrs_count - 1;
 
     if (bif_cfg->nodes[i].offset != 0 &&
         (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < offs.coff) {
@@ -414,6 +414,8 @@ int create_boot_image(uint32_t *img_ptr,
      * actual partition count, however the bootgen binary
      * always sets this field to 1. */
     img_hdr[f].name_len = 0x1;
+
+    f++;
   }
 
   /* Create the image header table */
