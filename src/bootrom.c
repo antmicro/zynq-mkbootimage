@@ -59,7 +59,6 @@ int append_file_to_image(uint32_t *addr,
   uint32_t img_size_init;
   linux_image_header_t linux_img;
   int ret;
-  unsigned int i;
 
   /* Initialize header with zeroes */
   memset(part_hdr, 0x0, sizeof(*part_hdr));
@@ -166,24 +165,9 @@ int append_file_to_image(uint32_t *addr,
     bops->init_part_hdr_default(part_hdr, &node);
   };
 
-  /* remove trailing zeroes */
-  while (*(addr + (*img_size)) == 0x0) {
-    (*img_size)--;
-  }
-
-  /* uImages actually require some undefined ammount of 0x0 padding after
-   * the image. Analysis shows that it is one or two bytes, while keeping
-   * the image size divisible by two. */
-  if (file_header == FILE_MAGIC_LINUX) {
-    if (linux_img.type == FILE_LINUX_IMG_TYPE_UIM) {
-      for (i = 0; i < 2; i++) {
-        (*img_size)++;
-        *(addr + (*img_size)) = 0x0;
-        if ((((*img_size) + 1) % 2) == 0)
-          break;
-      }
-    }
-  }
+  *img_size += img_size_init;
+  /* Convert size to 32bit words */
+  *img_size = (*img_size + 3) / 4;
 
   /* Finish partition header */
   bops->finish_part_hdr(part_hdr, img_size, offs);
@@ -316,7 +300,6 @@ int create_boot_image(uint32_t *img_ptr,
       fclose(pmufile);
       continue;
     }
-
 
     if (bif_cfg->nodes[i].offset != 0 &&
         (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < offs.coff) {

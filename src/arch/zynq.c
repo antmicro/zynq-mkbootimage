@@ -16,6 +16,7 @@
 #include <arch/zynq.h>
 
 int zynq_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *offs) {
+  (void)hdr_count;
   /* Copy the image pointer */
   offs->img_ptr = img_ptr;
 
@@ -238,11 +239,17 @@ int zynq_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
   bootrom_partition_hdr_zynq_t *hdr;
   hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
 
-  /* The output image needs to use the actual value +1B
-   * for some reason */
-  hdr->pd_len = *img_size + 1;
-  hdr->ed_len = *img_size + 1;
-  hdr->total_len = *img_size + 1;
+  /* Is bitstream? */
+  if(hdr->attributes == BOOTROM_PART_ATTR_DEST_DEV_PL) {
+    /* For some reason, a noop is appended after bitstream (only for zynq) */
+    const uint8_t noop[4] = {0, 0, 0, 0x20};
+    memcpy(offs->coff + (*img_size), noop, sizeof(noop));
+    (*img_size)++;
+  }
+
+  hdr->pd_len = *img_size;
+  hdr->ed_len = *img_size;
+  hdr->total_len = *img_size;
 
   /* Section count is always set to 1 */
   hdr->section_count = 0x1;
@@ -255,16 +262,10 @@ int zynq_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
   /* Fill the offset */
   hdr->data_off = (offs->coff - offs->img_ptr);
 
-  /* Add 0xFF padding - make sure to add at least one word of padding*/
-  if (!(*img_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t)))) {
-    (*img_size)++;
-    memset(offs->coff + (*img_size), 0xFF, sizeof(uint32_t));
-  }
-
   /* Continue adding padding util it hits the correct alignement */
   while (*img_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
-    (*img_size)++;
     memset(offs->coff + (*img_size), 0xFF, sizeof(uint32_t));
+    (*img_size)++;
   }
 
   return BOOTROM_SUCCESS;

@@ -14,6 +14,10 @@
 #include <arch/common.h>
 #include <arch/zynqmp.h>
 
+#define BOOTROM_ZYNQMP_IMAGE_HEADER_SIZE 0x40
+#define BOOTROM_ZYNQMP_PARTITION_HEADER_SIZE 0x40
+#define BOOTROM_ZYNQMP_OFFSET_AFTER_HEADERS 0x40
+
 int zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *offs) {
   /* Copy the image pointer */
   offs->img_ptr = img_ptr;
@@ -21,8 +25,11 @@ int zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *o
   /* Init constant offsets */
   offs->img_hdr_off = BOOTROM_IMG_HDR_OFF;
   offs->part_hdr_end_off = 0; /* Not needed by zynqmp */
-  offs->part_hdr_off = BOOTROM_PART_HDR_OFF_ZMP;
-  offs->bins_off = BOOTROM_BINS_OFF_ZMP;
+  offs->part_hdr_off = offs->img_hdr_off + sizeof(bootrom_img_hdr_tab_t)
+                     + BOOTROM_ZYNQMP_IMAGE_HEADER_SIZE * hdr_count;
+  offs->bins_off = offs->part_hdr_off
+                 + BOOTROM_ZYNQMP_PARTITION_HEADER_SIZE * hdr_count
+                 + BOOTROM_ZYNQMP_OFFSET_AFTER_HEADERS;
 
   /* Move the offset to reserve the space for headers */
   offs->poff = (offs->img_hdr_off) / sizeof(uint32_t) + img_ptr;
@@ -244,8 +251,7 @@ int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
   hdr->dest_exec_addr_lo = entry;
 
   /* Size needs to be rounded after conversion to words  */
-  while ((*size + 1) % 4)
-    (*size)++;
+  *size = (*size + 3) & ~3u;
 
   /* Set sizes (in words) */
   hdr->pd_len = *size / 4;

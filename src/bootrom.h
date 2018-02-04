@@ -212,7 +212,6 @@ typedef struct linux_image_header_t {
 #define BOOTROM_BINS_OFF          0x00001700
 
 /* The same defines as above but for zynqmp */
-#define BOOTROM_PART_HDR_OFF_ZMP  0x00000a00
 #define BOOTROM_BINS_OFF_ZMP      0x00000b40
 
 /* values from the documentation */

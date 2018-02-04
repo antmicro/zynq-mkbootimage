@@ -76,9 +76,10 @@ int bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
   fseek(bitfile, -1, SEEK_CUR);
   fread(img_size, 1, 4, bitfile);
 
-  *img_size = __builtin_bswap32(*img_size) + 1;
+  *img_size = __builtin_bswap32(*img_size);
+  uint32_t read_size = (*img_size + 3) & ~3;
 
-  for (i = 0; i <= *img_size; i += sizeof(chunk)) {
+  for (i = 0; i < read_size; i += sizeof(chunk)) {
     fread(&chunk, 1, sizeof(chunk), bitfile);
     rchunk = __builtin_bswap32(chunk);
     memcpy(dest, &rchunk, sizeof(rchunk));
