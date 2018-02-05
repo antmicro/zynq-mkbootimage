@@ -14,8 +14,6 @@
 #include <arch/common.h>
 #include <arch/zynqmp.h>
 
-#define BOOTROM_ZYNQMP_IMAGE_HEADER_SIZE 0x40
-#define BOOTROM_ZYNQMP_PARTITION_HEADER_SIZE 0x40
 #define BOOTROM_ZYNQMP_OFFSET_AFTER_HEADERS 0x40
 
 int zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *offs) {
@@ -26,10 +24,13 @@ int zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *o
   offs->img_hdr_off = BOOTROM_IMG_HDR_OFF;
   offs->part_hdr_end_off = 0; /* Not needed by zynqmp */
   offs->part_hdr_off = offs->img_hdr_off + sizeof(bootrom_img_hdr_tab_t)
-                     + BOOTROM_ZYNQMP_IMAGE_HEADER_SIZE * hdr_count;
+                     + sizeof(bootrom_img_hdr_t) * hdr_count;
   offs->bins_off = offs->part_hdr_off
-                 + BOOTROM_ZYNQMP_PARTITION_HEADER_SIZE * hdr_count
+                 + sizeof(bootrom_partition_hdr_t) * hdr_count
                  + BOOTROM_ZYNQMP_OFFSET_AFTER_HEADERS;
+
+  printf("bootrom_partition_hdr_t: %u  bootrom_img_hdr_t: %u\n",
+         sizeof(bootrom_partition_hdr_t), sizeof(bootrom_img_hdr_t));
 
   /* Move the offset to reserve the space for headers */
   offs->poff = (offs->img_hdr_off) / sizeof(uint32_t) + img_ptr;
@@ -114,12 +115,8 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   bootrom_init_img_hdr_tab(img_hdr_tab, offs);
 
   for (i = 0; i < img_hdr_tab->hdrs_count; i++) {
-    /* Write 0xFF padding first - will use offset info later */
     img_hdr_size = sizeof(img_hdr[i]) / sizeof(uint32_t);
-    while (img_hdr_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
-      memset(offs->poff + img_hdr_size, 0xFF, sizeof(uint32_t));
-      img_hdr_size++;
-    }
+    memset(&img_hdr[i].padding, 0xFF, sizeof(img_hdr->padding));
 
     img_hdr[i].part_hdr_off =
       (offs->part_hdr_off / sizeof(uint32_t)) +

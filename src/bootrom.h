@@ -122,6 +122,7 @@ typedef struct bootrom_img_hdr_t {
    * always sets this field to 1. */
   uint32_t name_len;
   uint8_t  name[BOOTROM_IMG_MAX_NAME_LEN];
+  uint8_t  padding[16];
 } bootrom_img_hdr_t;
 
 typedef struct linux_image_header_t {

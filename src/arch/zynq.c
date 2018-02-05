@@ -94,12 +94,8 @@ int zynq_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   bootrom_init_img_hdr_tab(img_hdr_tab, offs);
 
   for (i = 0; i < img_hdr_tab->hdrs_count; i++) {
-    /* Write 0xFF padding first - will use offset info later */
     img_hdr_size = sizeof(img_hdr[i]) / sizeof(uint32_t);
-    while (img_hdr_size % (BOOTROM_IMG_PADDING_SIZE / sizeof(uint32_t))) {
-      memset(offs->poff + img_hdr_size, 0xFF, sizeof(uint32_t));
-      img_hdr_size++;
-    }
+    memset(&img_hdr[i].padding, 0xFF, sizeof(img_hdr->padding));
 
     /* Calculate the next img hdr offsets */
     if (i + 1 == img_hdr_tab->hdrs_count) {
