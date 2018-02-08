@@ -29,9 +29,6 @@ int zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *o
                  + sizeof(bootrom_partition_hdr_t) * hdr_count
                  + BOOTROM_ZYNQMP_OFFSET_AFTER_HEADERS;
 
-  printf("bootrom_partition_hdr_t: %u  bootrom_img_hdr_t: %u\n",
-         sizeof(bootrom_partition_hdr_t), sizeof(bootrom_img_hdr_t));
-
   /* Move the offset to reserve the space for headers */
   offs->poff = (offs->img_hdr_off) / sizeof(uint32_t) + img_ptr;
   offs->coff = (offs->bins_off) / sizeof(uint32_t) + img_ptr;
