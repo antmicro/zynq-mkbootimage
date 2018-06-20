@@ -32,16 +32,78 @@
 #include <bootrom.h>
 #include <file/elf.h>
 
-int elf_find_offsets(const char *fname,
-                     uint8_t *elf_nbits,
-                     uint32_t *elf_start,
-                     uint32_t *elf_entry,
-                     uint32_t *img_size) {
-  Elf *elf;
-  int fd_elf;
-  Elf_Scn *elf_scn;
+static int elf_is_loadable_section(const GElf_Shdr *elf_shdr) {
+  return elf_shdr->sh_type != SHT_NOBITS &&
+         (elf_shdr->sh_flags & SHF_ALLOC) &&
+         elf_shdr->sh_size != 0;
+}
+
+static int elf_get_startaddr_endaddr(Elf *elf,
+                                     uint32_t *start_addr,
+                                     uint32_t *end_addr) {
+  Elf_Scn *elf_scn = NULL;
   GElf_Shdr elf_shdr;
+  *start_addr = -1;
+  *end_addr = 0;
+
+  while ((elf_scn = elf_nextscn(elf, elf_scn)) != NULL) {
+    if (gelf_getshdr(elf_scn, &elf_shdr) != &elf_shdr)
+      return -BOOTROM_ERROR_ELF;
+
+    if (!elf_is_loadable_section(&elf_shdr))
+      continue;
+
+    if (*start_addr > elf_shdr.sh_addr)
+      *start_addr = elf_shdr.sh_addr;
+
+    if (elf_shdr.sh_addr + elf_shdr.sh_size > *end_addr)
+      *end_addr = elf_shdr.sh_addr + elf_shdr.sh_size;
+  }
+
+  return BOOTROM_SUCCESS;
+}
+
+static int elf_create_image(Elf *elf,
+                            uint32_t start_addr,
+                            uint8_t *out_buf) {
+  Elf_Scn *elf_scn = NULL;
+  Elf_Data *elf_data;
+  GElf_Shdr elf_shdr;
+
+  while ((elf_scn = elf_nextscn(elf, elf_scn)) != NULL) {
+    if (gelf_getshdr(elf_scn, &elf_shdr) != &elf_shdr)
+      return -BOOTROM_ERROR_ELF;
+
+
+    if (!elf_is_loadable_section(&elf_shdr))
+      continue;
+
+    elf_data = NULL;
+
+    while ((elf_data = elf_rawdata(elf_scn, elf_data)) != NULL) {
+      if (!elf_data->d_buf)
+        return -BOOTROM_ERROR_ELF;
+
+      memcpy(out_buf + elf_shdr.sh_addr + elf_data->d_off - start_addr,
+             elf_data->d_buf, elf_data->d_size);
+    }
+  }
+
+  return BOOTROM_SUCCESS;
+}
+
+int elf_append(void *addr,
+               const char *fname,
+               uint32_t img_max_size,
+               uint32_t *img_size,
+               uint8_t *elf_nbits,
+               uint32_t *elf_load,
+               uint32_t *elf_entry) {
+  int fd_elf;
+  Elf *elf;
   GElf_Ehdr elf_ehdr;
+  uint32_t start_addr;
+  uint32_t end_addr;
 
   /* Init elf library */
   if (elf_version(EV_CURRENT) == EV_NONE)
@@ -59,28 +121,29 @@ int elf_find_offsets(const char *fname,
 
   /* Make sure it is an elf (despite magic byte check) */
   if (elf_kind(elf) != ELF_K_ELF) {
+    elf_end(elf);
     close(fd_elf);
     return -BOOTROM_ERROR_ELF;
   }
 
-  elf_scn = NULL;
-  *elf_start = 0;
+  if (elf_get_startaddr_endaddr(elf, &start_addr, &end_addr) != BOOTROM_SUCCESS) {
+    elf_end(elf);
+    close(fd_elf);
+    return -BOOTROM_ERROR_ELF;
+  }
 
-  while ((elf_scn = elf_nextscn(elf, elf_scn)) != NULL) {
-    if (gelf_getshdr(elf_scn, &elf_shdr) != &elf_shdr) {
-      elf_end(elf);
-      close(fd_elf);
-      return -BOOTROM_ERROR_ELF;
-    }
+  if (end_addr - start_addr > img_max_size) {
+    elf_end(elf);
+    close(fd_elf);
+    return -BOOTROM_ERROR_ELF;
+  }
 
-    if (*elf_start == 0)
-      *elf_start = elf_shdr.sh_offset;
+  memset(addr, 0, end_addr - start_addr);
 
-    if (elf_shdr.sh_type == SHT_NOBITS || !(elf_shdr.sh_flags & SHF_ALLOC)) {
-      /* Set the final size */
-      *img_size = elf_shdr.sh_offset - *elf_start;
-      break;
-    }
+  if (elf_create_image(elf, start_addr, addr) != BOOTROM_SUCCESS) {
+    elf_end(elf);
+    close(fd_elf);
+    return -BOOTROM_ERROR_ELF;
   }
 
   if (gelf_getehdr(elf, &elf_ehdr) != &elf_ehdr) {
@@ -89,19 +152,13 @@ int elf_find_offsets(const char *fname,
     return -BOOTROM_ERROR_ELF;
   }
 
+  *elf_load = start_addr;
   *elf_entry = elf_ehdr.e_entry;
   *elf_nbits = (elf_ehdr.e_ident[EI_CLASS] == ELFCLASS64) ? 64 : 32;
+  *img_size = end_addr - start_addr;
 
-  return BOOTROM_SUCCESS;
-}
-
-int elf_append(uint32_t *addr,
-               FILE *elffile,
-               uint32_t *img_size,
-               uint32_t start) {
-
-  fseek(elffile, start, SEEK_SET);
-  *img_size = fread(addr, 1, *img_size, elffile);
+  elf_end(elf);
+  close(fd_elf);
 
   return BOOTROM_SUCCESS;
 }

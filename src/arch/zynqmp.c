@@ -234,6 +234,7 @@ int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
 int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                              bif_node_t *node,
                              uint32_t *size,
+                             uint32_t load,
                              uint32_t entry,
                              uint8_t nbits) {
   /* Retrieve the header */
@@ -241,7 +242,7 @@ int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
   hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
 
   /* Set the load and execution address */
-  hdr->dest_load_addr_lo = entry;
+  hdr->dest_load_addr_lo = load;
   hdr->dest_exec_addr_lo = entry;
 
   /* Size needs to be rounded after conversion to words  */
