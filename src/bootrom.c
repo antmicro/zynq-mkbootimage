@@ -53,7 +53,7 @@ int append_file_to_image(uint32_t *addr,
   uint32_t file_header;
   struct stat cfile_stat;
   FILE *cfile;
-  uint32_t elf_start;
+  uint32_t elf_load;
   uint32_t elf_entry;
   uint8_t elf_nbits;
   uint32_t img_size_init;
@@ -86,11 +86,19 @@ int append_file_to_image(uint32_t *addr,
 
   switch(file_header) {
   case FILE_MAGIC_ELF:
-    /* Init elf file */
-    ret = elf_find_offsets(node.fname, &elf_nbits,
-                           &elf_start, &elf_entry, img_size);
+    /* Init elf file (img_size_init is non-zero for a bootloader if there
+     * is PMU firmware waiting). File size is used as result size limit
+     * as estimate_boot_image_size() makes that same assumption when
+     * allocating the memory area for the boot image */
+    ret = elf_append(addr + img_size_init / sizeof(uint32_t),
+                     node.fname,
+                     cfile_stat.st_size,
+                     img_size,
+                     &elf_nbits,
+                     &elf_load,
+                     &elf_entry);
     if (ret) {
-      fprintf(stderr, "ELF file initialization failed\n");
+      fprintf(stderr, "ELF file reading failed\n");
 
       /* Close the file */
       fclose(cfile);
@@ -103,21 +111,8 @@ int append_file_to_image(uint32_t *addr,
      * 'init' size is added before initializing the partition header and
      * subtracted after the initialization is done */
     *img_size += img_size_init;
-    bops->init_part_hdr_elf(part_hdr, &node, img_size, elf_entry, elf_nbits);
+    bops->init_part_hdr_elf(part_hdr, &node, img_size, elf_load, elf_entry, elf_nbits);
     *img_size -= img_size_init;
-
-    /* Read the actual content of the file, here the address is also moved by
-     * the 'init' size (which again, is non-zero only if this elf is a
-     * bootloader with PMU firmware */
-    ret = elf_append(addr + img_size_init / sizeof(uint32_t),
-                     cfile, img_size, elf_start);
-    if (ret) {
-      fprintf(stderr, "ELF file reading failed\n");
-
-      /* Close the file */
-      fclose(cfile);
-      return ret;
-    }
 
     break;
   case FILE_MAGIC_XILINXBIT_0:
@@ -225,12 +220,11 @@ int create_boot_image(uint32_t *img_ptr,
   int img_term_n = 0;
   uint8_t img_name[BOOTROM_IMG_MAX_NAME_LEN];
   uint8_t pmufw_img[BOOTROM_PMUFW_MAX_SIZE];
-  uint32_t pmufw_img_start;
+  uint32_t pmufw_img_load;
   uint32_t pmufw_img_entry;
   uint32_t pmufw_img_size;
   uint8_t pmufw_img_nbits;
   struct stat pmufile_stat;
-  FILE *pmufile;
 
 
   bootrom_partition_hdr_t part_hdr[bif_cfg->nodes_num];
@@ -265,17 +259,6 @@ int create_boot_image(uint32_t *img_ptr,
       hdr.pmufw_len = BOOTROM_PMUFW_MAX_SIZE;
       hdr.pmufw_total_len = hdr.pmufw_len;
 
-      /* Load the file to a temporary place */
-      ret = elf_find_offsets(bif_cfg->nodes[i].fname,
-                             &pmufw_img_nbits,
-                             &pmufw_img_start,
-                             &pmufw_img_entry,
-                             &pmufw_img_size);
-
-      if (ret != BOOTROM_SUCCESS) {
-        return -BOOTROM_ERROR_ELF;
-      }
-
       /* Prepare the array for the firmware */
       memset(pmufw_img, 0x00, sizeof(pmufw_img));
 
@@ -288,16 +271,17 @@ int create_boot_image(uint32_t *img_ptr,
         fprintf(stderr, "Not a regular file: %s\n", bif_cfg->nodes[i].fname);
         return -BOOTROM_ERROR_NOFILE;
       }
-      pmufile = fopen(bif_cfg->nodes[i].fname, "rb");
-
-      if (pmufile == NULL) {
-        fprintf(stderr, "Could not open file: %s\n", bif_cfg->nodes[i].fname);
-        return -BOOTROM_ERROR_NOFILE;
+      ret = elf_append(pmufw_img,
+                       bif_cfg->nodes[i].fname,
+                       hdr.pmufw_len,
+                       &pmufw_img_size,
+                       &pmufw_img_nbits,
+                       &pmufw_img_load,
+                       &pmufw_img_entry);
+      if (ret != BOOTROM_SUCCESS) {
+        fprintf(stderr, "Failed to parse ELF file: %s\n", bif_cfg->nodes[i].fname);
+        return -BOOTROM_ERROR_ELF;
       }
-
-      elf_append((uint32_t*)pmufw_img, pmufile,
-                 &pmufw_img_size, pmufw_img_start);
-      fclose(pmufile);
       continue;
     }
 

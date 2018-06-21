@@ -164,6 +164,7 @@ int zynq_init_part_hdr_dtb(bootrom_partition_hdr_t *ihdr,
 int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                            bif_node_t *node,
                            uint32_t *size,
+                           uint32_t load,
                            uint32_t entry,
                            uint8_t nbits) {
   /* Handle unused parameters warning */
@@ -176,7 +177,7 @@ int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
   hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
 
   /* Set the load and execution address */
-  hdr->dest_load_addr = entry;
+  hdr->dest_load_addr = load;
   hdr->dest_exec_addr = entry;
 
   /* set destination device as the only attribute */
