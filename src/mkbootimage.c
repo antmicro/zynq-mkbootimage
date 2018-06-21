@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 
   if (ret != BOOTROM_SUCCESS) { /* Error */
     free(file_data);
-    return ofile_size;
+    return EXIT_FAILURE;
   }
 
   ofile = fopen(arguments.bin_filename, "wb");
