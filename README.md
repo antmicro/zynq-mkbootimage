@@ -1,5 +1,4 @@
-Zynq mkbootimage
-----------------
+# Zynq mkbootimage
 
 (c) 2015-2018 Antmicro <www.antmicro.com>
 
@@ -20,7 +19,8 @@ To use it, type in:
 ./mkbootimage [--zynqmp|-u] <input_bif_file> <output_bin_file>
 ```
 
-Zynq Support:
+### Zynq-7000
+
 Currently it supports creating boot image containing fsbl, bitstream,
 u-boot, and linux related binary files.
 
@@ -51,7 +51,8 @@ will generate a bin image which can be used in u-boot, as follows:
 bootm 0x3000000 0x2000000 0x2a00000
 ```
 
-Zynq Ultrascale+ support:
+### Zynq Ultrascale+
+
 Currently it supports creating boot image containing fsbl, bitstream,
 u-boot, the arm trusted software and linux related binary images.
 
