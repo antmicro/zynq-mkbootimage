@@ -1,9 +1,9 @@
 # Zynq mkbootimage
 
-(c) 2015-2018 Antmicro <www.antmicro.com>
+(c) 2015-2018 [Antmicro](https://antmicro.com)
 
-This is an open-source replacement for the Xilinx bootgen application.
-It parses a `.bif` file and creates a Zynq boot image in `.bin` format.
+This is an open-source replacement for the Xilinx `bootgen` application.
+It parses a `.bif` file and creates a Zynq boot image in the `.bin` format.
 
 It is written entirely in C.
 
@@ -21,14 +21,14 @@ To use it, type in:
 
 ### Zynq-7000
 
-Currently it supports creating boot image containing fsbl, bitstream,
-u-boot, and linux related binary files.
+For Zynq-7000 series, `zynq-mkbootimage` currently supports creating boot images
+containing the FSBL, bitstream, U-Boot, and Linux-related binary files.
 
-For loading linux related images, both the `[load]` and the `[offset]` attributes
+For loading Linux-related images, both the `[load]` and the `[offset]` attributes
 are supported.
-As opposed to the original bootgen, the file extensions are not required.
+As opposed to the original `bootgen` utility, file extensions are not required.
 
-For example the following .bif file:
+For example the following `.bif` file:
 ```
 the_ROM_image:
 {
@@ -41,22 +41,22 @@ the_ROM_image:
 }
 ```
 
-Used as follows:
+used with the following command:
 ```
 ./mkbootimage boot.bif boot.bin
 ```
 
-will generate a bin image which can be used in u-boot, as follows:
+will generate a `.bin` image which can be used in U-Boot, as follows:
 ```
 bootm 0x3000000 0x2000000 0x2a00000
 ```
 
-### Zynq Ultrascale+
+### Zynq UltraScale+
 
-Currently it supports creating boot image containing fsbl, bitstream,
-u-boot, the arm trusted software and linux related binary images.
+For Zynq UltraScale+, `zynq-mkbootimage` currently supports creating boot images
+containing the FSBL, bitstream, U-Boot, ARM trusted software and Linux-related binary images.
 
-For example the following .bif file:
+For example the following `.bif` file:
 ```
 the_ROM_image:
 {
@@ -71,13 +71,13 @@ the_ROM_image:
 }
 ```
 
-Used as follows:
+used with the following command:
 ```
 ./mkbootimage --zynqmp boot.bif boot.bin
 ```
 
-will generate a bin image, which can be used to successfully boot a Zynq
-Ultrascale+ machine, and to boot Linux using U-Boot command:
+will generate a `.bin` image, which can be used to successfully boot a Zynq
+UltraScale+ machine, and to boot Linux using the following U-Boot command:
 ```
 bootm 0x3000000 0x2000000 0x2a00000
 ```
