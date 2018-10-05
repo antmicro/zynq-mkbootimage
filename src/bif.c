@@ -133,6 +133,7 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
     node.load = 0;
     node.bootloader = 0;
     node.fsbl_config = 0;
+    node.partition_owner = OWNER_FSBL;
     node.pmufw_image = 0;
     node.destination_device = DST_DEV_UNDEF;
     node.destination_cpu = DST_CPU_UNDEF;
@@ -216,6 +217,18 @@ int bif_node_set_attr(bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *v
 
   if (strcmp(attr_name, "offset") == 0 ) {
     sscanf(value, "0x%08x", &(node->offset));
+    return BIF_SUCCESS;
+  }
+
+  if (strcmp(attr_name, "partition_owner") == 0) {
+    if (strcmp(value, "fsbl") == 0)
+      node->partition_owner = OWNER_FSBL;
+    else if (strcmp(value, "uboot") == 0)
+      node->partition_owner = OWNER_UBOOT;
+    else {
+      fprintf(stderr, "Value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
+      return BIF_ERROR_UNSUPPORTED_VAL;
+    }
     return BIF_SUCCESS;
   }
 

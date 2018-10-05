@@ -16,6 +16,11 @@
 #define BIF_ARCH_ZYNQ              (1 << 0)
 #define BIF_ARCH_ZYNQMP            (1 << 1)
 
+typedef enum partition_owner_e {
+  OWNER_FSBL,
+  OWNER_UBOOT
+} partition_owner_t;
+
 typedef enum destination_device_e {
   DST_DEV_UNDEF = -1,
   DST_DEV_PS,
@@ -48,6 +53,7 @@ typedef struct bif_node_t {
   uint8_t bootloader; /* boolean */
   uint32_t load;
   uint32_t offset;
+  partition_owner_t partition_owner;
 
   /* supported zynqmp attributes */
   uint8_t fsbl_config; /* boolean */

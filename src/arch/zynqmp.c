@@ -170,9 +170,12 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
 }
 
 uint32_t zynqmp_calc_part_hdr_attr(bif_node_t *node) {
-  uint32_t attr;
+  uint32_t attr = 0;
 
-  attr = 0;
+  if (node->partition_owner == OWNER_FSBL)
+    attr |= BOOTROM_PART_ATTR_OWNER_FSBL;
+  else if (node->partition_owner == OWNER_UBOOT)
+    attr |= BOOTROM_PART_ATTR_OWNER_UBOOT;
 
   if (node->destination_device == DST_DEV_PS)
     attr |= BOOTROM_PART_ATTR_DEST_DEV_PS;
@@ -311,9 +314,6 @@ int zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
   if (img->type == FILE_LINUX_IMG_TYPE_UIM) {
     hdr->attributes = BINARY_ATTR_LINUX;
   }
-
-  if (img->type == FILE_LINUX_IMG_TYPE_URD)
-    hdr->attributes = 0x00; /* despite what the doc says */
 
   /* TODO implement and test me */
 
