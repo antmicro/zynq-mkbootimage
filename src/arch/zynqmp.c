@@ -171,47 +171,55 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
 
 uint32_t zynqmp_calc_part_hdr_attr(bif_node_t *node) {
   uint32_t attr;
-  int elvl;
-  char *p;
 
   attr = 0;
-  p = (char*)&node->destination_device;
 
-  if (strlen(p) == 2) {
-    if (strncmp(p, "pl", 2) == 0) {
-      attr |= BOOTROM_PART_ATTR_DEST_DEV_PL;
-    }
-  }
+  if (node->destination_device == DST_DEV_PS)
+    attr |= BOOTROM_PART_ATTR_DEST_DEV_PS;
+  else if (node->destination_device == DST_DEV_PL)
+    attr |= BOOTROM_PART_ATTR_DEST_DEV_PL;
 
-  p = (char*)&node->destination_cpu;
-
-  if(strlen(p) == 5) {
-    if (strncmp(p, "a53-0", 5) == 0) {
+  switch (node->destination_cpu) {
+    case DST_CPU_A53_0:
       attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_0;
-    } else if (strncmp(p, "a53-1", 5) == 0) {
+      break;
+    case DST_CPU_A53_1:
       attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_1;
-    } else if (strncmp(p, "a53-2", 5) == 0) {
+      break;
+    case DST_CPU_A53_2:
       attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_2;
-    } else if (strncmp(p, "a53-3", 5) == 0) {
+      break;
+    case DST_CPU_A53_3:
       attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_3;
-    }
-  } else if (strlen(p) == 4) {
-    if (strncmp(p, "r5-0", 4) == 0) {
+      break;
+    case DST_CPU_R5_0:
       attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_0;
-    } else if (strncmp(p, "r5-1", 4) == 0) {
+      break;
+    case DST_CPU_R5_1:
       attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_1;
-    }
+      break;
+    case DST_CPU_R5_LOCKSTEP:
+      attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_L;
+      break;
+    default:
+      break;
   }
 
-  elvl = 0;
-  p = (char*)&node->exception_level;
-
-  if (strlen(p) == 4) {
-    sscanf(p, "el-%d", &elvl);
-  }
-
-  if (elvl) {
-    attr |= ((elvl) << BOOTROM_PART_ATTR_EXC_LVL_OFF);
+  switch (node->exception_level) {
+    case EL_0:
+      attr |= BOOTROM_PART_ATTR_EXC_LVL_EL0;
+      break;
+    case EL_1:
+      attr |= BOOTROM_PART_ATTR_EXC_LVL_EL1;
+      break;
+    case EL_2:
+      attr |= BOOTROM_PART_ATTR_EXC_LVL_EL2;
+      break;
+    case EL_3:
+      attr |= BOOTROM_PART_ATTR_EXC_LVL_EL3;
+      break;
+    default:
+      break;
   }
 
   return attr;

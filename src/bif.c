@@ -134,9 +134,9 @@ int parse_bif(const char* fname, bif_cfg_t *cfg) {
     node.bootloader = 0;
     node.fsbl_config = 0;
     node.pmufw_image = 0;
-    strcpy(node.destination_device, "");
-    strcpy(node.destination_cpu, "");
-    strcpy(node.exception_level, "");
+    node.destination_device = DST_DEV_UNDEF;
+    node.destination_cpu = DST_CPU_UNDEF;
+    node.exception_level = EL_UNDEF;
     node.is_file = 1;
 
     ret = pcre_exec(re, NULL, bif_cfg, strlen(bif_cfg), soff, 0, ovec, 30);
@@ -235,23 +235,59 @@ int bif_node_set_attr(bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *v
     }
 
     if (strcmp(attr_name, "destination_device") == 0 ) {
-      sscanf(value, "%s", node->destination_device);
+      if (strcmp(value, "ps") == 0)
+        node->destination_device = DST_DEV_PS;
+      else if (strcmp(value, "pl") == 0)
+        node->destination_device = DST_DEV_PL;
+      else {
+        fprintf(stderr, "Value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
+        return BIF_ERROR_UNSUPPORTED_VAL;
+      }
+
       return BIF_SUCCESS;
     }
 
     if (strcmp(attr_name, "destination_cpu") == 0 ) {
-      sscanf(value, "%s", node->destination_cpu);
+      if (strcmp(value, "a53-0") == 0)
+        node->destination_cpu = DST_CPU_A53_0;
+      else if (strcmp(value, "a53-1") == 0)
+        node->destination_cpu = DST_CPU_A53_1;
+      else if (strcmp(value, "a53-2") == 0)
+        node->destination_cpu = DST_CPU_A53_2;
+      else if (strcmp(value, "a53-3") == 0)
+        node->destination_cpu = DST_CPU_A53_3;
+      else if (strcmp(value, "r5-0") == 0)
+        node->destination_cpu = DST_CPU_R5_0;
+      else if (strcmp(value, "r5-1") == 0)
+        node->destination_cpu = DST_CPU_R5_1;
+      else if (strcmp(value, "r5-lockstep") == 0)
+        node->destination_cpu = DST_CPU_R5_LOCKSTEP;
+      else {
+        fprintf(stderr, "Value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
+        return BIF_ERROR_UNSUPPORTED_VAL;
+      }
       return BIF_SUCCESS;
     }
 
-    if (strcmp(attr_name, "exception_level") == 0 ) {
-      sscanf(value, "%s", node->exception_level);
+    if (strcmp(attr_name, "exception_level") == 0) {
+      if (strcmp(value, "el-0") == 0)
+        node->exception_level = EL_0;
+      else if (strcmp(value, "el-1") == 0)
+        node->exception_level = EL_1;
+      else if (strcmp(value, "el-2") == 0)
+        node->exception_level = EL_2;
+      else if (strcmp(value, "el-3") == 0)
+        node->exception_level = EL_3;
+      else {
+        fprintf(stderr, "Value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
+        return BIF_ERROR_UNSUPPORTED_VAL;
+      }
       return BIF_SUCCESS;
     }
   }
 
   fprintf(stderr, "Node attribute not supported: \"%s\"\n", attr_name);
-  return BIF_ERROR_UNSUPORTED_ATTR;
+  return BIF_ERROR_UNSUPPORTED_ATTR;
 }
 
 int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {

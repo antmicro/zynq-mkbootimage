@@ -9,11 +9,37 @@
 #define BIF_SUCCESS                0
 #define BIF_ERROR_NOFILE           1
 #define BIF_ERROR_PARSER           2
-#define BIF_ERROR_UNSUPORTED_ATTR  3
+#define BIF_ERROR_UNSUPPORTED_ATTR 3
 #define BIF_ERROR_UNINITIALIZED    4
+#define BIF_ERROR_UNSUPPORTED_VAL  5
 
 #define BIF_ARCH_ZYNQ              (1 << 0)
 #define BIF_ARCH_ZYNQMP            (1 << 1)
+
+typedef enum destination_device_e {
+  DST_DEV_UNDEF = -1,
+  DST_DEV_PS,
+  DST_DEV_PL
+} destination_device_t;
+
+typedef enum destination_cpu_e {
+  DST_CPU_UNDEF = -1,
+  DST_CPU_A53_0,
+  DST_CPU_A53_1,
+  DST_CPU_A53_2,
+  DST_CPU_A53_3,
+  DST_CPU_R5_0,
+  DST_CPU_R5_1,
+  DST_CPU_R5_LOCKSTEP
+} destination_cpu_t;
+
+typedef enum exception_level_e {
+  EL_UNDEF = -1,
+  EL_0,
+  EL_1,
+  EL_2,
+  EL_3
+} exception_level_t;
 
 typedef struct bif_node_t {
   char fname[PATH_MAX];
@@ -26,9 +52,9 @@ typedef struct bif_node_t {
   /* supported zynqmp attributes */
   uint8_t fsbl_config; /* boolean */
   uint8_t pmufw_image; /* boolean */
-  char destination_device[100];
-  char destination_cpu[100];
-  char exception_level[100];
+  destination_device_t destination_device;
+  destination_cpu_t destination_cpu;
+  exception_level_t exception_level;
 
   /* special, non-bootgen features */
   uint8_t is_file; /* for now equal to !fsbl_config */
