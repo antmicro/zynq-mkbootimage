@@ -19,6 +19,11 @@ To use it, type in:
 ./mkbootimage [--zynqmp|-u] <input_bif_file> <output_bin_file>
 ```
 
+To see all available options, run:
+```
+./mkbootimage --help
+```
+
 ### Zynq-7000
 
 For Zynq-7000 series, `zynq-mkbootimage` currently supports creating boot images
