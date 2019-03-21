@@ -225,9 +225,14 @@ int create_boot_image(uint32_t *img_ptr,
   uint32_t pmufw_img_size;
   uint8_t pmufw_img_nbits;
   struct stat pmufile_stat;
+  uint8_t part_hdr_count;
 
+  if (bops->append_null_part)
+    part_hdr_count = bif_cfg->nodes_num + 1;
+  else
+    part_hdr_count = bif_cfg->nodes_num;
 
-  bootrom_partition_hdr_t part_hdr[bif_cfg->nodes_num];
+  bootrom_partition_hdr_t part_hdr[part_hdr_count];
   bootrom_img_hdr_t img_hdr[bif_cfg->nodes_num];
   uint32_t img_size;
 
