@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "bootrom.h"
 
-bootrom_ops_t zynqmp_bops;
+extern bootrom_ops_t zynqmp_bops;
 
 typedef struct bootrom_partition_hdr_zynqmp_t {
   uint32_t pd_len;
