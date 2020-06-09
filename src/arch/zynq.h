@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "bootrom.h"
 
-bootrom_ops_t zynq_bops;
+extern bootrom_ops_t zynq_bops;
 
 typedef struct bootrom_partition_hdr_zynq_t {
   uint32_t pd_len; /* encrypted partiton data length */
