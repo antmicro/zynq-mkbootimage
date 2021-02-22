@@ -1,6 +1,6 @@
 # Zynq mkbootimage
 
-(c) 2015-2018 [Antmicro](https://antmicro.com)
+Copright (c) 2015-2018 [Antmicro](https://antmicro.com)
 
 This is an open-source replacement for the Xilinx `bootgen` application.
 It parses a `.bif` file and creates a Zynq boot image in the `.bin` format.
