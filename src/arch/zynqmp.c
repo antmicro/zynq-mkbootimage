@@ -302,21 +302,29 @@ int zynqmp_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr,
 int zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
                                bif_node_t *node,
                                linux_image_header_t *img) {
-  /* Handle unused parameters warning */
-  (void) node;
-
-  /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
+  int attributes;
   hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
 
-  hdr->attributes = zynqmp_calc_part_hdr_attr(node);
+  hdr->attributes = 0x0;
 
-  if (img->type == FILE_LINUX_IMG_TYPE_UIM) {
+  if (img->type == FILE_LINUX_IMG_TYPE_UIM)
     hdr->attributes = BINARY_ATTR_LINUX;
-  }
 
-  /* TODO implement and test me */
+  if (img->type == FILE_LINUX_IMG_TYPE_SCR)
+    hdr->attributes = BINARY_ATTR_GENERAL;
 
+  /* Set destination device attribute */
+  hdr->attributes |= BOOTROM_PART_ATTR_DEST_DEV_PS;
+
+  /* Add explicitly defined attributes if they're given */
+  attributes = zynqmp_calc_part_hdr_attr(node);
+  if (attributes)
+    hdr->attributes |= attributes;
+
+  /* No load/execution address */
+  hdr->dest_load_addr_lo = node->load;
+  hdr->dest_exec_addr_lo = 0x0;
   return BOOTROM_SUCCESS;
 }
 
