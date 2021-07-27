@@ -303,24 +303,23 @@ int zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
                                bif_node_t *node,
                                linux_image_header_t *img) {
   bootrom_partition_hdr_zynqmp_t *hdr;
-  int attributes;
   hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
 
-  hdr->attributes = 0x0;
+  /* Despite what ug1283 p. 21 says, sometimes attributes need to be zeroed */
+  if (img->type == FILE_LINUX_IMG_TYPE_URD) {
+    hdr->attributes = 0x0;
+  } else if (img->type == FILE_LINUX_IMG_TYPE_SCR) {
+    hdr->attributes = 0x0;
+  } else {
+    /* Add explicitly defined attributes if they're given */
+    hdr->attributes = zynqmp_calc_part_hdr_attr(node);
 
-  if (img->type == FILE_LINUX_IMG_TYPE_UIM)
-    hdr->attributes = BINARY_ATTR_LINUX;
+    /* Set destination device attribute */
+    hdr->attributes |= BOOTROM_PART_ATTR_DEST_DEV_PS;
 
-  if (img->type == FILE_LINUX_IMG_TYPE_SCR)
-    hdr->attributes = BINARY_ATTR_GENERAL;
-
-  /* Set destination device attribute */
-  hdr->attributes |= BOOTROM_PART_ATTR_DEST_DEV_PS;
-
-  /* Add explicitly defined attributes if they're given */
-  attributes = zynqmp_calc_part_hdr_attr(node);
-  if (attributes)
-    hdr->attributes |= attributes;
+    if (img->type == FILE_LINUX_IMG_TYPE_UIM)
+      hdr->attributes |= BINARY_ATTR_LINUX;
+  }
 
   /* No load/execution address */
   hdr->dest_load_addr_lo = node->load;
