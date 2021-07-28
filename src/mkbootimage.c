@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
   cfg.arch = (arguments.zynqmp) ? BIF_ARCH_ZYNQMP : BIF_ARCH_ZYNQ;
   bops = (arguments.zynqmp) ? &zynqmp_bops : &zynq_bops;
 
-  ret = parse_bif(arguments.bif_filename, &cfg);
+  ret = bif_parse(arguments.bif_filename, &cfg);
   if (ret != BIF_SUCCESS || cfg.nodes_num == 0) {
     fprintf(stderr, "Error parsing %s file.\n", arguments.bif_filename);
     return EXIT_FAILURE;

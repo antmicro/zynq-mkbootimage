@@ -19,7 +19,7 @@ override CFLAGS += $(foreach includedir,$(MKBOOTIMAGE_INCLUDE_DIRS),-I$(included
 	-Wall -Wextra -Wpedantic \
 	--std=c11
 
-LDLIBS = -lpcre -lelf
+LDLIBS = -lelf
 
 all: $(MKBOOTIMAGE_NAME)
 

@@ -7,7 +7,7 @@ It parses a `.bif` file and creates a Zynq boot image in the `.bin` format.
 
 It is written entirely in C.
 
-Required C libraries: `pcre`, `libelf`.
+Requires the `libelf` C library.
 
 To build this application run:
 ```
@@ -16,7 +16,7 @@ make
 
 To use it, type in:
 ```
-./mkbootimage [--zynqmp|-u] <input_bif_file> <output_bin_file>
+./mkbootimage [--analyze|-a] [--zynqmp|-u] <input_bif_file> <output_bin_file>
 ```
 
 To see all available options, run:

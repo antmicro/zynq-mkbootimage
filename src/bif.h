@@ -12,6 +12,7 @@
 #define BIF_ERROR_UNSUPPORTED_ATTR 3
 #define BIF_ERROR_UNINITIALIZED    4
 #define BIF_ERROR_UNSUPPORTED_VAL  5
+#define BIF_ERROR_LEXER            6
 
 #define BIF_ARCH_ZYNQ              (1 << 0)
 #define BIF_ARCH_ZYNQMP            (1 << 1)
@@ -46,6 +47,26 @@ typedef enum exception_level_e {
   EL_3
 } exception_level_t;
 
+enum token_type {
+  TOKEN_EOF = 0,
+
+  TOKEN_UNKNOWN = 256, /* skip ASCII */
+  TOKEN_NAME,
+};
+
+typedef struct lexer_t {
+  FILE *file; /* the file being parsed */
+  char *fname;
+
+  int line, column;
+
+  int type; /* type of the last token read */
+  struct {
+    char *buffer; /* tokens of the token */
+    int len, cap; /* current length and allocated size */
+  };
+} lexer_t;
+
 typedef struct bif_node_t {
   char fname[PATH_MAX];
 
@@ -78,8 +99,10 @@ typedef struct bif_cfg_t {
 
 int init_bif_cfg(bif_cfg_t *cfg);
 int deinit_bif_cfg(bif_cfg_t *cfg);
+
 int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node);
-int bif_node_set_attr(bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *value);
-int parse_bif(const char* fname, bif_cfg_t *cfg);
+int bif_node_set_attr(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *value);
+
+int bif_parse(const char* fname, bif_cfg_t *cfg);
 
 #endif /* BIF_PARSER_H */
