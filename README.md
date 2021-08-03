@@ -16,7 +16,7 @@ make
 
 To use it, type in:
 ```
-./mkbootimage [--analyze|-a] [--zynqmp|-u] <input_bif_file> <output_bin_file>
+./mkbootimage [--parse-only|-p] [--zynqmp|-u] <input_bif_file> <output_bin_file>
 ```
 
 To see all available options, run:

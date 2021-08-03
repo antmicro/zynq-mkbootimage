@@ -217,7 +217,7 @@ static int bif_scan(lexer_t *lex) {
           return err;
 
         /* Replace ch with a more neutral char than '/' and '*' */
-	ch = ch == '/' ? '\n' : ' ';
+        ch = ch == '/' ? '\n' : ' ';
       } else {
         /* The char after initial '/' didn't start a comment,
            so pretend it wasn't read */

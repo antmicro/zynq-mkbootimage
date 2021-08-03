@@ -37,11 +37,11 @@
 /* Prepare global variables for arg parser */
 const char *argp_program_version = MKBOOTIMAGE_VER;
 static char doc[] = "Generate bootloader images for Xilinx Zynq based platforms.";
-static char args_doc[] = "[--analyze|-a] [--zynqmp|-u] <input_bif_file> <output_bin_file>";
+static char args_doc[] = "[--parse-only|-p] [--zynqmp|-u] <input_bif_file> <output_bin_file>";
 
 static struct argp_option argp_options[] = {
-  {"zynqmp",  'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)",       0},
-  {"analyze", 'a', 0, 0, "Analyze BIF grammar, but don't generate any files", 0},
+  {"zynqmp",     'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)",       0},
+  {"parse-only", 'p', 0, 0, "Analyze BIF grammar, but don't generate any files", 0},
   { 0 }
 };
 
@@ -50,7 +50,7 @@ struct arguments {
   uint8_t zynqmp;
   char *bif_filename;
   char *bin_filename;
-  uint8_t analyze;
+  uint8_t parse_only;
 };
 
 /* Define argument parser */
@@ -61,8 +61,8 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   case 'u':
     arguments->zynqmp = 0xFF;
     break;
-  case 'a':
-    arguments->analyze = 0xFF;
+  case 'p':
+    arguments->parse_only = 0xFF;
     break;
   case ARGP_KEY_ARG:
     switch(state->arg_num) {
@@ -79,7 +79,7 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   case ARGP_KEY_END:
     if (state->arg_num < 1)
       argp_usage(state);
-    else if (state->arg_num < 2 && !arguments->analyze)
+    else if (state->arg_num < 2 && !arguments->parse_only)
       argp_usage(state);
     break;
   default:
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 
   /* Init non-string arguments */
   arguments.zynqmp = 0;
-  arguments.analyze = 0;
+  arguments.parse_only = 0;
 
   /* Parse program arguments */
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
       printf("  offset: %08x\n", cfg.nodes[i].offset);
   }
 
-  if (arguments.analyze) {
+  if (arguments.parse_only) {
     printf("The source BIF has a correct syntax\n");
     return EXIT_SUCCESS;
   }
