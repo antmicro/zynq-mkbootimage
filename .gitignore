@@ -6,4 +6,5 @@ mkbootimage
 *.dtb
 *.o
 *.vim
+*.log
 tags

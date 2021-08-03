@@ -1,0 +1,5 @@
+the_ROM_image:
+{
+	[fsbl_config] a53_x64
+	[load=0x0210000] minimal.cpio.uboot
+}

@@ -1,0 +1,5 @@
+the_ROM_image:
+{
+	[bootloader]fsbl.elf
+	HelloWorld.elf
+}

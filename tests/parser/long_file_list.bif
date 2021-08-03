@@ -1,0 +1,2863 @@
+the_ROM_image:
+{
+	/*this is a comment !!*/[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]/*an fsbl file*/fsbl.elf
+	[destination_device=pl] "../bits/fp,ga.bit"
+	//[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	//[destination_cpu=a53-0,exception_level=el-2] u-boot.elf -- skip this thing
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb /* A multiline comment
+	*/    [offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	//[destination_device=pl] fpga.bit
+	//[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	//[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	//[offset=0x1D00000] Image.img
+	//[offset=0x2B00000] devicetree.dtb
+	//[offset=0x2B80000] uboot_ramdisk.scr
+	//[offset=0x2C00000] uramdisk.img
+	//[fsbl_config] a53_x64
+	//[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	/*[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	*/[bootloader]fsbl.elf    /*
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf****/
+	[bootloader]fsbl.elf
+	//[destination_device=pl] fpga.bit
+	//[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	//[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	//[offset=0x1D00000] Image.img
+	//[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	/*[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	*/[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	/*[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	*/[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img/*
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb*** ***/
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	//[fsbl_config] a53_x64
+//	[pmufw_image] pmu.elf
+//	[bootloader]fsbl.elf
+//	[destination_device=pl] fpga.bit
+//	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+//	[offset=0x1D00000] Image.img
+//	[offset=0x2B00000] devicetree.dtb
+/*	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+*/	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+/*	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+*/	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf/*
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	*/[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf   /******
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	*********/[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+	[fsbl_config] a53_x64
+	[pmufw_image] pmu.elf
+	[bootloader]fsbl.elf
+	[destination_device=pl] fpga.bit
+	[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+	[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+	[offset=0x1D00000] Image.img
+	[offset=0x2B00000] devicetree.dtb
+	[offset=0x2B80000] uboot_ramdisk.scr
+	[offset=0x2C00000] uramdisk.img
+}

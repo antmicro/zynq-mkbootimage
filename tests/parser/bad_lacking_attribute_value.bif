@@ -1,0 +1,10 @@
+the_ROM_image:
+{
+	[bootloader]fsbl.elf
+	fpga.bit
+	u-boot.elf
+	[offset=0x00600000]uImage.bin
+	[offset]devicetree.dtb
+	[offset=0x00c00000]uboot_ramdisk.scr
+	[offset=0x00c40000]uramdisk.bin
+}

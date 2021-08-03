@@ -1,0 +1,10 @@
+the_ROM_image:
+{
+[fsbl_config] a53_x64
+[pmufw_image] pmu.elf
+[bootloader] fsbl.elf
+[destination_device=pl] fpga.bit
+[destination_cpu=a53-0,exception_level=el-2] bl31.elf
+[destination_cpu=a53-0,exception_level=el-2] u-boot.elf
+}
+//
