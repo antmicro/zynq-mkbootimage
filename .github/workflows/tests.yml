@@ -1,0 +1,25 @@
+name: Test mkbootimage
+on: [push, pull_request]
+jobs:
+  test-zynq-mkbootimage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run:  sudo apt-get install --yes libelf-dev
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build the project
+        run: |
+          make
+          test -f mkbootimage
+
+      - name: Run integration tests
+        run:  tests/tester.sh
+
+      - name: Save logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: results
+          path: tests/results.log
