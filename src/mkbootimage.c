@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, Antmicro Ltd
+/* Copyright (c) 2013-2021, Antmicro Ltd
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
