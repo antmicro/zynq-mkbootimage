@@ -38,7 +38,8 @@
 
 #include <sys/stat.h>
 
-/* TODO: handle errors here */
+/* TODO: handle offset errors */
+
 #define BYTE_OFFSET(base, offset) \
   ((void*)((uint8_t*)(base)+(offset)))
 
@@ -64,6 +65,7 @@ struct arguments {
   uint8_t partitions;
   uint8_t zynqmp;
 
+  uint8_t force;
   uint8_t extract;
   int extract_count;
   char **extract_names;
@@ -86,6 +88,9 @@ typedef bootrom_hdr_t                  hdr_t;
 typedef bootrom_img_hdr_tab_t          img_hdr_tab_t;
 typedef bootrom_img_hdr_t              img_hdr_t;
 
+typedef bootrom_partition_hdr_t        part_hdr_t;
+
+int name_to_string(char *dst, void *base, int offset);
 int print_dec(FILE *f, void *base, int offset);
 int print_word(FILE *f, void *base, int offset);
 int print_dbl_word(FILE *f, void *base, int offset);
@@ -107,13 +112,12 @@ static char args_doc[] = "[--zynqmp|-u] "
 static struct argp_option argp_options[] = {
   {"zynqmp",   'u', 0, 0, "Expect files for ZynqMP (default is Zynq)", 0},
   {"extract",  'x', 0, 0, "Extract files embed in the image",          0},
+  {"force",    'f', 0, 0, "Don't avoid overwriting an extracted file", 0},
   {"list",     'l', 0, 0, "List files embedded in the image",          0},
   {"describe", 'd', 0, 0, "Describe the boot image (-hip equivalent)", 0},
   {"header",   'h', 0, 0, "Print main boot image header",              0},
   {"images",   'i', 0, 0, "Print partition image headers",             0},
   {"parts",    'p', 0, 0, "Print partition headers",                   0},
-  /* TODO: force */
-  /* TODO: only */
   { 0 }
 };
 
@@ -162,7 +166,7 @@ static struct format zynq_hdr_fmt[] = {
   {"Total Length",            offsetof(zynq_hdr_t, total_len),      print_dec},
   {"Load Address",            offsetof(zynq_hdr_t, dest_load_addr), print_word},
   {"Execution Address",       offsetof(zynq_hdr_t, dest_exec_addr), print_word},
-  {"Data Word Offset",        offsetof(zynq_hdr_t, data_off),       print_word},
+  {"Partition Data Offset",   offsetof(zynq_hdr_t, data_off),       print_word},
   {"Attributes",              offsetof(zynq_hdr_t, attributes),     print_attr},
   {"Section Count",           offsetof(zynq_hdr_t, section_count),  print_dec},
   {"Checksum Offset",         offsetof(zynq_hdr_t, checksum_off),   print_word},
@@ -179,7 +183,7 @@ static struct format zynqmp_hdr_fmt[] = {
   {"Next Header Offset",      offsetof(zynqmp_hdr_t, next_part_hdr_off), print_word},
   {"Load Address",            offsetof(zynqmp_hdr_t, dest_load_addr_lo), print_dbl_word},
   {"Execution Address",       offsetof(zynqmp_hdr_t, dest_exec_addr_lo), print_dbl_word},
-  {"Data Word Offset",        offsetof(zynqmp_hdr_t, actual_part_off),   print_word},
+  {"Partition Data Offset",   offsetof(zynqmp_hdr_t, actual_part_off),   print_word},
   {"Attributes",              offsetof(zynqmp_hdr_t, attributes),        print_attr},
   {"Section Count",           offsetof(zynqmp_hdr_t, section_count),     print_dec},
   {"Checksum Offset",         offsetof(zynqmp_hdr_t, checksum_off),      print_word},
@@ -189,6 +193,7 @@ static struct format zynqmp_hdr_fmt[] = {
   { 0 }
 };
 
+/* Print desired number of repetitions of the same char */
 int print_padding(FILE *f, int times, char ch) {
   int err;
 
@@ -218,19 +223,12 @@ int print_dbl_word(FILE *f, void *base, int lo_offset) {
   return fprintf(f, "0x%08x%08x", hi, lo);
 }
 
-/* Print a string of chars encoded as big-endian 32bit words*/
+/* Print a string of chars encoded as big-endian 32bit words */
 int print_name(FILE *f, void *base, int offset) {
-  int i, j;
-  char *s = (char*)base+offset;
+  char name[BOOTROM_IMG_MAX_NAME_LEN];
 
-  for (i = 0; i < BOOTROM_IMG_MAX_NAME_LEN; i += sizeof(uint32_t)) {
-    if (*(uint32_t*)(s + i) == 0)
-      break;
-
-    for (j = i+3; j >= i; j--)
-      if (s[j] > 0)
-        fputc(s[j], f);
-  }
+  name_to_string(name, base, offset);
+  fputs(name, f);
 
   return 0;
 }
@@ -339,6 +337,33 @@ int print_struct(FILE *f, void *base, struct format fmt[]) {
   return 0;
 }
 
+/* Convert a name encoded as big-endian 32bit words to string */
+int name_to_string(char *dst, void *base, int offset) {
+  int i, j, p = 0;
+  char *s = (char*)base+offset;
+
+  for (i = 0; i < BOOTROM_IMG_MAX_NAME_LEN; i += sizeof(uint32_t)) {
+    if (*(uint32_t*)(s + i) == 0)
+      break;
+
+    for (j = i+3; j >= i; j--)
+      if (s[j] > 0)
+        dst[p++] = s[j];
+  }
+  dst[p] = '\0';
+
+  return p;
+}
+
+int is_on_list(char *list[], char *s) {
+  int i;
+
+  for (i = 0; list[i]; i++)
+    if (strcmp(list[i], s) == 0)
+      return 0xFF;
+  return 0;
+}
+
 /* Define argument parser */
 static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   struct arguments *arguments = state->input;
@@ -346,45 +371,39 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   switch (key) {
   case 'u':
     arguments->zynqmp = 0xFF;
-    arguments->in_file_list = 0x0;
     break;
   case 'x':
     arguments->extract = 0xFF;
-    arguments->in_file_list = 0xFF;
+    break;
+  case 'f':
+    arguments->force = 0xFF;
     break;
   case 'l':
     arguments->list = 0xFF;
-    arguments->in_file_list = 0;
     break;
   case 'd':
     arguments->header = 0xFF;
     arguments->images = 0xFF;
     arguments->partitions = 0xFF;
-    arguments->in_file_list = 0;
     break;
   case 'h':
     arguments->header = 0xFF;
-    arguments->in_file_list = 0;
     break;
   case 'i':
     arguments->images = 0xFF;
-    arguments->in_file_list = 0;
     break;
   case 'p':
     arguments->partitions = 0xFF;
-    arguments->in_file_list = 0;
     break;
   case ARGP_KEY_ARG:
-    if (arguments->in_file_list) {
-      if (!arguments->extract_names) {
-        arguments->extract_names = calloc(state->argc, sizeof (char *));
-        arguments->extract_names[0] = arg;
-        arguments->extract_count = 1;
-      } else {
-        arguments->extract_names[arguments->extract_count++] = arg;
-      }
-    } else if (!arguments->fname) {
+    if (state->arg_num == 0) {
       arguments->fname = arg;
+    } else if (arguments->extract) {
+      if (arguments->extract_count <= 0) {
+        arguments->extract_names = calloc(state->argc+1, sizeof(char*));
+        arguments->extract_count = 0;
+      }
+      arguments->extract_names[arguments->extract_count++] = arg;
     } else {
       argp_usage(state);
     }
@@ -392,9 +411,10 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   case ARGP_KEY_END:
     if (state->arg_num < 1)
       argp_usage(state);
+    else if (arguments->extract && arguments->extract_count <= 0)
+      argp_usage(state);
     else if (arguments->extract)
-      if (state->arg_num < 2 || arguments->extract_count <= 0)
-        argp_usage(state);
+      arguments->extract_names[arguments->extract_count] = NULL;
     break;
   default:
     return ARGP_ERR_UNKNOWN;
@@ -407,9 +427,10 @@ static struct argp argp = { argp_options, argp_parser, args_doc, doc, 0, 0, 0 };
 
 /* Declare the main function */
 int main(int argc, char *argv[]) {
+  char name[BOOTROM_IMG_MAX_NAME_LEN];
   struct arguments arguments;
   struct stat bfile_stat;
-  uint32_t size;
+  uint32_t size, offset;
   hdr_t *major;             /* Image's base memory address */
   img_hdr_tab_t *tab;
   img_hdr_t *img, *first_img;
@@ -424,6 +445,7 @@ int main(int argc, char *argv[]) {
   arguments.zynqmp = 0;
   arguments.fname = NULL;
 
+  arguments.force = 0;
   arguments.extract = 0;
   arguments.extract_count = 0;
   arguments.extract_names = NULL;
@@ -449,13 +471,14 @@ int main(int argc, char *argv[]) {
   size = bfile_stat.st_size;
   major = calloc(size, sizeof(uint8_t));
   fread(major, sizeof(uint8_t), bfile_stat.st_size, bfile);
+  fclose(bfile);
 
   tab = BYTE_OFFSET(major, sizeof(hdr_t));
   first_img = WORD_OFFSET(major, tab->part_img_hdr_off);
 
   if (arguments.list) {
     for (img = first_img; !IS_EQUAL(major, img);) {
-      print_name(stdout, img, offsetof(bootrom_img_hdr_t, name));
+      print_name(stdout, img, offsetof(img_hdr_t, name));
       fputc('\n', stdout);
 
       img = WORD_OFFSET(major, img->next_img_off);
@@ -495,7 +518,7 @@ int main(int argc, char *argv[]) {
     for (img = first_img; !IS_EQUAL(major, img);) {
       part = WORD_OFFSET(major, img->part_hdr_off);
 
-      print_name(stdout, img, offsetof(bootrom_img_hdr_t, name));
+      print_name(stdout, img, offsetof(img_hdr_t, name));
       fprintf(stdout, ":\n");
 
       if (arguments.zynqmp)
@@ -508,9 +531,44 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  int i;
-  for (i = 0; i < arguments.extract_count; i++)
-    puts(arguments.extract_names[i]);
+  if (arguments.extract) {
+    /* Offset of a header field containing partition offset (sic) */
+    if (arguments.zynqmp)
+      offset = offsetof(zynqmp_hdr_t, actual_part_off);
+   else
+      offset = offsetof(zynq_hdr_t, data_off);
+
+    for (img = first_img; !IS_EQUAL(major, img);) {
+      name_to_string(name, img, offsetof(img_hdr_t, name));
+
+      /* Check if we're interested */
+      if (is_on_list(arguments.extract_names, name)) {
+        part = WORD_OFFSET(major, img->part_hdr_off);
+
+        size = *(uint32_t*)BYTE_OFFSET(part, offsetof(part_hdr_t, total_len));
+
+        part = WORD_OFFSET(major, *(uint32_t*)BYTE_OFFSET(part, offset));
+
+        if(!stat(name, &bfile_stat) && !arguments.force) { /* TODO */
+          fprintf(stderr, "File %s already exists, use -f to force\n", name);
+          return -BOOTROM_ERROR_NOFILE;
+        }
+        if (!(bfile = fopen(name, "wb"))) {
+          fprintf(stderr, "Could not open file: %s\n", name);
+          return -BOOTROM_ERROR_NOFILE;
+        }
+
+        fprintf(stdout, "Extracting %s... ", name);
+
+        fwrite(part, size, sizeof(uint32_t), bfile);
+        fclose(bfile);
+
+        fprintf(stdout, "done\n");
+      }
+
+      img = WORD_OFFSET(major, img->next_img_off);
+    }
+  }
 
   return EXIT_SUCCESS;
 }
