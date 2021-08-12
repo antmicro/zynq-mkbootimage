@@ -36,6 +36,8 @@
 #include <arch/zynq.h>
 #include <arch/zynqmp.h>
 
+#include <file/bitstream.h>
+
 #include <sys/stat.h>
 
 /* TODO: handle offset errors */
@@ -44,7 +46,7 @@
   ((void*)((uint8_t*)(base)+(offset)))
 
 #define WORD_OFFSET(base, offset) \
-  ((void*)((uint32_t*)(base) + (offset)))
+  ((void*)((uint32_t*)(base)+(offset)))
 
 #define IS_BYTE_OFFSET(bsize, offset) \
   ((offset)/sizeof(uint8_t) < (bsize))
@@ -70,6 +72,9 @@ struct arguments {
   int extract_count;
   char **extract_names;
   uint8_t in_file_list;
+
+  char *design;
+  char *part;
 
   char *fname;
 };
@@ -107,17 +112,22 @@ static char args_doc[] = "[--zynqmp|-u] "
                          "[--header|-h] "
                          "[--images|-i] "
                          "[--parts|-p] "
+                         "[--bitstream|-b DESIGN,PART]"
                          "<input_bif_file> <output_bin_file>";
 
 static struct argp_option argp_options[] = {
-  {"zynqmp",   'u', 0, 0, "Expect files for ZynqMP (default is Zynq)", 0},
-  {"extract",  'x', 0, 0, "Extract files embed in the image",          0},
-  {"force",    'f', 0, 0, "Don't avoid overwriting an extracted file", 0},
-  {"list",     'l', 0, 0, "List files embedded in the image",          0},
-  {"describe", 'd', 0, 0, "Describe the boot image (-hip equivalent)", 0},
-  {"header",   'h', 0, 0, "Print main boot image header",              0},
-  {"images",   'i', 0, 0, "Print partition image headers",             0},
-  {"parts",    'p', 0, 0, "Print partition headers",                   0},
+  {"zynqmp",    'u', 0, 0, "Expect files for ZynqMP (default is Zynq)", 0},
+  {"extract",   'x', 0, 0, "Extract files embed in the image",          0},
+  {"force",     'f', 0, 0, "Don't avoid overwriting an extracted file", 0},
+  {"list",      'l', 0, 0, "List files embedded in the image",          0},
+  {"describe",  'd', 0, 0, "Describe the boot image (-hip equivalent)", 0},
+  {"header",    'h', 0, 0, "Print main boot image header",              0},
+  {"images",    'i', 0, 0, "Print partition image headers",             0},
+  {"parts",     'p', 0, 0, "Print partition headers",                   0},
+  {"bitstream", 'b',
+   "DESIGN,PART", 0,
+   "Reconstruct bitstream headers after extraction", 0
+  },
   { 0 }
 };
 
@@ -355,6 +365,7 @@ int name_to_string(char *dst, void *base, int offset) {
   return p;
 }
 
+/* Check if a string is present on a list*/
 int is_on_list(char *list[], char *s) {
   int i;
 
@@ -367,6 +378,7 @@ int is_on_list(char *list[], char *s) {
 /* Define argument parser */
 static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   struct arguments *arguments = state->input;
+  char *s;
 
   switch (key) {
   case 'u':
@@ -394,6 +406,15 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
     break;
   case 'p':
     arguments->partitions = 0xFF;
+    break;
+  case 'b':
+    if (!(s = strchr(arg, ',')))
+      argp_usage(state);
+
+    *s = '\0';
+
+    arguments->design = arg;
+    arguments->part = s+1;
     break;
   case ARGP_KEY_ARG:
     if (state->arg_num == 0) {
@@ -450,6 +471,9 @@ int main(int argc, char *argv[]) {
   arguments.extract_count = 0;
   arguments.extract_names = NULL;
   arguments.in_file_list = 0;
+
+  arguments.design = 0;
+  arguments.part = 0;
 
   /* Parse program arguments */
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
@@ -549,7 +573,7 @@ int main(int argc, char *argv[]) {
 
         part = WORD_OFFSET(major, *(uint32_t*)BYTE_OFFSET(part, offset));
 
-        if(!stat(name, &bfile_stat) && !arguments.force) { /* TODO */
+        if(!stat(name, &bfile_stat) && !arguments.force) {
           fprintf(stderr, "File %s already exists, use -f to force\n", name);
           return -BOOTROM_ERROR_NOFILE;
         }
@@ -559,6 +583,13 @@ int main(int argc, char *argv[]) {
         }
 
         fprintf(stdout, "Extracting %s... ", name);
+
+        if (strcmp(name+strlen(name)-4, ".bit") == 0 && arguments.part)
+          bitstream_write_header(
+            bfile,
+            size,
+            arguments.design,
+            arguments.part);
 
         fwrite(part, size, sizeof(uint32_t), bfile);
         fclose(bfile);
