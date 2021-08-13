@@ -42,20 +42,21 @@
 
 /* TODO: handle offset errors */
 
-#define BYTE_OFFSET(base, offset) \
-  ((void*)((uint8_t*)(base)+(offset)))
+/* Calculate absolute value of a byte or word address */
+#define ABS_BADDR(base, addr) \
+  ((void*)((uint8_t*)(base)+(addr)))
+#define ABS_WADDR(base, addr) \
+  ((void*)((uint32_t*)(base)+(addr)))
 
-#define WORD_OFFSET(base, offset) \
-  ((void*)((uint32_t*)(base)+(offset)))
+/* Check if a byte or word address is correct */
+#define IS_REL_BADDR(bsize, addr) \
+  ((addr)/sizeof(uint8_t) < (bsize))
+#define IS_REL_WADDR(bsize, addr) \
+  ((addr)/sizeof(uint32_t) < (bsize))
 
-#define IS_BYTE_OFFSET(bsize, offset) \
-  ((offset)/sizeof(uint8_t) < (bsize))
-
-#define IS_WORD_OFFSET(bsize, offset) \
-  ((offset)/sizeof(uint32_t) < (bsize))
-
-#define IS_EQUAL(base, relative) \
-  ((void*)(base) == (void*)(relative))
+/* Check if an absolute address is relatively NULL  */
+#define IS_REL_NULL(base, addr) \
+  ((void*)(base) == (void*)(addr))
 
 
 /* Prapare struct for holding parsed arguments */
@@ -95,12 +96,14 @@ typedef bootrom_img_hdr_t              img_hdr_t;
 
 typedef bootrom_partition_hdr_t        part_hdr_t;
 
-int name_to_string(char *dst, void *base, int offset);
 int print_dec(FILE *f, void *base, int offset);
 int print_word(FILE *f, void *base, int offset);
 int print_dbl_word(FILE *f, void *base, int offset);
 int print_name(FILE *f, void *base, int offset);
 int print_attr(FILE *f, void *base, int offset);
+
+int name_to_string(char *dst, void *base, int offset);
+int print_padding(FILE  *f, int times, char ch);
 
 /* Prepare global variables for arg parser */
 const char *argp_program_version = MKBOOTIMAGE_VER;
@@ -203,32 +206,22 @@ static struct format zynqmp_hdr_fmt[] = {
   { 0 }
 };
 
-/* Print desired number of repetitions of the same char */
-int print_padding(FILE *f, int times, char ch) {
-  int err;
-
-  while (times-- > 0)
-    if ((err = fputc(ch, f)) < 0)
-      return err;
-  return 0;
-}
-
 /* Print a word as a decimal*/
 int print_dec(FILE *f, void *base, int offset) {
-  return fprintf(f, "%d", *(uint32_t*)BYTE_OFFSET(base, offset));
+  return fprintf(f, "%d", *(uint32_t*)ABS_BADDR(base, offset));
 }
 
 /* Print a word as a hexadecimal*/
 int print_word(FILE *f, void *base, int offset) {
-  return fprintf(f, "0x%08x", *(uint32_t*)BYTE_OFFSET(base, offset));
+  return fprintf(f, "0x%08x", *(uint32_t*)ABS_BADDR(base, offset));
 }
 
 /* Print double word as a decimal*/
 int print_dbl_word(FILE *f, void *base, int lo_offset) {
   uint32_t lo, hi;
 
-  lo = *((uint32_t*)BYTE_OFFSET(base, lo_offset));
-  hi = *((uint32_t*)BYTE_OFFSET(base, lo_offset)+1);
+  lo = *((uint32_t*)ABS_BADDR(base, lo_offset));
+  hi = *((uint32_t*)ABS_BADDR(base, lo_offset)+1);
 
   return fprintf(f, "0x%08x%08x", hi, lo);
 }
@@ -244,7 +237,7 @@ int print_name(FILE *f, void *base, int offset) {
 }
 
 int print_attr(FILE *f, void *base, int offset) {
-  uint32_t attr = *(uint32_t*)BYTE_OFFSET(base, offset);
+  uint32_t attr = *(uint32_t*)ABS_BADDR(base, offset);
 
   uint32_t owner =   (attr >> BOOTROM_PART_ATTR_OWNER_OFF)      & 0x3;
   uint32_t rsa =     (attr >> BOOTROM_PART_ATTR_RSA_USED_OFF)   & 0x1;
@@ -347,6 +340,16 @@ int print_struct(FILE *f, void *base, struct format fmt[]) {
   return 0;
 }
 
+/* Print desired number of repetitions of the same char */
+int print_padding(FILE *f, int times, char ch) {
+  int err;
+
+  while (times-- > 0)
+    if ((err = fputc(ch, f)) < 0)
+      return err;
+  return 0;
+}
+
 /* Convert a name encoded as big-endian 32bit words to string */
 int name_to_string(char *dst, void *base, int offset) {
   int i, j, p = 0;
@@ -363,6 +366,10 @@ int name_to_string(char *dst, void *base, int offset) {
   dst[p] = '\0';
 
   return p;
+}
+
+int is_postfix(char *string, char *pfix) {
+  return strcmp(string+strlen(string)-strlen(pfix), pfix) == 0;
 }
 
 /* Check if a string is present on a list*/
@@ -432,9 +439,7 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   case ARGP_KEY_END:
     if (state->arg_num < 1)
       argp_usage(state);
-    else if (arguments->extract && arguments->extract_count <= 0)
-      argp_usage(state);
-    else if (arguments->extract)
+    else if (arguments->extract_names)
       arguments->extract_names[arguments->extract_count] = NULL;
     break;
   default:
@@ -497,15 +502,15 @@ int main(int argc, char *argv[]) {
   fread(major, sizeof(uint8_t), bfile_stat.st_size, bfile);
   fclose(bfile);
 
-  tab = BYTE_OFFSET(major, sizeof(hdr_t));
-  first_img = WORD_OFFSET(major, tab->part_img_hdr_off);
+  tab = ABS_BADDR(major, sizeof(hdr_t));
+  first_img = ABS_WADDR(major, tab->part_img_hdr_off);
 
   if (arguments.list) {
-    for (img = first_img; !IS_EQUAL(major, img);) {
+    for (img = first_img; !IS_REL_NULL(major, img);) {
       print_name(stdout, img, offsetof(img_hdr_t, name));
       fputc('\n', stdout);
 
-      img = WORD_OFFSET(major, img->next_img_off);
+      img = ABS_WADDR(major, img->next_img_off);
     }
   }
 
@@ -526,11 +531,11 @@ int main(int argc, char *argv[]) {
     fprintf(stdout, "IMAGE HEADERS SECTION\n");
     print_padding(stdout, 60, '=');
     fputc('\n', stdout);
-    for (img = first_img; !IS_EQUAL(major, img);) {
+    for (img = first_img; !IS_REL_NULL(major, img);) {
       print_struct(stdout, img, img_hdr_fmt);
       fputc('\n', stdout);
 
-      img = WORD_OFFSET(major, img->next_img_off);
+      img = ABS_WADDR(major, img->next_img_off);
     }
   }
 
@@ -539,8 +544,8 @@ int main(int argc, char *argv[]) {
     print_padding(stdout, 60, '=');
     fputc('\n', stdout);
 
-    for (img = first_img; !IS_EQUAL(major, img);) {
-      part = WORD_OFFSET(major, img->part_hdr_off);
+    for (img = first_img; !IS_REL_NULL(major, img);) {
+      part = ABS_WADDR(major, img->part_hdr_off);
 
       print_name(stdout, img, offsetof(img_hdr_t, name));
       fprintf(stdout, ":\n");
@@ -551,7 +556,7 @@ int main(int argc, char *argv[]) {
         print_struct(stdout, part, zynq_hdr_fmt);
       fputc('\n', stdout);
 
-      img = WORD_OFFSET(major, img->next_img_off);
+      img = ABS_WADDR(major, img->next_img_off);
     }
   }
 
@@ -562,16 +567,16 @@ int main(int argc, char *argv[]) {
    else
       offset = offsetof(zynq_hdr_t, data_off);
 
-    for (img = first_img; !IS_EQUAL(major, img);) {
+    for (img = first_img; !IS_REL_NULL(major, img);) {
       name_to_string(name, img, offsetof(img_hdr_t, name));
 
       /* Check if we're interested */
-      if (is_on_list(arguments.extract_names, name)) {
-        part = WORD_OFFSET(major, img->part_hdr_off);
+      if (arguments.extract_count == 0 || is_on_list(arguments.extract_names, name)) {
+        part = ABS_WADDR(major, img->part_hdr_off);
 
-        size = *(uint32_t*)BYTE_OFFSET(part, offsetof(part_hdr_t, total_len));
+        size = *(uint32_t*)ABS_BADDR(part, offsetof(part_hdr_t, total_len));
 
-        part = WORD_OFFSET(major, *(uint32_t*)BYTE_OFFSET(part, offset));
+        part = ABS_WADDR(major, *(uint32_t*)ABS_BADDR(part, offset));
 
         if(!stat(name, &bfile_stat) && !arguments.force) {
           fprintf(stderr, "File %s already exists, use -f to force\n", name);
@@ -584,7 +589,7 @@ int main(int argc, char *argv[]) {
 
         fprintf(stdout, "Extracting %s... ", name);
 
-        if (strcmp(name+strlen(name)-4, ".bit") == 0 && arguments.part)
+        if (is_postfix(name, ".bit") == 0 && arguments.part)
           bitstream_write_header(
             bfile,
             size,
@@ -597,7 +602,7 @@ int main(int argc, char *argv[]) {
         fprintf(stdout, "done\n");
       }
 
-      img = WORD_OFFSET(major, img->next_img_off);
+      img = ABS_WADDR(major, img->next_img_off);
     }
   }
 
