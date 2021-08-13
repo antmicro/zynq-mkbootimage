@@ -29,6 +29,7 @@
 #include <time.h>
 
 #include <bootrom.h>
+#include <common.h>
 #include <file/bitstream.h>
 
 int bitstream_verify(FILE *bitfile) {
@@ -133,7 +134,7 @@ int bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
     fread(&section_hdr, 1, sizeof(section_hdr), bitfile);
     if (section_hdr[1] != 0x1 && section_hdr[1] != 0x0) {
       fclose(bitfile);
-      fprintf(stderr, "Bitstream file seems to have mismatched sections.\n");
+      errorf("bitstream file seems to have mismatched sections.\n");
       return -BOOTROM_ERROR_BITSTREAM;
     }
 
