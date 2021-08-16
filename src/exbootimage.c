@@ -40,11 +40,7 @@
 
 #include <sys/stat.h>
 
-/* TODO: handle errors whenever an int function only returns 0 */
-
-/* TODO: handle offset errors */
-
-/* {("[^"]+"), +offsetof\((\w+), (\w+)\), +print_(\w+)} */
+/* A macro contructor of struct fmt */
 #define FORMAT(name, type, field, fmt) \
   {name, offsetof(type, field), print_ ## fmt}
 
@@ -256,7 +252,7 @@ int print_attr(FILE *f, void *base, int offset) {
   uint32_t cpu =     (attr >> BOOTROM_PART_ATTR_DEST_CPU_OFF)   & 0x7;
   uint32_t encrypt = (attr >> BOOTROM_PART_ATTR_ENCRYPTION_OFF) & 0x1;
   uint32_t dev =     (attr >> BOOTROM_PART_ATTR_DEST_DEV_OFF)   & 0x7;
-  /*uint32_t exec =    (attr >> BOOTROM_PART_ATTR_A5X_EXEC_S_OFF) & 0x7;*/
+  uint32_t exec =    (attr >> BOOTROM_PART_ATTR_A5X_EXEC_S_OFF) & 0x7;
   uint32_t exclvl =  (attr >> BOOTROM_PART_ATTR_EXC_LVL_OFF)    & 0x3;
   uint32_t trust =   (attr >> BOOTROM_PART_ATTR_TRUST_ZONE_OFF) & 0x1;
 
@@ -310,10 +306,11 @@ int print_attr(FILE *f, void *base, int offset) {
     dev == 3 ? "INT" :
                "INVALID");
 
-  /*fprintf(f, "\tA5X Execution S: %s\n"
-    exec == 0 ? "64" :
-    exec == 1 ? "32" :
-                "[bad value]");*/
+  print_padding(f, 13, ' ');
+  fprintf(f, "A5x Execution State: %s\n",
+    exec == 0 ? "64 bit" :
+    exec == 1 ? "32 bit" :
+                "INVALID");
 
   print_padding(f, 13, ' ');
   fprintf(f, "Exception Level: %s\n",
