@@ -45,7 +45,7 @@
 /* TODO: handle offset errors */
 
 /* {("[^"]+"), +offsetof\((\w+), (\w+)\), +print_(\w+)} */
-#define FIELD(name, type, field, fmt) \
+#define FORMAT(name, type, field, fmt) \
   {name, offsetof(type, field), print_ ## fmt}
 
 /* Calculate absolute value of a byte or word address */
@@ -147,74 +147,74 @@ static struct argp_option argp_options[] = {
 };
 
 static struct format hdr_fmt[] = {
-  {"Width Detection Word",          offsetof(hdr_t, width_detect),      print_word},
-  {"Header Signature",              offsetof(hdr_t, img_id),            print_word},
-  {"Key Source",                    offsetof(hdr_t, encryption_status), print_word},
-  {"Header Version",                offsetof(hdr_t, fsbl_defined_0),    print_word},
-  {"Source Byte Offset",            offsetof(hdr_t, src_offset),        print_word},
-  {"FSBL Image Length",             offsetof(hdr_t, img_len),           print_dec},
-  {"FSBL Load Address",             offsetof(hdr_t, pmufw_total_len),   print_word},
-  {"FSBL Execution Address",        offsetof(hdr_t, start_of_exec),     print_word},
-  {"Total FSBL Length",             offsetof(hdr_t, total_img_len),     print_dec},
-  {"QSPI configuration Word",       offsetof(hdr_t, reserved_1),        print_word},
-  {"Boot Header Checksum",          offsetof(hdr_t, checksum),          print_word},
+  FORMAT("Width Detection Word",    hdr_t, width_detect,      word),
+  FORMAT("Header Signature",        hdr_t, img_id,            word),
+  FORMAT("Key Source",              hdr_t, encryption_status, word),
+  FORMAT("Header Version",          hdr_t, fsbl_defined_0,    word),
+  FORMAT("Source Byte Offset",      hdr_t, src_offset,        word),
+  FORMAT("FSBL Image Length",       hdr_t, img_len,           dec),
+  FORMAT("FSBL Load Address",       hdr_t, pmufw_total_len,   word),
+  FORMAT("FSBL Execution Address",  hdr_t, start_of_exec,     word),
+  FORMAT("Total FSBL Length",       hdr_t, total_img_len,     dec),
+  FORMAT("QSPI configuration Word", hdr_t, reserved_1,        word),
+  FORMAT("Boot Header Checksum",    hdr_t, checksum,          word),
   { 0 }
 };
 
 static struct format img_hdr_tab_fmt[] = {
-  {"Version",                       offsetof(img_hdr_tab_t, version),          print_word},
-  {"Header Count",                  offsetof(img_hdr_tab_t, hdrs_count),       print_dec},
-  {"Partition Header Offset",       offsetof(img_hdr_tab_t, part_hdr_off),     print_word},
-  {"Partition Image Header Offset", offsetof(img_hdr_tab_t, part_img_hdr_off), print_word},
-  {"Header Authentication Offset",  offsetof(img_hdr_tab_t, auth_hdr_off),     print_word},
+  FORMAT("Version",                       img_hdr_tab_t, version,          word),
+  FORMAT("Header Count",                  img_hdr_tab_t, hdrs_count,       dec),
+  FORMAT("Partition Header Offset",       img_hdr_tab_t, part_hdr_off,     word),
+  FORMAT("Partition Image Header Offset", img_hdr_tab_t, part_img_hdr_off, word),
+  FORMAT("Header Authentication Offset",  img_hdr_tab_t, auth_hdr_off,     word),
   { 0 }
 };
 
 static struct format zynqmp_img_hdr_tab_fmt[] = {
-  {"(ZynqMP) Boot Device", offsetof(img_hdr_tab_t, boot_dev), print_word},
-  {"(ZynqMP) Checksum",    offsetof(img_hdr_tab_t, checksum), print_word},
+  FORMAT("(ZynqMP) Boot Device", img_hdr_tab_t, boot_dev, word),
+  FORMAT("(ZynqMP) Checksum",    img_hdr_tab_t, checksum, word),
   { 0 }
 };
 
 static struct format img_hdr_fmt[] = {
-  {"Next Image Offset",          offsetof(img_hdr_t, next_img_off), print_word},
-  {"Partition Header Offset",    offsetof(img_hdr_t, part_hdr_off), print_word},
-  {"Partition Count (always 0)", offsetof(img_hdr_t, part_count),   print_dec},
-  {"Name Length (usually 1)",    offsetof(img_hdr_t, name_len),     print_dec},
-  {"Image Name",                 offsetof(img_hdr_t, name),         print_name},
+  FORMAT("Next Image Offset",          img_hdr_t, next_img_off, word),
+  FORMAT("Partition Header Offset",    img_hdr_t, part_hdr_off, word),
+  FORMAT("Partition Count (always 0)", img_hdr_t, part_count,   dec),
+  FORMAT("Name Length (usually 1)",    img_hdr_t, name_len,     dec),
+  FORMAT("Image Name",                 img_hdr_t, name,         name),
   { 0 }
 };
 
 static struct format zynq_hdr_fmt[] = {
-  {"Encrypted Data Length",   offsetof(zynq_hdr_t, pd_len),         print_dec},
-  {"Unencrypted Data Length", offsetof(zynq_hdr_t, ed_len),         print_dec},
-  {"Total Length",            offsetof(zynq_hdr_t, total_len),      print_dec},
-  {"Load Address",            offsetof(zynq_hdr_t, dest_load_addr), print_word},
-  {"Execution Address",       offsetof(zynq_hdr_t, dest_exec_addr), print_word},
-  {"Partition Data Offset",   offsetof(zynq_hdr_t, data_off),       print_word},
-  {"Attributes",              offsetof(zynq_hdr_t, attributes),     print_attr},
-  {"Section Count",           offsetof(zynq_hdr_t, section_count),  print_dec},
-  {"Checksum Offset",         offsetof(zynq_hdr_t, checksum_off),   print_word},
-  {"Image Header Offset",     offsetof(zynq_hdr_t, img_hdr_off),    print_word},
-  {"Certificate Offset",      offsetof(zynq_hdr_t, cert_off),       print_word},
-  {"Checksum",                offsetof(zynq_hdr_t, checksum),       print_word},
+  FORMAT("Encrypted Data Length",   zynq_hdr_t, pd_len,         dec),
+  FORMAT("Unencrypted Data Length", zynq_hdr_t, ed_len,         dec),
+  FORMAT("Total Length",            zynq_hdr_t, total_len,      dec),
+  FORMAT("Load Address",            zynq_hdr_t, dest_load_addr, word),
+  FORMAT("Execution Address",       zynq_hdr_t, dest_exec_addr, word),
+  FORMAT("Partition Data Offset",   zynq_hdr_t, data_off,       word),
+  FORMAT("Attributes",              zynq_hdr_t, attributes,     attr),
+  FORMAT("Section Count",           zynq_hdr_t, section_count,  dec),
+  FORMAT("Checksum Offset",         zynq_hdr_t, checksum_off,   word),
+  FORMAT("Image Header Offset",     zynq_hdr_t, img_hdr_off,    word),
+  FORMAT("Certificate Offset",      zynq_hdr_t, cert_off,       word),
+  FORMAT("Checksum",                zynq_hdr_t, checksum,       word),
   { 0 }
 };
 
 static struct format zynqmp_hdr_fmt[] = {
-  {"Encrypted Data Length",   offsetof(zynqmp_hdr_t, pd_len),            print_dec},
-  {"Unencrypted Data Length", offsetof(zynqmp_hdr_t, ed_len),            print_dec},
-  {"Total Length",            offsetof(zynqmp_hdr_t, total_len),         print_dec},
-  {"Next Header Offset",      offsetof(zynqmp_hdr_t, next_part_hdr_off), print_word},
-  {"Load Address",            offsetof(zynqmp_hdr_t, dest_load_addr_lo), print_dbl_word},
-  {"Execution Address",       offsetof(zynqmp_hdr_t, dest_exec_addr_lo), print_dbl_word},
-  {"Partition Data Offset",   offsetof(zynqmp_hdr_t, actual_part_off),   print_word},
-  {"Attributes",              offsetof(zynqmp_hdr_t, attributes),        print_attr},
-  {"Section Count",           offsetof(zynqmp_hdr_t, section_count),     print_dec},
-  {"Checksum Offset",         offsetof(zynqmp_hdr_t, checksum_off),      print_word},
-  {"Image Header Offset",     offsetof(zynqmp_hdr_t, img_hdr_off),       print_word},
-  {"Certificate Offset",      offsetof(zynqmp_hdr_t, cert_off),          print_word},
-  {"Checksum",                offsetof(zynqmp_hdr_t, checksum),          print_word},
+  FORMAT("Encrypted Data Length",   zynqmp_hdr_t, pd_len,            dec),
+  FORMAT("Unencrypted Data Length", zynqmp_hdr_t, ed_len,            dec),
+  FORMAT("Total Length",            zynqmp_hdr_t, total_len,         dec),
+  FORMAT("Next Header Offset",      zynqmp_hdr_t, next_part_hdr_off, word),
+  FORMAT("Load Address",            zynqmp_hdr_t, dest_load_addr_lo, dbl_word),
+  FORMAT("Execution Address",       zynqmp_hdr_t, dest_exec_addr_lo, dbl_word),
+  FORMAT("Partition Data Offset",   zynqmp_hdr_t, actual_part_off,   word),
+  FORMAT("Attributes",              zynqmp_hdr_t, attributes,        attr),
+  FORMAT("Section Count",           zynqmp_hdr_t, section_count,     dec),
+  FORMAT("Checksum Offset",         zynqmp_hdr_t, checksum_off,      word),
+  FORMAT("Image Header Offset",     zynqmp_hdr_t, img_hdr_off,       word),
+  FORMAT("Certificate Offset",      zynqmp_hdr_t, cert_off,          word),
+  FORMAT("Checksum",                zynqmp_hdr_t, checksum,          word),
   { 0 }
 };
 
