@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2017, Antmicro Ltd
+/* Copyright (c) 2013-2021, Antmicro Ltd
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,9 +24,12 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdint.h>
+#include <time.h>
 
 #include <bootrom.h>
+#include <common.h>
 #include <file/bitstream.h>
 
 int bitstream_verify(FILE *bitfile) {
@@ -48,6 +51,75 @@ int bitstream_verify(FILE *bitfile) {
   return BOOTROM_SUCCESS;
 }
 
+int bitstream_write_header_part(FILE *bitfile,
+                              const uint8_t tag,
+                              const char *data) {
+  uint16_t len = strlen(data) + 1;
+  uint8_t n;
+
+  fwrite(&tag, sizeof(uint8_t), 1, bitfile);
+
+  n = (len >> 8) & 0xFF;
+  fwrite(&n, sizeof(uint8_t), 1, bitfile);
+  n = len & 0xFF;
+  fwrite(&n, sizeof(uint8_t), 1, bitfile);
+
+  fwrite(data, sizeof(uint8_t), len, bitfile);
+
+  return 0;
+}
+
+int bitstream_write_header(FILE *bitfile,
+                           uint32_t size,
+                           const char *design,
+                           const char *part) {
+  const uint8_t header[] = {
+    0x00, 0x09, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f,
+    0xf0, 0x0f, 0xf0, 0x00, 0x00, 0x01,
+  };
+
+  int i;
+  uint8_t n;
+
+  char stime[80];
+  time_t gtime;
+  struct tm ltime;
+
+  gtime = time(NULL);
+  ltime = *localtime(&gtime);
+
+  /* TODO: the header sections are similar, generalize it */
+
+  /* Write magic numbers */
+  fwrite(header, sizeof(uint8_t), sizeof(header), bitfile);
+
+  /* Write the section 'a' */
+
+  bitstream_write_header_part(bitfile, 'a', design);
+
+  /* Write the section 'b' */
+  bitstream_write_header_part(bitfile, 'b', part);
+
+  /* Write the section 'c' */
+  strftime(stime, sizeof(stime)-1, "%Y/%m/%d", &ltime);
+  bitstream_write_header_part(bitfile, 'c', stime);
+
+  /* Write the section 'd' */
+  strftime(stime, sizeof(stime)-1, "%H:%M:%S", &ltime);
+  bitstream_write_header_part(bitfile, 'd', stime);
+
+  /* Write the start of the section 'e' */
+  n = 'e';
+  fwrite(&n, sizeof(uint8_t), 1, bitfile);
+
+  for (i = 3; i >= 0; i--) {
+    n = (size >> (i*8)) & 0xFF;
+    fwrite(&n, sizeof(uint8_t), 1, bitfile);
+  }
+
+  return 0;
+}
+
 int bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
   uint32_t *dest = addr;
   uint32_t chunk, rchunk;
@@ -62,7 +134,7 @@ int bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
     fread(&section_hdr, 1, sizeof(section_hdr), bitfile);
     if (section_hdr[1] != 0x1 && section_hdr[1] != 0x0) {
       fclose(bitfile);
-      fprintf(stderr, "Bitstream file seems to have mismatched sections.\n");
+      errorf("bitstream file seems to have mismatched sections.\n");
       return -BOOTROM_ERROR_BITSTREAM;
     }
 

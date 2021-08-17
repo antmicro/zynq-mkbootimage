@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, Antmicro Ltd
+/* Copyright (c) 2013-2021, Antmicro Ltd
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,10 +33,11 @@
 #include <stdbool.h>
 
 #include <bif.h>
+#include <common.h>
 
 /* TODO: panic mode support */
 
-static int errorf(lexer_t *lex, const char *fmt, ...);
+static int perrorf(lexer_t *lex, const char *fmt, ...);
 
 static inline char *get_token_name(int type);
 
@@ -50,6 +51,19 @@ static int bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node);
 static int bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node);
 
 static const char *special_chars = ":{}[],=/\\";
+
+/* errorf equivalent for parser errors */
+static int perrorf(lexer_t *lex, const char *fmt, ...) {
+  int n;
+  va_list args;
+
+  va_start(args, fmt);
+  fprintf(stderr, "error: %s:%d:%d: ", lex->fname, lex->line, lex->column);
+  n = vfprintf(stderr, fmt, args);
+  va_end(args);
+
+  return n;
+}
 
 int init_bif_cfg(bif_cfg_t *cfg) {
   /* Initially setup 8 nodes */
@@ -78,7 +92,7 @@ static int init_lexer(lexer_t *lex, const char *fname) {
   int err;
 
   if (!(lex->file = fopen(fname, "r"))) {
-    errorf(NULL, "could not open file \"%s\"\n", fname);
+    errorf("could not open file \"%s\"\n", fname);
     return BIF_ERROR_NOFILE;
   }
 
@@ -126,20 +140,6 @@ static inline char *get_token_name(int type) {
   return "unknown token";
 }
 
-static int errorf(lexer_t *lex, const char *fmt, ...) {
-  int n;
-  va_list args;
-
-  va_start(args, fmt);
-  if (lex)
-    fprintf(stderr, "%s:%d:%d: ", lex->fname, lex->line, lex->column);
-  fprintf(stderr, "error: ");
-  n = vfprintf(stderr, fmt, args);
-  va_end(args);
-
-  return n;
-}
-
 static inline void update_pos(lexer_t *lex, char ch) {
   /* Calculate the lexer position after reading ch */
 
@@ -160,7 +160,7 @@ static inline int append_token(lexer_t *lex, char ch) {
     lex->cap = 2*(lex->len);
     lex->buffer = realloc(lex->buffer, lex->cap);
     if (!lex->buffer) {
-      errorf(NULL, "out of memory\n");
+      errorf("out of memory\n");
       return -ENOMEM;
     }
   }
@@ -178,7 +178,7 @@ static inline int bif_scan_comment(lexer_t *lex, char type) {
       prev = ch;
       /* Break if its the end of file */
       if ((ch = fgetc(lex->file)) < 0) {
-        errorf(lex, "file ended while scanning a C-style comment\n");
+        perrorf(lex, "file ended while scanning a C-style comment\n");
         return BIF_ERROR_LEXER;
       }
       /* Break if its the end of the comment */
@@ -254,7 +254,7 @@ static int bif_scan(lexer_t *lex) {
       ch = fgetc(lex->file);
 
       if (ch < 0) {
-        errorf(lex, "file ended while scanning a string\n");
+        perrorf(lex, "file ended while scanning a string\n");
         return BIF_ERROR_LEXER;
       } else if (ch == '\\') {
         esc = true;
@@ -263,7 +263,7 @@ static int bif_scan(lexer_t *lex) {
         lex->type = TOKEN_NAME;
         break;
       } else if (esc) {
-        errorf(lex, "only escape for '\"' char is supported\n");
+        perrorf(lex, "only escape for '\"' char is supported\n");
       }
 
       update_pos(lex, ch);
@@ -302,7 +302,9 @@ static inline int bif_expect(lexer_t *lex, int type) {
   int err = bif_consume(lex, type);
 
   if (err == BIF_ERROR_PARSER)
-    errorf(lex, "expected %s, got %s\n", get_token_name(type), get_token_name(lex->type));
+    perrorf(lex, "expected %s, got %s\n",
+      get_token_name(type),
+      get_token_name(lex->type));
   return err;
 }
 
@@ -419,11 +421,11 @@ int bif_node_set_attr(lexer_t *lex,
 
   if (strcmp(attr_name, "load") == 0 ) {
     if (!value) {
-      errorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
+      perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
       return BIF_ERROR_PARSER;
     }
     if (sscanf(value, "0x%08x", &(node->load)) < 1) {
-      errorf(lex, "the value \"%s\" in an improper format, expected '0xhhhhhhhh' form\n", value);
+      perrorf(lex, "the value \"%s\" in an improper format, expected '0xhhhhhhhh' form\n", value);
       return BIF_ERROR_PARSER;
     }
     return BIF_SUCCESS;
@@ -431,11 +433,11 @@ int bif_node_set_attr(lexer_t *lex,
 
   if (strcmp(attr_name, "offset") == 0 ) {
     if (!value) {
-      errorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
+      perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
       return BIF_ERROR_PARSER;
     }
     if (sscanf(value, "0x%08x", &(node->offset)) < 1) {
-      errorf(lex, "the value \"%s\" in an improper format, expected '0xhhhhhhhh' form\n", value);
+      perrorf(lex, "the value \"%s\" in an improper format, expected '0xhhhhhhhh' form\n", value);
       return BIF_ERROR_PARSER;
     }
     return BIF_SUCCESS;
@@ -443,7 +445,7 @@ int bif_node_set_attr(lexer_t *lex,
 
   if (strcmp(attr_name, "partition_owner") == 0) {
     if (!value) {
-      errorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
+      perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
       return BIF_ERROR_PARSER;
     }
     if (strcmp(value, "fsbl") == 0)
@@ -451,7 +453,7 @@ int bif_node_set_attr(lexer_t *lex,
     else if (strcmp(value, "uboot") == 0)
       node->partition_owner = OWNER_UBOOT;
     else {
-      errorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
+      perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
       return BIF_ERROR_UNSUPPORTED_VAL;
     }
     return BIF_SUCCESS;
@@ -474,7 +476,7 @@ int bif_node_set_attr(lexer_t *lex,
 
     if (strcmp(attr_name, "destination_device") == 0 ) {
       if (!value) {
-        errorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
+        perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
         return BIF_ERROR_PARSER;
       }
       if (strcmp(value, "ps") == 0)
@@ -482,7 +484,7 @@ int bif_node_set_attr(lexer_t *lex,
       else if (strcmp(value, "pl") == 0)
         node->destination_device = DST_DEV_PL;
       else {
-        errorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
+        perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
         return BIF_ERROR_UNSUPPORTED_VAL;
       }
 
@@ -491,7 +493,7 @@ int bif_node_set_attr(lexer_t *lex,
 
     if (strcmp(attr_name, "destination_cpu") == 0 ) {
       if (!value) {
-        errorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
+        perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
         return BIF_ERROR_PARSER;
       }
       if (strcmp(value, "a53-0") == 0)
@@ -509,7 +511,7 @@ int bif_node_set_attr(lexer_t *lex,
       else if (strcmp(value, "r5-lockstep") == 0)
         node->destination_cpu = DST_CPU_R5_LOCKSTEP;
       else {
-        errorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
+        perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
         return BIF_ERROR_UNSUPPORTED_VAL;
       }
       return BIF_SUCCESS;
@@ -517,7 +519,7 @@ int bif_node_set_attr(lexer_t *lex,
 
     if (strcmp(attr_name, "exception_level") == 0) {
       if (!value) {
-        errorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
+        perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
         return BIF_ERROR_PARSER;
       }
       if (strcmp(value, "el-0") == 0)
@@ -529,14 +531,14 @@ int bif_node_set_attr(lexer_t *lex,
       else if (strcmp(value, "el-3") == 0)
         node->exception_level = EL_3;
       else {
-        errorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
+        perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
         return BIF_ERROR_UNSUPPORTED_VAL;
       }
       return BIF_SUCCESS;
     }
   }
 
-  errorf(lex, "node attribute not supported: \"%s\"\n", attr_name);
+  perrorf(lex, "node attribute not supported: \"%s\"\n", attr_name);
   return BIF_ERROR_UNSUPPORTED_ATTR;
 }
 

@@ -3,31 +3,42 @@
 CC=gcc
 
 MKBOOTIMAGE_NAME:=mkbootimage
+EXBOOTIMAGE_NAME:=exbootimage
 
 VERSION_MAJOR:=2.3
-VERSION_MINOR:=${shell git rev-parse --short HEAD}
+VERSION_MINOR:=$(shell git rev-parse --short HEAD)
 
-VERSION:=${MKBOOTIMAGE_NAME} ${VERSION_MAJOR}-${VERSION_MINOR}
+VERSION:=$(MKBOOTIMAGE_NAME) $(VERSION_MAJOR)-$(VERSION_MINOR)
 
-MKBOOTIMAGE_SRCS:=$(wildcard src/*.c) $(wildcard src/arch/*c) $(wildcard src/file/*c)
-MKBOOTIMAGE_OBJS:=${MKBOOTIMAGE_SRCS:.c=.o}
+COMMON_SRCS:=src/bif.c src/bootrom.c src/common.c $(wildcard src/arch/*.c) $(wildcard src/file/*.c)
 
-MKBOOTIMAGE_INCLUDE_DIRS:=src
+MKBOOTIMAGE_SRCS:=src/mkbootimage.c $(COMMON_SRCS)
+MKBOOTIMAGE_OBJS:=$(MKBOOTIMAGE_SRCS:.c=.o)
 
-override CFLAGS += $(foreach includedir,$(MKBOOTIMAGE_INCLUDE_DIRS),-I$(includedir)) \
+EXBOOTIMAGE_SRCS:=src/exbootimage.c $(COMMON_SRCS)
+EXBOOTIMAGE_OBJS:=$(EXBOOTIMAGE_SRCS:.c=.o)
+
+INCLUDE_DIRS:=src
+
+override CFLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir)) \
 	-DMKBOOTIMAGE_VER="\"$(VERSION)\"" \
 	-Wall -Wextra -Wpedantic \
 	--std=c11
 
 LDLIBS = -lelf
 
-all: $(MKBOOTIMAGE_NAME)
+all: $(MKBOOTIMAGE_NAME) $(EXBOOTIMAGE_NAME)
 
 $(MKBOOTIMAGE_NAME): $(MKBOOTIMAGE_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(MKBOOTIMAGE_OBJS) -o $(MKBOOTIMAGE_NAME) $(LDLIBS)
 
+$(EXBOOTIMAGE_NAME): $(EXBOOTIMAGE_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(EXBOOTIMAGE_OBJS) -o $(EXBOOTIMAGE_NAME) $(LDLIBS)
+
 clean:
 	@- $(RM) $(MKBOOTIMAGE_NAME)
 	@- $(RM) $(MKBOOTIMAGE_OBJS)
+	@- $(RM) $(EXBOOTIMAGE_NAME)
+	@- $(RM) $(EXBOOTIMAGE_OBJS)
 
 distclean: clean

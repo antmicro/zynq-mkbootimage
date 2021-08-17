@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, Antmicro Ltd
+/* Copyright (c) 2013-2021, Antmicro Ltd
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,17 +67,17 @@ int append_file_to_image(uint32_t *addr,
   *img_size = 0;
 
   if(stat(node.fname, &cfile_stat)) {
-    fprintf(stderr, "Could not stat file: %s\n", node.fname);
+    errorf("could not stat file: %s\n", node.fname);
     return -BOOTROM_ERROR_NOFILE;
   }
   if (!S_ISREG(cfile_stat.st_mode)) {
-    fprintf(stderr, "Not a regular file: %s\n", node.fname);
+    errorf("not a regular file: %s\n", node.fname);
     return -BOOTROM_ERROR_NOFILE;
   }
   cfile = fopen(node.fname, "rb");
 
   if (cfile == NULL) {
-    fprintf(stderr, "Could not open file: %s\n", node.fname);
+    errorf("could not open file: %s\n", node.fname);
     return -BOOTROM_ERROR_NOFILE;
   }
 
@@ -98,7 +98,7 @@ int append_file_to_image(uint32_t *addr,
                      &elf_load,
                      &elf_entry);
     if (ret) {
-      fprintf(stderr, "ELF file reading failed\n");
+      errorf("ELF file reading failed\n");
 
       /* Close the file */
       fclose(cfile);
@@ -118,7 +118,7 @@ int append_file_to_image(uint32_t *addr,
   case FILE_MAGIC_XILINXBIT_0:
     /* Verify file */
     if (bitstream_verify(cfile) != BOOTROM_SUCCESS) {
-      fprintf(stderr, "Not a valid bitstream file: %s.\n", node.fname);
+      errorf("not a valid bitstream file: %s.\n", node.fname);
 
       /* Close the file */
       fclose(cfile);
@@ -190,7 +190,7 @@ uint32_t estimate_boot_image_size(bif_cfg_t *bif_cfg)
       continue;
 
     if (stat(bif_cfg->nodes[i].fname, &st_file)) {
-      fprintf(stderr, "Could not stat %s\n", bif_cfg->nodes[i].fname);
+      errorf("could not stat %s\n", bif_cfg->nodes[i].fname);
       return 0;
     }
 
@@ -269,11 +269,11 @@ int create_boot_image(uint32_t *img_ptr,
 
       /* Open pmu file */
       if(stat(bif_cfg->nodes[i].fname, &pmufile_stat)) {
-        fprintf(stderr, "Could not stat file: %s\n", bif_cfg->nodes[i].fname);
+        errorf("could not stat file: %s\n", bif_cfg->nodes[i].fname);
         return -BOOTROM_ERROR_NOFILE;
       }
       if (!S_ISREG(pmufile_stat.st_mode)) {
-        fprintf(stderr, "Not a regular file: %s\n", bif_cfg->nodes[i].fname);
+        errorf("not a regular file: %s\n", bif_cfg->nodes[i].fname);
         return -BOOTROM_ERROR_NOFILE;
       }
       ret = elf_append(pmufw_img,
@@ -284,7 +284,7 @@ int create_boot_image(uint32_t *img_ptr,
                        &pmufw_img_load,
                        &pmufw_img_entry);
       if (ret != BOOTROM_SUCCESS) {
-        fprintf(stderr, "Failed to parse ELF file: %s\n", bif_cfg->nodes[i].fname);
+        errorf("failed to parse ELF file: %s\n", bif_cfg->nodes[i].fname);
         return -BOOTROM_ERROR_ELF;
       }
       continue;
@@ -292,7 +292,7 @@ int create_boot_image(uint32_t *img_ptr,
 
     if (bif_cfg->nodes[i].offset != 0 &&
         (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < offs.coff) {
-      fprintf(stderr, "Binary sections overlapping.\n");
+      errorf("binary sections overlapping.\n");
       return -BOOTROM_ERROR_SEC_OVERLAP;
     } else {
       /* Add 0xFF padding until this binary */

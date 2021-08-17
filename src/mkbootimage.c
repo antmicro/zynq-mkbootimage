@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, Antmicro Ltd
+/* Copyright (c) 2013-2021, Antmicro Ltd
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@
 
 #include <bif.h>
 #include <bootrom.h>
+#include <common.h>
 
 #include <arch/zynq.h>
 #include <arch/zynqmp.h>
@@ -121,7 +122,6 @@ int main(int argc, char *argv[]) {
 
   ret = bif_parse(arguments.bif_filename, &cfg);
   if (ret != BIF_SUCCESS || cfg.nodes_num == 0) {
-    fprintf(stderr, "Error parsing %s file.\n", arguments.bif_filename);
     return EXIT_FAILURE;
   }
 
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
   ofile = fopen(arguments.bin_filename, "wb");
 
   if (ofile == NULL ) {
-    fprintf(stderr, "Could not open output file: %s\n", arguments.bin_filename);
+    errorf("could not open output file: %s\n", arguments.bin_filename);
     return EXIT_FAILURE;
   }
 
@@ -183,4 +183,3 @@ int main(int argc, char *argv[]) {
   printf("All done, quitting\n");
   return EXIT_SUCCESS;
 }
-

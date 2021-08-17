@@ -11,6 +11,7 @@
 #define BOOTROM_ERROR_SEC_OVERLAP 4
 #define BOOTROM_ERROR_UNSUPPORTED 5
 #define BOOTROM_ERROR_NOMEM 6
+#define BOOTROM_ERROR_WADDR 7
 
 /* BootROM Header based on ug585 and ug1085 */
 typedef struct bootrom_hdr_t {

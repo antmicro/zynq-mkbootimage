@@ -3,16 +3,20 @@
 Copyright (c) 2015-2021 [Antmicro](https://antmicro.com)
 
 This is an open-source replacement for the Xilinx `bootgen` application.
-It parses a `.bif` file and creates a Zynq boot image in the `.bin` format.
+The package provides sources of two binaries `mkbootimage` and `exbootimage`
+for both creation and extraction of Zynq boot images.
 
-It is written entirely in C.
+The tools are written entirely in C.
 
 Requires the `libelf` C library.
 
-To build this application run:
+To build these the tools run:
 ```
 make
 ```
+
+## mkbootimage
+`mkbootimage` parses a `.bif` file and creates a Zynq boot image in the `.bin` format.
 
 To use it, type in:
 ```
@@ -88,3 +92,78 @@ bootm 0x3000000 0x2000000 0x2a00000
 ```
 
 Encryption certificates are not supported.
+
+## exbootimage
+`exbootimage` parses a boot ROM file and extracts desired information out of it.
+
+To use it, type in:
+```
+./exbootimage [--zynqmp|-u]   [--extract|-x] [--force|-f]  [--list|-l]
+              [--describe|-d] [--header|-h]  [--images|-i] [--parts|-p]
+              [--bitstream|-d DESIGN,PART-NAME]
+              <input_bif_file> [extract_file...]
+```
+
+To see all available options, run:
+```
+./exbootimage --help
+```
+
+Three of the main functionalities of the tool are described below.
+
+### Listing the contents of the boot image
+
+To list the contents of the boot image use the `-l` option. It
+is especially useful before extracting partitions.
+
+To obtain the list, run:
+```
+./exbootimage -l boot.bin
+```
+
+### Printing a description of headers of the boot image
+You can print a readable description of all headers in a boot image
+by using the `-d` option.
+
+The output is divided into sections dedicated to various header types:
+1. Main file header
+2. Image header table
+3. Image headers
+4. Partition headers
+
+To see it working, run:
+```
+./exbootimage -d boot.bin
+```
+
+Or for ZynqMP bootimages:
+```
+./exbootimage -u -d boot.bin
+```
+
+### Extracting partition data
+To extract partition contents use the `-x` option. The partitions
+will be extracted into files named after each partition's image name.
+
+To perform this operation, run:
+```
+./exbootimage -x boot.bin
+```
+
+Or for ZynqMP boot files:
+```
+./exbootimage -ux boot.bin
+```
+
+The tool stops if a file of that name is already present, this behaviour
+can be bypassed with the `-f` flag:
+```
+./exbootimage -uxf boot.bin
+```
+
+To extract only some of the partitions, type their names after
+the boot image name:
+```
+./exbootimage -x boot.bin fpga.bit rootfs.img
+```
+
