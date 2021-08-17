@@ -7,7 +7,8 @@ DIR=$(git rev-parse --show-toplevel)
 TESTS=$DIR/tests
 LOG=$TESTS/results.log
 PARSER=$TESTS/parser
-EXTRACT=$TESTS/extract
+EXTRACT=$TESTS/extraction
+OFFSETS=$TESTS/offsets
 
 cd $DIR
 
@@ -53,7 +54,9 @@ testparser() {
   done
 }
 
-testextractor() {
+# Create a fake boot image out of project's files, then
+# unpack it and compar with the original ones.
+testextraction() {
   # Create a simple BIF from the list in the "files" file
   BIF=$EXTRACT/boot.bif
   BIN=$EXTRACT/boot.bin
@@ -90,6 +93,24 @@ testextractor() {
   cd $DIR
 }
 
+# Check if wrong offsets are detected properly
+testoffseterrors() {
+  for file in $OFFSETS/*; do
+    printf "\nLogs for $(basename $file) offsets:\n" >> $LOG
+
+    base=$(basename $file)
+    negative=$(expr 0 "<" "(" $base : "^bad_" ")" )
+    $DIR/exbootimage -l $file 1> /dev/null 2>> $LOG
+
+    # XOR between program's success and test positivity
+    if [ $(expr $? = 0) != $negative ]; then
+      passtest $(basename $file)
+    else
+      failtest $(basename $file)
+    fi
+  done
+}
+
 # It is encouraged for future tests to be placed here
 # and implemented in an analogous way with the `testparser`
 # test routine, with both negative and positive tests.
@@ -115,7 +136,8 @@ printf "Performed on $(date)\n" > $LOG
 
 # Perform parser tests
 testparser
-testextractor
+testextraction
+testoffseterrors
 
 # RESULT INFORMATION -------------------------------------- #
 printf "\npassed: %s\nfailed: %s\n\n" $pass $fail
