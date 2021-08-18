@@ -126,6 +126,7 @@ static char args_doc[] = "[--zynqmp|-u] "
                          "[--bitstream|-bDESIGN,PART-NAME] "
                          "<input_bit_file> <files_to_extract>";
 
+/* clang-format off */
 static struct argp_option argp_options[] = {
   {"zynqmp",    'u', 0, 0, "Expect files for ZynqMP (default is Zynq)", 0},
   {"extract",   'x', 0, 0, "Extract files embed in the image",          0},
@@ -139,7 +140,7 @@ static struct argp_option argp_options[] = {
    "DESIGN,PART-NAME", 0,
    "Reconstruct bitstream headers after extraction", 0
   },
-  { 0 }
+  {0},
 };
 
 static struct format hdr_fmt[] = {
@@ -154,7 +155,7 @@ static struct format hdr_fmt[] = {
   FORMAT("Total FSBL Length",       hdr_t, total_img_len,     dec),
   FORMAT("QSPI configuration Word", hdr_t, reserved_1,        word),
   FORMAT("Boot Header Checksum",    hdr_t, checksum,          word),
-  { 0 }
+  {0},
 };
 
 static struct format img_hdr_tab_fmt[] = {
@@ -163,13 +164,13 @@ static struct format img_hdr_tab_fmt[] = {
   FORMAT("Partition Header Offset",       img_hdr_tab_t, part_hdr_off,     word),
   FORMAT("Partition Image Header Offset", img_hdr_tab_t, part_img_hdr_off, word),
   FORMAT("Header Authentication Offset",  img_hdr_tab_t, auth_hdr_off,     word),
-  { 0 }
+  {0},
 };
 
 static struct format zynqmp_img_hdr_tab_fmt[] = {
   FORMAT("(ZynqMP) Boot Device", img_hdr_tab_t, boot_dev, word),
   FORMAT("(ZynqMP) Checksum",    img_hdr_tab_t, checksum, word),
-  { 0 }
+  {0},
 };
 
 static struct format img_hdr_fmt[] = {
@@ -178,7 +179,7 @@ static struct format img_hdr_fmt[] = {
   FORMAT("Partition Count (always 0)", img_hdr_t, part_count,   dec),
   FORMAT("Name Length (usually 1)",    img_hdr_t, name_len,     dec),
   FORMAT("Image Name",                 img_hdr_t, name,         name),
-  { 0 }
+  {0},
 };
 
 static struct format zynq_hdr_fmt[] = {
@@ -194,7 +195,7 @@ static struct format zynq_hdr_fmt[] = {
   FORMAT("Image Header Offset",     zynq_hdr_t, img_hdr_off,    word),
   FORMAT("Certificate Offset",      zynq_hdr_t, cert_off,       word),
   FORMAT("Checksum",                zynq_hdr_t, checksum,       word),
-  { 0 }
+  {0},
 };
 
 static struct format zynqmp_hdr_fmt[] = {
@@ -211,8 +212,9 @@ static struct format zynqmp_hdr_fmt[] = {
   FORMAT("Image Header Offset",     zynqmp_hdr_t, img_hdr_off,       word),
   FORMAT("Certificate Offset",      zynqmp_hdr_t, cert_off,          word),
   FORMAT("Checksum",                zynqmp_hdr_t, checksum,          word),
-  { 0 }
+  {0},
 };
+/* clang-format on */
 
 /* Print a word as a decimal*/
 int print_dec(FILE *f, void *base, int offset) {

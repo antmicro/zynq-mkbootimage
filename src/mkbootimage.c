@@ -43,7 +43,7 @@ static char args_doc[] = "[--parse-only|-p] [--zynqmp|-u] <input_bif_file> <outp
 static struct argp_option argp_options[] = {
   {"zynqmp",     'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)",       0},
   {"parse-only", 'p', 0, 0, "Analyze BIF grammar, but don't generate any files", 0},
-  { 0 }
+  { 0 },
 };
 
 /* Prapare struct for holding parsed arguments */

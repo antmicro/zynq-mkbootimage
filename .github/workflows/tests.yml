@@ -2,10 +2,13 @@ name: Test mkbootimage
 on: [push, pull_request]
 jobs:
   test-zynq-mkbootimage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Install dependencies
-        run:  sudo apt-get install --yes libelf-dev
+        run: |
+          sudo apt-get install --yes libelf-dev
+          sudo apt-get install --yes clang-format-12
+          clang-format-12 --version
 
       - name: Checkout
         uses: actions/checkout@v2
@@ -14,6 +17,15 @@ jobs:
         run: |
           make
           test -f mkbootimage
+
+      - name: Run formatting tests
+        run: |
+          clang-format-12 -i src/{arch/,file/,}*.{c,h}
+          git diff --exit-code
+          if [ $? -ne 0 ]; then
+            echo The used coding style is not proper
+            exit 1
+          fi
 
       - name: Run integration tests
         run:  tests/tester.sh
