@@ -13,27 +13,28 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
-#include <errno.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include <stdbool.h>
 
 #include <bif.h>
 #include <common.h>
+#include <ctype.h>
+#include <errno.h>
 
 /* TODO: panic mode support */
 
@@ -71,7 +72,7 @@ int init_bif_cfg(bif_cfg_t *cfg) {
   cfg->nodes_avail = 8;
 
   /* Alloc memory for it */
-  cfg->nodes = malloc(sizeof (bif_node_t) * cfg->nodes_avail);
+  cfg->nodes = malloc(sizeof(bif_node_t) * cfg->nodes_avail);
   if (!cfg->nodes) {
     return -ENOMEM;
   }
@@ -96,14 +97,14 @@ static int init_lexer(lexer_t *lex, const char *fname) {
     return BIF_ERROR_NOFILE;
   }
 
-  lex->fname = malloc(strlen(fname)+1);
+  lex->fname = malloc(strlen(fname) + 1);
   strcpy(lex->fname, fname);
 
   lex->line = lex->column = 1;
   lex->type = 0;
 
   lex->len = lex->cap = 32;
-  lex->buffer = malloc(lex->cap*sizeof(char));
+  lex->buffer = malloc(lex->cap * sizeof(char));
 
   /* Scan a first token
      as the lexer is assumed to always contain a next token
@@ -124,18 +125,29 @@ static int deinit_lexer(lexer_t *lex) {
 
 static inline char *get_token_name(int type) {
   switch (type) {
-  case ':':  return "':' operator";
-  case '{':  return "'{' operator";
-  case '}':  return "'}' operator";
-  case '[':  return "'[' operator";
-  case ']':  return "']' operator";
-  case ',':  return "',' operator";
-  case '=':  return "'=' operator";
-  case '/':  return "'/' operator";
-  case '\\': return "'\\' operator";
+  case ':':
+    return "':' operator";
+  case '{':
+    return "'{' operator";
+  case '}':
+    return "'}' operator";
+  case '[':
+    return "'[' operator";
+  case ']':
+    return "']' operator";
+  case ',':
+    return "',' operator";
+  case '=':
+    return "'=' operator";
+  case '/':
+    return "'/' operator";
+  case '\\':
+    return "'\\' operator";
 
-  case TOKEN_EOF:  return "end of file";
-  case TOKEN_NAME: return "a string";
+  case TOKEN_EOF:
+    return "end of file";
+  case TOKEN_NAME:
+    return "a string";
   }
   return "unknown token";
 }
@@ -157,7 +169,7 @@ static inline int append_token(lexer_t *lex, char ch) {
   lex->len++;
 
   if (lex->len >= lex->cap) {
-    lex->cap = 2*(lex->len);
+    lex->cap = 2 * (lex->len);
     lex->buffer = realloc(lex->buffer, lex->cap);
     if (!lex->buffer) {
       errorf("out of memory\n");
@@ -165,7 +177,7 @@ static inline int append_token(lexer_t *lex, char ch) {
     }
   }
 
-  lex->buffer[lex->len-1] = ch;
+  lex->buffer[lex->len - 1] = ch;
   lex->buffer[lex->len] = '\0';
   return BIF_SUCCESS;
 }
@@ -275,7 +287,7 @@ static int bif_scan(lexer_t *lex) {
     for (;;) {
       ch = fgetc(lex->file);
 
-      if (ch < 0 || strchr(special_chars,  ch) || isspace(ch)) {
+      if (ch < 0 || strchr(special_chars, ch) || isspace(ch)) {
         ungetc(ch, lex->file); /* we don't want that char */
         lex->type = TOKEN_NAME;
         break;
@@ -302,9 +314,7 @@ static inline int bif_expect(lexer_t *lex, int type) {
   int err = bif_consume(lex, type);
 
   if (err == BIF_ERROR_PARSER)
-    perrorf(lex, "expected %s, got %s\n",
-      get_token_name(type),
-      get_token_name(lex->type));
+    perrorf(lex, "expected %s, got %s\n", get_token_name(type), get_token_name(lex->type));
   return err;
 }
 
@@ -376,7 +386,7 @@ static int bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
   return err;
 }
 
-int bif_parse(const char* fname, bif_cfg_t *cfg) {
+int bif_parse(const char *fname, bif_cfg_t *cfg) {
   int err;
   lexer_t lex;
   bif_node_t node;
@@ -407,11 +417,8 @@ int bif_parse(const char* fname, bif_cfg_t *cfg) {
   return BIF_SUCCESS;
 }
 
-int bif_node_set_attr(lexer_t *lex,
-                      bif_cfg_t *cfg,
-                      bif_node_t *node,
-                      char *attr_name,
-                      char *value) {
+int bif_node_set_attr(
+  lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *value) {
   /* TODO: parser errors on wrong scans */
 
   if (strcmp(attr_name, "bootloader") == 0) {
@@ -419,7 +426,7 @@ int bif_node_set_attr(lexer_t *lex,
     return BIF_SUCCESS;
   }
 
-  if (strcmp(attr_name, "load") == 0 ) {
+  if (strcmp(attr_name, "load") == 0) {
     if (!value) {
       perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
       return BIF_ERROR_PARSER;
@@ -431,7 +438,7 @@ int bif_node_set_attr(lexer_t *lex,
     return BIF_SUCCESS;
   }
 
-  if (strcmp(attr_name, "offset") == 0 ) {
+  if (strcmp(attr_name, "offset") == 0) {
     if (!value) {
       perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
       return BIF_ERROR_PARSER;
@@ -474,7 +481,7 @@ int bif_node_set_attr(lexer_t *lex,
       return BIF_SUCCESS;
     }
 
-    if (strcmp(attr_name, "destination_device") == 0 ) {
+    if (strcmp(attr_name, "destination_device") == 0) {
       if (!value) {
         perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
         return BIF_ERROR_PARSER;
@@ -491,7 +498,7 @@ int bif_node_set_attr(lexer_t *lex,
       return BIF_SUCCESS;
     }
 
-    if (strcmp(attr_name, "destination_cpu") == 0 ) {
+    if (strcmp(attr_name, "destination_cpu") == 0) {
       if (!value) {
         perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
         return BIF_ERROR_PARSER;
@@ -587,7 +594,7 @@ int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
   /* Allocate more space if needed */
   if (cfg->nodes_num >= cfg->nodes_avail) {
     cfg->nodes_avail *= 2;
-    cfg->nodes = realloc(cfg->nodes, sizeof (bif_node_t) * cfg->nodes_avail);
+    cfg->nodes = realloc(cfg->nodes, sizeof(bif_node_t) * cfg->nodes_avail);
     if (!cfg->nodes) {
       return -ENOMEM;
     }

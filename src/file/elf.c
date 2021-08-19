@@ -13,34 +13,32 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
 #include <stdint.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <gelf.h>
+#include <stdio.h>
 
 #include <bootrom.h>
+#include <fcntl.h>
 #include <file/elf.h>
+#include <gelf.h>
+#include <unistd.h>
 
 static int elf_is_loadable_section(const GElf_Shdr *elf_shdr) {
-  return elf_shdr->sh_type != SHT_NOBITS &&
-         (elf_shdr->sh_flags & SHF_ALLOC) &&
+  return elf_shdr->sh_type != SHT_NOBITS && (elf_shdr->sh_flags & SHF_ALLOC) &&
          elf_shdr->sh_size != 0;
 }
 
-static int elf_get_startaddr_endaddr(Elf *elf,
-                                     uint32_t *start_addr,
-                                     uint32_t *end_addr) {
+static int elf_get_startaddr_endaddr(Elf *elf, uint32_t *start_addr, uint32_t *end_addr) {
   Elf_Scn *elf_scn = NULL;
   GElf_Shdr elf_shdr;
   *start_addr = -1;
@@ -63,9 +61,7 @@ static int elf_get_startaddr_endaddr(Elf *elf,
   return BOOTROM_SUCCESS;
 }
 
-static int elf_create_image(Elf *elf,
-                            uint32_t start_addr,
-                            uint8_t *out_buf) {
+static int elf_create_image(Elf *elf, uint32_t start_addr, uint8_t *out_buf) {
   Elf_Scn *elf_scn = NULL;
   Elf_Data *elf_data;
   GElf_Shdr elf_shdr;
@@ -73,7 +69,6 @@ static int elf_create_image(Elf *elf,
   while ((elf_scn = elf_nextscn(elf, elf_scn)) != NULL) {
     if (gelf_getshdr(elf_scn, &elf_shdr) != &elf_shdr)
       return -BOOTROM_ERROR_ELF;
-
 
     if (!elf_is_loadable_section(&elf_shdr))
       continue;
@@ -85,7 +80,8 @@ static int elf_create_image(Elf *elf,
         return -BOOTROM_ERROR_ELF;
 
       memcpy(out_buf + elf_shdr.sh_addr + elf_data->d_off - start_addr,
-             elf_data->d_buf, elf_data->d_size);
+             elf_data->d_buf,
+             elf_data->d_size);
     }
   }
 

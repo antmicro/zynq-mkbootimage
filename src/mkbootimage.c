@@ -13,27 +13,27 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <argp.h>
-
-#include <bif.h>
-#include <bootrom.h>
-#include <common.h>
+#include <stdlib.h>
 
 #include <arch/zynq.h>
 #include <arch/zynqmp.h>
+#include <argp.h>
+#include <bif.h>
+#include <bootrom.h>
+#include <common.h>
 
 /* Prepare global variables for arg parser */
 const char *argp_program_version = MKBOOTIMAGE_VER;
@@ -41,9 +41,9 @@ static char doc[] = "Generate bootloader images for Xilinx Zynq based platforms.
 static char args_doc[] = "[--parse-only|-p] [--zynqmp|-u] <input_bif_file> <output_bin_file>";
 
 static struct argp_option argp_options[] = {
-  {"zynqmp",     'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)",       0},
+  {"zynqmp", 'u', 0, 0, "Generate files for ZyqnMP (default is Zynq)", 0},
   {"parse-only", 'p', 0, 0, "Analyze BIF grammar, but don't generate any files", 0},
-  { 0 }
+  {0},
 };
 
 /* Prapare struct for holding parsed arguments */
@@ -66,7 +66,7 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
     arguments->parse_only = 0xFF;
     break;
   case ARGP_KEY_ARG:
-    switch(state->arg_num) {
+    switch (state->arg_num) {
     case 0:
       arguments->bif_filename = arg;
       break;
@@ -90,7 +90,7 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
 }
 
 /* Finally initialize argp struct */
-static struct argp argp = {argp_options, argp_parser, args_doc, doc, 0, 0, 0 };
+static struct argp argp = {argp_options, argp_parser, args_doc, doc, 0, 0, 0};
 
 /* Declare the main function */
 int main(int argc, char *argv[]) {
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
 
   ofile = fopen(arguments.bin_filename, "wb");
 
-  if (ofile == NULL ) {
+  if (ofile == NULL) {
     errorf("could not open output file: %s\n", arguments.bin_filename);
     return EXIT_FAILURE;
   }

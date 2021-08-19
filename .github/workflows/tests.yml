@@ -1,11 +1,39 @@
 name: Test mkbootimage
 on: [push, pull_request]
+
 jobs:
-  test-zynq-mkbootimage:
-    runs-on: ubuntu-latest
+  check-formatting:
+    runs-on: ubuntu-20.04
     steps:
       - name: Install dependencies
-        run:  sudo apt-get install --yes libelf-dev
+        run: |
+          sudo apt-get install --yes clang-format-12
+          clang-format-12 --version
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run formatting check
+        run: |
+          clang-format-12 -i src/{arch/,file/,}*.{c,h}
+          git diff --exit-code > formatting.log
+          if [ $? -ne 0 ]; then
+            echo The code formatting is not proper
+            exit 1
+          fi
+
+      - name: Save diff
+        uses: actions/upload-artifact@v2
+        with:
+          name: formatting
+          path: formatting.log
+
+  test-zynq-mkbootimage:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get install --yes libelf-dev
 
       - name: Checkout
         uses: actions/checkout@v2

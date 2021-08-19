@@ -13,33 +13,33 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <libgen.h>
-#include <byteswap.h>
 
+#include <arch/common.h>
 #include <bif.h>
 #include <bootrom.h>
+#include <byteswap.h>
 #include <common.h>
-#include <arch/common.h>
-
-#include <file/elf.h>
+#include <fcntl.h>
 #include <file/bitstream.h>
+#include <file/elf.h>
+#include <libgen.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* Returns the offset by which the addr parameter should be moved
  * and partition header info via argument pointers.
@@ -66,7 +66,7 @@ int append_file_to_image(uint32_t *addr,
   img_size_init = *img_size;
   *img_size = 0;
 
-  if(stat(node.fname, &cfile_stat)) {
+  if (stat(node.fname, &cfile_stat)) {
     errorf("could not stat file: %s\n", node.fname);
     return -BOOTROM_ERROR_NOFILE;
   }
@@ -84,7 +84,7 @@ int append_file_to_image(uint32_t *addr,
   /* Check file format */
   fread(&file_header, 1, sizeof(file_header), cfile);
 
-  switch(file_header) {
+  switch (file_header) {
   case FILE_MAGIC_ELF:
     /* Init elf file (img_size_init is non-zero for a bootloader if there
      * is PMU firmware waiting). File size is used as result size limit
@@ -174,8 +174,7 @@ int append_file_to_image(uint32_t *addr,
 }
 
 /* Returns an estimation of the output image size */
-uint32_t estimate_boot_image_size(bif_cfg_t *bif_cfg)
-{
+uint32_t estimate_boot_image_size(bif_cfg_t *bif_cfg) {
   uint8_t i;
   uint32_t estimated_size;
   struct stat st_file;
@@ -268,7 +267,7 @@ int create_boot_image(uint32_t *img_ptr,
       memset(pmufw_img, 0x00, sizeof(pmufw_img));
 
       /* Open pmu file */
-      if(stat(bif_cfg->nodes[i].fname, &pmufile_stat)) {
+      if (stat(bif_cfg->nodes[i].fname, &pmufile_stat)) {
         errorf("could not stat file: %s\n", bif_cfg->nodes[i].fname);
         return -BOOTROM_ERROR_NOFILE;
       }
@@ -296,7 +295,7 @@ int create_boot_image(uint32_t *img_ptr,
       return -BOOTROM_ERROR_SEC_OVERLAP;
     } else {
       /* Add 0xFF padding until this binary */
-      while (offs.coff < (bif_cfg->nodes[i].offset / sizeof(uint32_t) + img_ptr) ) {
+      while (offs.coff < (bif_cfg->nodes[i].offset / sizeof(uint32_t) + img_ptr)) {
         memset(offs.coff, 0xFF, sizeof(uint32_t));
         offs.coff++;
       }
@@ -311,12 +310,8 @@ int create_boot_image(uint32_t *img_ptr,
       img_size = 0;
     }
 
-    ret = append_file_to_image(offs.coff,
-                               bops,
-                               &offs,
-                               bif_cfg->nodes[i],
-                               &(part_hdr[f]),
-                               &img_size);
+    ret =
+      append_file_to_image(offs.coff, bops, &offs, bif_cfg->nodes[i], &(part_hdr[f]), &img_size);
 
     if (ret != BOOTROM_SUCCESS) {
       return ret;
@@ -324,9 +319,7 @@ int create_boot_image(uint32_t *img_ptr,
 
     /* Check if dealing with bootloader (size is in words - thus x 4) */
     if (bif_cfg->nodes[i].bootloader) {
-      bops->setup_fsbl_at_curr_off(&hdr,
-                                   &offs,
-                                   (part_hdr[f].pd_len * 4) - hdr.pmufw_len);
+      bops->setup_fsbl_at_curr_off(&hdr, &offs, (part_hdr[f].pd_len * 4) - hdr.pmufw_len);
     }
 
     /* Update the offset, skip padding for the last image */
@@ -351,14 +344,14 @@ int create_boot_image(uint32_t *img_ptr,
     /* Calculate number of string terminators, this should be 32b
      * however if the name length is divisible by 4 the bootgen
      * binary makes it 64b and thats what we're going to do here */
-    if (strlen((char*)img_name) % 4 == 0) {
+    if (strlen((char *) img_name) % 4 == 0) {
       img_term_n = 2;
     } else {
       img_term_n = 1;
     }
 
     /* Make the name len be divisible by 4 */
-    while(img_hdr[f].name_len % 4)
+    while (img_hdr[f].name_len % 4)
       img_hdr[f].name_len++;
 
     /* The name is packed in big-endian order. To reconstruct
@@ -372,12 +365,11 @@ int create_boot_image(uint32_t *img_ptr,
     }
 
     /* Append the actual terminators */
-    memset(&(img_hdr[f].name[img_hdr[f].name_len]),
-           0x00, img_term_n * sizeof(uint32_t));
+    memset(&(img_hdr[f].name[img_hdr[f].name_len]), 0x00, img_term_n * sizeof(uint32_t));
 
     /* Fill the rest with 0xFF padding */
-    for (j = img_hdr[f].name_len + img_term_n * sizeof(uint32_t);
-         j < BOOTROM_IMG_MAX_NAME_LEN; j++) {
+    for (j = img_hdr[f].name_len + img_term_n * sizeof(uint32_t); j < BOOTROM_IMG_MAX_NAME_LEN;
+         j++) {
       img_hdr[f].name[j] = 0xFF;
     }
 
@@ -391,16 +383,13 @@ int create_boot_image(uint32_t *img_ptr,
   }
 
   /* Create the image header table */
-  bops->init_img_hdr_tab(&img_hdr_tab,
-                         img_hdr,
-                         part_hdr,
-                         &offs);
+  bops->init_img_hdr_tab(&img_hdr_tab, img_hdr, part_hdr, &offs);
 
   /* Copy the image header as all the fields should be filled by now */
   memcpy(offs.hoff, &(img_hdr_tab), sizeof(img_hdr_tab));
 
   /* Add 0xFF padding until partition header offset */
-  while ((uint32_t)(offs.poff - img_ptr) < offs.part_hdr_off / sizeof(uint32_t)) {
+  while ((uint32_t) (offs.poff - img_ptr) < offs.part_hdr_off / sizeof(uint32_t)) {
     memset(offs.poff, 0xFF, sizeof(uint32_t));
     offs.poff++;
   }
@@ -423,20 +412,19 @@ int create_boot_image(uint32_t *img_ptr,
 
   /* Recalculate partition hdr end offset/padding */
   if (offs.part_hdr_end_off) {
-    offs.part_hdr_end_off =
-      BOOTROM_PART_HDR_OFF
-      + (img_hdr_tab.hdrs_count * sizeof(struct bootrom_partition_hdr_t))
-      + BOOTROM_PART_HDR_END_PADD;
+    offs.part_hdr_end_off = BOOTROM_PART_HDR_OFF +
+                            (img_hdr_tab.hdrs_count * sizeof(struct bootrom_partition_hdr_t)) +
+                            BOOTROM_PART_HDR_END_PADD;
   }
 
   /* Add 0x00 padding until end of partition header */
-  while ((uint32_t)(offs.poff - img_ptr) < offs.part_hdr_end_off / sizeof(uint32_t)) {
+  while ((uint32_t) (offs.poff - img_ptr) < offs.part_hdr_end_off / sizeof(uint32_t)) {
     memset(offs.poff, 0x00, sizeof(uint32_t));
     offs.poff++;
   }
 
   /* Add 0xFF padding until BOOTROM_BINS_OFF */
-  while ((uint32_t)(offs.poff - img_ptr) < offs.bins_off / sizeof(uint32_t) ) {
+  while ((uint32_t) (offs.poff - img_ptr) < offs.bins_off / sizeof(uint32_t)) {
     memset(offs.poff, 0xFF, sizeof(uint32_t));
     offs.poff++;
   }

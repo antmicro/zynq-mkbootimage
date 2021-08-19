@@ -1,9 +1,10 @@
 #ifndef BIF_PARSER_H
 #define BIF_PARSER_H
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
+
 #include <linux/limits.h>
 
 #define BIF_SUCCESS                0
@@ -14,21 +15,24 @@
 #define BIF_ERROR_UNSUPPORTED_VAL  5
 #define BIF_ERROR_LEXER            6
 
-#define BIF_ARCH_ZYNQ              (1 << 0)
-#define BIF_ARCH_ZYNQMP            (1 << 1)
+#define BIF_ARCH_ZYNQ   (1 << 0)
+#define BIF_ARCH_ZYNQMP (1 << 1)
 
-typedef enum partition_owner_e {
+typedef enum partition_owner_e
+{
   OWNER_FSBL,
   OWNER_UBOOT
 } partition_owner_t;
 
-typedef enum destination_device_e {
+typedef enum destination_device_e
+{
   DST_DEV_UNDEF = -1,
   DST_DEV_PS,
   DST_DEV_PL
 } destination_device_t;
 
-typedef enum destination_cpu_e {
+typedef enum destination_cpu_e
+{
   DST_CPU_UNDEF = -1,
   DST_CPU_A53_0,
   DST_CPU_A53_1,
@@ -39,7 +43,8 @@ typedef enum destination_cpu_e {
   DST_CPU_R5_LOCKSTEP
 } destination_cpu_t;
 
-typedef enum exception_level_e {
+typedef enum exception_level_e
+{
   EL_UNDEF = -1,
   EL_0,
   EL_1,
@@ -47,7 +52,8 @@ typedef enum exception_level_e {
   EL_3
 } exception_level_t;
 
-enum token_type {
+enum token_type
+{
   TOKEN_EOF = 0,
 
   TOKEN_UNKNOWN = 256, /* skip ASCII */
@@ -103,6 +109,6 @@ int deinit_bif_cfg(bif_cfg_t *cfg);
 int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node);
 int bif_node_set_attr(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *value);
 
-int bif_parse(const char* fname, bif_cfg_t *cfg);
+int bif_parse(const char *fname, bif_cfg_t *cfg);
 
 #endif /* BIF_PARSER_H */
