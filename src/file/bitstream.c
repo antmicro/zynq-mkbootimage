@@ -13,24 +13,25 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
-#include <time.h>
 
 #include <bootrom.h>
 #include <common.h>
 #include <file/bitstream.h>
+#include <time.h>
 
 int bitstream_verify(FILE *bitfile) {
   uint32_t fhdr;
@@ -51,9 +52,7 @@ int bitstream_verify(FILE *bitfile) {
   return BOOTROM_SUCCESS;
 }
 
-int bitstream_write_header_part(FILE *bitfile,
-                              const uint8_t tag,
-                              const char *data) {
+int bitstream_write_header_part(FILE *bitfile, const uint8_t tag, const char *data) {
   uint16_t len = strlen(data) + 1;
   uint8_t n;
 
@@ -69,13 +68,21 @@ int bitstream_write_header_part(FILE *bitfile,
   return 0;
 }
 
-int bitstream_write_header(FILE *bitfile,
-                           uint32_t size,
-                           const char *design,
-                           const char *part) {
+int bitstream_write_header(FILE *bitfile, uint32_t size, const char *design, const char *part) {
   const uint8_t header[] = {
-    0x00, 0x09, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f,
-    0xf0, 0x0f, 0xf0, 0x00, 0x00, 0x01,
+    0x00,
+    0x09,
+    0x0f,
+    0xf0,
+    0x0f,
+    0xf0,
+    0x0f,
+    0xf0,
+    0x0f,
+    0xf0,
+    0x00,
+    0x00,
+    0x01,
   };
 
   int i;
@@ -101,11 +108,11 @@ int bitstream_write_header(FILE *bitfile,
   bitstream_write_header_part(bitfile, 'b', part);
 
   /* Write the section 'c' */
-  strftime(stime, sizeof(stime)-1, "%Y/%m/%d", &ltime);
+  strftime(stime, sizeof(stime) - 1, "%Y/%m/%d", &ltime);
   bitstream_write_header_part(bitfile, 'c', stime);
 
   /* Write the section 'd' */
-  strftime(stime, sizeof(stime)-1, "%H:%M:%S", &ltime);
+  strftime(stime, sizeof(stime) - 1, "%H:%M:%S", &ltime);
   bitstream_write_header_part(bitfile, 'd', stime);
 
   /* Write the start of the section 'e' */
@@ -113,7 +120,7 @@ int bitstream_write_header(FILE *bitfile,
   fwrite(&n, sizeof(uint8_t), 1, bitfile);
 
   for (i = 3; i >= 0; i--) {
-    n = (size >> (i*8)) & 0xFF;
+    n = (size >> (i * 8)) & 0xFF;
     fwrite(&n, sizeof(uint8_t), 1, bitfile);
   }
 

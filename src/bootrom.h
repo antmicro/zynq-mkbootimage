@@ -1,17 +1,17 @@
 #ifndef BOOTROM_H
 #define BOOTROM_H
 
-#include <gelf.h>
 #include <bif.h>
+#include <gelf.h>
 
-#define BOOTROM_SUCCESS 0
-#define BOOTROM_ERROR_NOFILE 1
-#define BOOTROM_ERROR_BITSTREAM 2
-#define BOOTROM_ERROR_ELF 3
+#define BOOTROM_SUCCESS           0
+#define BOOTROM_ERROR_NOFILE      1
+#define BOOTROM_ERROR_BITSTREAM   2
+#define BOOTROM_ERROR_ELF         3
 #define BOOTROM_ERROR_SEC_OVERLAP 4
 #define BOOTROM_ERROR_UNSUPPORTED 5
-#define BOOTROM_ERROR_NOMEM 6
-#define BOOTROM_ERROR_WADDR 7
+#define BOOTROM_ERROR_NOMEM       6
+#define BOOTROM_ERROR_WADDR       7
 
 /* BootROM Header based on ug585 and ug1085 */
 typedef struct bootrom_hdr_t {
@@ -80,9 +80,9 @@ typedef struct bootrom_hdr_t {
 typedef struct bootrom_img_hdr_tab_t {
   uint32_t version;
   uint32_t hdrs_count;
-  uint32_t part_hdr_off; /* word offset to the partition header */
+  uint32_t part_hdr_off;     /* word offset to the partition header */
   uint32_t part_img_hdr_off; /* word offset to first image header */
-  uint32_t auth_hdr_off; /* word offset to header authentication */
+  uint32_t auth_hdr_off;     /* word offset to header authentication */
   union {
     /* just padding for zynq */
     uint32_t padding[11];
@@ -122,8 +122,8 @@ typedef struct bootrom_img_hdr_t {
    * actual partition count, however the bootgen binary
    * always sets this field to 1. */
   uint32_t name_len;
-  uint8_t  name[BOOTROM_IMG_MAX_NAME_LEN];
-  uint8_t  padding[16];
+  uint8_t name[BOOTROM_IMG_MAX_NAME_LEN];
+  uint8_t padding[16];
 } bootrom_img_hdr_t;
 
 typedef struct linux_image_header_t {
@@ -142,15 +142,15 @@ typedef struct linux_image_header_t {
 } linux_image_header_t;
 
 /* attributes of the bootrom partition header */
-#define BOOTROM_PART_ATTR_OWNER_OFF      16
-#define BOOTROM_PART_ATTR_OWNER_MASK     (3 << BOOTROM_PART_ATTR_OWNER_OFF)
-#define BOOTROM_PART_ATTR_OWNER_FSBL     (0 << BOOTROM_PART_ATTR_OWNER_OFF)
-#define BOOTROM_PART_ATTR_OWNER_UBOOT    (1 << BOOTROM_PART_ATTR_OWNER_OFF)
+#define BOOTROM_PART_ATTR_OWNER_OFF   16
+#define BOOTROM_PART_ATTR_OWNER_MASK  (3 << BOOTROM_PART_ATTR_OWNER_OFF)
+#define BOOTROM_PART_ATTR_OWNER_FSBL  (0 << BOOTROM_PART_ATTR_OWNER_OFF)
+#define BOOTROM_PART_ATTR_OWNER_UBOOT (1 << BOOTROM_PART_ATTR_OWNER_OFF)
 
-#define BOOTROM_PART_ATTR_RSA_USED_OFF   15
-#define BOOTROM_PART_ATTR_RSA_USED_MASK  (1 << BOOTROM_PATR_ATTR_RSA_USED_OFF)
-#define BOOTROM_PART_ATTR_RSA_USED       (1 << BOOTROM_PART_ATTR_RSA_USED_OFF)
-#define BOOTROM_PART_ATTR_RSA_NOT_USED   (0 << BOOTROM_PART_ATTR_RSA_USED_OFF)
+#define BOOTROM_PART_ATTR_RSA_USED_OFF  15
+#define BOOTROM_PART_ATTR_RSA_USED_MASK (1 << BOOTROM_PATR_ATTR_RSA_USED_OFF)
+#define BOOTROM_PART_ATTR_RSA_USED      (1 << BOOTROM_PART_ATTR_RSA_USED_OFF)
+#define BOOTROM_PART_ATTR_RSA_NOT_USED  (0 << BOOTROM_PART_ATTR_RSA_USED_OFF)
 
 #define BOOTROM_PART_ATTR_DEST_CPU_OFF   8
 #define BOOTROM_PART_ATTR_DEST_CPU_NONE  (0 << BOOTROM_PART_ATTR_DEST_CPU_OFF)
@@ -166,23 +166,23 @@ typedef struct linux_image_header_t {
 #define BOOTROM_PART_ATTR_ENCRYPTION_YES (1 << BOOTROM_PART_ATTR_ENCRYPTION_OFF)
 #define BOOTROM_PART_ATTR_ENCRYPTION_NO  (0 << BOOTROM_PART_ATTR_ENCRYPTION_OFF)
 
-#define BOOTROM_PART_ATTR_DEST_DEV_OFF   4
-#define BOOTROM_PART_ATTR_DEST_DEV_MASK  (7 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
-#define BOOTROM_PART_ATTR_DEST_DEV_NONE  (0 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
-#define BOOTROM_PART_ATTR_DEST_DEV_PS    (1 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
-#define BOOTROM_PART_ATTR_DEST_DEV_PL    (2 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
-#define BOOTROM_PART_ATTR_DEST_DEV_INT   (3 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
+#define BOOTROM_PART_ATTR_DEST_DEV_OFF  4
+#define BOOTROM_PART_ATTR_DEST_DEV_MASK (7 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
+#define BOOTROM_PART_ATTR_DEST_DEV_NONE (0 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
+#define BOOTROM_PART_ATTR_DEST_DEV_PS   (1 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
+#define BOOTROM_PART_ATTR_DEST_DEV_PL   (2 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
+#define BOOTROM_PART_ATTR_DEST_DEV_INT  (3 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
 
 #define BOOTROM_PART_ATTR_A5X_EXEC_S_OFF 3
 #define BOOTROM_PART_ATTR_A5X_EXEC_S_64  (0 << BOOTROM_PART_ATTR_A5X_EXEC_S_OFF)
 #define BOOTROM_PART_ATTR_A5X_EXEC_S_32  (1 << BOOTROM_PART_ATTR_A5X_EXEC_S_OFF)
 
-#define BOOTROM_PART_ATTR_EXC_LVL_OFF    1
-#define BOOTROM_PART_ATTR_EXC_LVL_MASK   (0x3 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
-#define BOOTROM_PART_ATTR_EXC_LVL_EL0    (0 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
-#define BOOTROM_PART_ATTR_EXC_LVL_EL1    (1 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
-#define BOOTROM_PART_ATTR_EXC_LVL_EL2    (2 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
-#define BOOTROM_PART_ATTR_EXC_LVL_EL3    (3 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
+#define BOOTROM_PART_ATTR_EXC_LVL_OFF  1
+#define BOOTROM_PART_ATTR_EXC_LVL_MASK (0x3 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
+#define BOOTROM_PART_ATTR_EXC_LVL_EL0  (0 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
+#define BOOTROM_PART_ATTR_EXC_LVL_EL1  (1 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
+#define BOOTROM_PART_ATTR_EXC_LVL_EL2  (2 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
+#define BOOTROM_PART_ATTR_EXC_LVL_EL3  (3 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
 
 #define BOOTROM_PART_ATTR_TRUST_ZONE_OFF 0
 #define BOOTROM_PART_ATTR_TRUST_ZONE_YES (1 << BOOTROM_PART_ATTR_TRUST_ZONE_OFF)
@@ -195,14 +195,14 @@ typedef struct linux_image_header_t {
 #define BOOTROM_RESERVED_ZMP_RL   0x01000020 /* The same as img version? */
 
 /* user defined 0 / fsbl execution address */
-#define BOOTROM_USER_0            0x01010000 /* used by zynq */
-#define BOOTROM_FSBL_EXEC_ADDR    0xfffc0000 /* used by zynqmp */
+#define BOOTROM_USER_0         0x01010000 /* used by zynq */
+#define BOOTROM_FSBL_EXEC_ADDR 0xfffc0000 /* used by zynqmp */
 
 /* PMU firmware related */
 /* The maximum PMU FW size should be 0x00020000 (128kB)
  * according to the TRM, but for some reason bootgen uses
  * the value used below */
-#define BOOTROM_PMUFW_MAX_SIZE    0x0001fae0
+#define BOOTROM_PMUFW_MAX_SIZE 0x0001fae0
 
 /* these values are also taken from bootm.bin
  * however these might not be the only valid
@@ -214,21 +214,21 @@ typedef struct linux_image_header_t {
 #define BOOTROM_BINS_OFF          0x00001700
 
 /* The same defines as above but for zynqmp */
-#define BOOTROM_BINS_OFF_ZMP      0x00000b40
+#define BOOTROM_BINS_OFF_ZMP 0x00000b40
 
 /* values from the documentation */
-#define BOOTROM_WIDTH_DETECT      0xAA995566
-#define BOOTROM_IMG_ID            "XNLX"
-#define BOOTROM_ENCRYPTED_EFUSE   0xA5C3C5A3
-#define BOOTROM_ENCRYPTED_OEFUSE  0xA5C3C5A7 /* obfuscated key in eFUSE */
-#define BOOTROM_ENCRYPTED_RAMKEY  0x3A5C3C5A /* bram */
-#define BOOTROM_ENCRYPTED_OBHDR   0xA35C7CA5 /* obfuscated key in boot hdr */
-#define BOOTROM_ENCRYPTED_NONE    0x00000000 /* anything but efuse, ramkey*/
-#define BOOTROM_MIN_SRC_OFFSET    0x000008C0
-#define BOOTROM_RESERVED_0        0x00000000 /* MUST be set to 0 */
-#define BOOTROM_RESERVED_1        0x00000000 /* MUST be set to 0 */
+#define BOOTROM_WIDTH_DETECT     0xAA995566
+#define BOOTROM_IMG_ID           "XNLX"
+#define BOOTROM_ENCRYPTED_EFUSE  0xA5C3C5A3
+#define BOOTROM_ENCRYPTED_OEFUSE 0xA5C3C5A7 /* obfuscated key in eFUSE */
+#define BOOTROM_ENCRYPTED_RAMKEY 0x3A5C3C5A /* bram */
+#define BOOTROM_ENCRYPTED_OBHDR  0xA35C7CA5 /* obfuscated key in boot hdr */
+#define BOOTROM_ENCRYPTED_NONE   0x00000000 /* anything but efuse, ramkey*/
+#define BOOTROM_MIN_SRC_OFFSET   0x000008C0
+#define BOOTROM_RESERVED_0       0x00000000 /* MUST be set to 0 */
+#define BOOTROM_RESERVED_1       0x00000000 /* MUST be set to 0 */
 
-#define BOOTROM_IMG_VERSION       0x01020000
+#define BOOTROM_IMG_VERSION 0x01020000
 
 #define BOOTROM_IMG_HDR_BOOT_SAME 0x0
 #define BOOTROM_IMG_HDR_BOOT_QSPI 0x1
@@ -241,28 +241,28 @@ typedef struct linux_image_header_t {
 #define BOOTROM_IMG_HDR_BOOT_SATA 0x8
 
 /* TODO find definitions for other CPUs */
-#define BOOTROM_FSBL_CPU_R5       0x001
-#define BOOTROM_FSBL_CPU_A53_64   0x800
+#define BOOTROM_FSBL_CPU_R5     0x001
+#define BOOTROM_FSBL_CPU_A53_64 0x800
 
 /* Other file specific files */
-#define FILE_MAGIC_ELF            0x464C457F
+#define FILE_MAGIC_ELF 0x464C457F
 
-#define FILE_MAGIC_XILINXBIT_0    0xf00f0900
-#define FILE_MAGIC_XILINXBIT_1    0xf00ff00f
+#define FILE_MAGIC_XILINXBIT_0 0xf00f0900
+#define FILE_MAGIC_XILINXBIT_1 0xf00ff00f
 
-#define FILE_MAGIC_LINUX          0x56190527
-#define FILE_MAGIC_DTB            0xedfe0dd0
+#define FILE_MAGIC_LINUX 0x56190527
+#define FILE_MAGIC_DTB   0xedfe0dd0
 
-#define FILE_XILINXBIT_SEC_START  13
-#define FILE_XILINXBIT_SEC_DATA   'e'
+#define FILE_XILINXBIT_SEC_START 13
+#define FILE_XILINXBIT_SEC_DATA  'e'
 
-#define FILE_LINUX_IMG_TYPE_UIM   2
-#define FILE_LINUX_IMG_TYPE_URD   3
-#define FILE_LINUX_IMG_TYPE_SCR   6
+#define FILE_LINUX_IMG_TYPE_UIM 2
+#define FILE_LINUX_IMG_TYPE_URD 3
+#define FILE_LINUX_IMG_TYPE_SCR 6
 
-#define BINARY_ATTR_LINUX         0x00
-#define BINARY_ATTR_RAMDISK       0x02
-#define BINARY_ATTR_GENERAL       0x01
+#define BINARY_ATTR_LINUX   0x00
+#define BINARY_ATTR_RAMDISK 0x02
+#define BINARY_ATTR_GENERAL 0x01
 
 typedef struct bootrom_offs_t {
   /* pointer to the image in memory */
@@ -284,48 +284,39 @@ typedef struct bootrom_offs_t {
 typedef struct bootrom_ops_t {
   /* Initialize offsets - image pointer should be
    * set before this one is called */
-  int (*init_offs)(uint32_t*, int, bootrom_offs_t*);
+  int (*init_offs)(uint32_t *, int, bootrom_offs_t *);
 
   /* Initialize the main bootrom header */
-  int (*init_header)(bootrom_hdr_t*, bootrom_offs_t*);
+  int (*init_header)(bootrom_hdr_t *, bootrom_offs_t *);
 
   /* Setup bootloader at the current offset */
-  int (*setup_fsbl_at_curr_off)(bootrom_hdr_t*,
-                                bootrom_offs_t*,
-                                uint32_t img_len);
+  int (*setup_fsbl_at_curr_off)(bootrom_hdr_t *, bootrom_offs_t *, uint32_t img_len);
 
   /* Prepare image header table */
-  int (*init_img_hdr_tab)(bootrom_img_hdr_tab_t*,
-                          bootrom_img_hdr_t*,
-                          bootrom_partition_hdr_t*,
-                          bootrom_offs_t*);
+  int (*init_img_hdr_tab)(bootrom_img_hdr_tab_t *,
+                          bootrom_img_hdr_t *,
+                          bootrom_partition_hdr_t *,
+                          bootrom_offs_t *);
 
   /* Partition header related callbacks */
-  int (*init_part_hdr_default)(bootrom_partition_hdr_t*,
-                               bif_node_t*);
-  int (*init_part_hdr_dtb)(bootrom_partition_hdr_t*,
-                           bif_node_t*);
-  int (*init_part_hdr_elf)(bootrom_partition_hdr_t*,
-                           bif_node_t*,
+  int (*init_part_hdr_default)(bootrom_partition_hdr_t *, bif_node_t *);
+  int (*init_part_hdr_dtb)(bootrom_partition_hdr_t *, bif_node_t *);
+  int (*init_part_hdr_elf)(bootrom_partition_hdr_t *,
+                           bif_node_t *,
                            uint32_t *size,
                            uint32_t load,
                            uint32_t entry,
                            uint8_t nbits);
-  int (*init_part_hdr_bitstream)(bootrom_partition_hdr_t*,
-                                 bif_node_t*);
-  int (*init_part_hdr_linux)(bootrom_partition_hdr_t*,
-                             bif_node_t*,
-                             linux_image_header_t*);
+  int (*init_part_hdr_bitstream)(bootrom_partition_hdr_t *, bif_node_t *);
+  int (*init_part_hdr_linux)(bootrom_partition_hdr_t *, bif_node_t *, linux_image_header_t *);
   /* The finish function is common for all partition types */
-  int (*finish_part_hdr)(bootrom_partition_hdr_t*,
-                         uint32_t *img_size,
-                         bootrom_offs_t*);
+  int (*finish_part_hdr)(bootrom_partition_hdr_t *, uint32_t *img_size, bootrom_offs_t *);
 
   /* Some archs require a null partition at the end */
   uint8_t append_null_part;
 } bootrom_ops_t;
 
-uint32_t estimate_boot_image_size(bif_cfg_t*);
-int create_boot_image(uint32_t*, bif_cfg_t*, bootrom_ops_t*, uint32_t*);
+uint32_t estimate_boot_image_size(bif_cfg_t *);
+int create_boot_image(uint32_t *, bif_cfg_t *, bootrom_ops_t *, uint32_t *);
 
 #endif /* BOOTROM_H */

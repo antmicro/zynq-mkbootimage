@@ -2,6 +2,7 @@
 #define ARCH_ZYNQMP_H
 
 #include <stdint.h>
+
 #include "bootrom.h"
 
 extern bootrom_ops_t zynqmp_bops;

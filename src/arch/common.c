@@ -1,11 +1,11 @@
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <stdio.h>
 
+#include <arch/common.h>
 #include <bif.h>
 #include <bootrom.h>
 #include <common.h>
-#include <arch/common.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int bootrom_init_header(bootrom_hdr_t *hdr) {
   unsigned int i = 0;
@@ -18,7 +18,7 @@ int bootrom_init_header(bootrom_hdr_t *hdr) {
 
   /* BootROM does not interpret the field below */
   hdr->src_offset = 0x0; /* Will be filled elsewhere */
-  hdr->img_len = 0x0; /* Will be filled elsewhere */
+  hdr->img_len = 0x0;    /* Will be filled elsewhere */
   hdr->reserved_0 = BOOTROM_RESERVED_0;
   hdr->start_of_exec = 0x0; /* Will be filled elsewhere */
   hdr->total_img_len = 0x0; /* Will be filled elsewhere */
@@ -30,17 +30,15 @@ int bootrom_init_header(bootrom_hdr_t *hdr) {
 void bootrom_calc_hdr_checksum(bootrom_hdr_t *hdr) {
   /* the checksum skips the interupt vector and starts
    * at the width detect field */
-  hdr->checksum = calc_checksum(&(hdr->width_detect),
-                                &(hdr->checksum) - 1);
+  hdr->checksum = calc_checksum(&(hdr->width_detect), &(hdr->checksum) - 1);
 }
 
-int bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
-                             bootrom_offs_t *offs) {
+int bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab, bootrom_offs_t *offs) {
   /* Prepare image header table */
   img_hdr_tab->version = BOOTROM_IMG_VERSION;
-  img_hdr_tab->part_hdr_off = 0x0; /* filled below */
+  img_hdr_tab->part_hdr_off = 0x0;     /* filled below */
   img_hdr_tab->part_img_hdr_off = 0x0; /* filled below */
-  img_hdr_tab->auth_hdr_off = 0x0; /* auth not implemented */
+  img_hdr_tab->auth_hdr_off = 0x0;     /* auth not implemented */
 
   /* The data will be copied to the reserved space later
    * when we know all the required offsets,

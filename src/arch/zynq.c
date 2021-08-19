@@ -1,22 +1,21 @@
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <gelf.h>
-#include <unistd.h>
-#include <libgen.h>
 
-#include <bif.h>
-#include <bootrom.h>
-
-#include <common.h>
 #include <arch/common.h>
 #include <arch/zynq.h>
+#include <bif.h>
+#include <bootrom.h>
+#include <common.h>
+#include <fcntl.h>
+#include <gelf.h>
+#include <libgen.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 int zynq_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *offs) {
-  (void)hdr_count;
+  (void) hdr_count;
   /* Copy the image pointer */
   offs->img_ptr = img_ptr;
 
@@ -47,7 +46,8 @@ int zynq_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
   memset(hdr->user_defined_zynq_0, 0x0, sizeof(hdr->user_defined_zynq_0));
 
   hdr->user_defined_zynq_0[19] = offs->img_hdr_off;
-  hdr->user_defined_zynq_0[20] = offs->part_hdr_off;;
+  hdr->user_defined_zynq_0[20] = offs->part_hdr_off;
+  ;
 
   /* Memory acces ranges - set to full (0x0 - 0xFFFFFFFF range) */
   for (i = 0; i < 256; i++) {
@@ -63,8 +63,8 @@ int zynq_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
   return BOOTROM_SUCCESS;
 }
 
-int zynq_bootrom_setup_fsbl_at_curr_off(bootrom_hdr_t* hdr,
-                                        bootrom_offs_t* offs,
+int zynq_bootrom_setup_fsbl_at_curr_off(bootrom_hdr_t *hdr,
+                                        bootrom_offs_t *offs,
                                         uint32_t img_len) {
   /* Update the header to point at the bootloader */
   hdr->src_offset = (offs->coff - offs->img_ptr) * sizeof(uint32_t);
@@ -88,7 +88,7 @@ int zynq_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
 
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *part_hdr;
-  part_hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
+  part_hdr = (bootrom_partition_hdr_zynq_t *) ihdr;
 
   /* Call the common code */
   bootrom_init_img_hdr_tab(img_hdr_tab, offs);
@@ -104,9 +104,8 @@ int zynq_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
       img_hdr[i].next_img_off = offs->poff + img_hdr_size - offs->img_ptr;
     }
 
-    img_hdr[i].part_hdr_off =
-      (offs->part_hdr_off / sizeof(uint32_t)) +
-      (i * sizeof(bootrom_partition_hdr_t) / sizeof(uint32_t));
+    img_hdr[i].part_hdr_off = (offs->part_hdr_off / sizeof(uint32_t)) +
+                              (i * sizeof(bootrom_partition_hdr_t) / sizeof(uint32_t));
 
     /* Write the actual img_hdr data */
     memcpy(offs->poff, &(img_hdr[i]), sizeof(img_hdr[i]));
@@ -115,8 +114,7 @@ int zynq_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
     part_hdr[i].img_hdr_off = (offs->poff - offs->img_ptr);
 
     /* Calculate the checksum */
-    part_hdr[i].checksum = calc_checksum(&(part_hdr[i].pd_len),
-                                         &(part_hdr[i].checksum) - 1);
+    part_hdr[i].checksum = calc_checksum(&(part_hdr[i].pd_len), &(part_hdr[i].checksum) - 1);
 
     if (i == 0) {
       img_hdr_tab->part_img_hdr_off = (offs->poff - offs->img_ptr);
@@ -139,11 +137,10 @@ int zynq_init_part_hdr_generic(bootrom_partition_hdr_t *ihdr,
                                uint32_t extra_args) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;
-  hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynq_t *) ihdr;
 
   /* set destination device as the only attribute */
-  hdr->attributes =
-    (0x1 << BOOTROM_PART_ATTR_DEST_DEV_OFF) | extra_args;
+  hdr->attributes = (0x1 << BOOTROM_PART_ATTR_DEST_DEV_OFF) | extra_args;
 
   /* No load/execution address */
   hdr->dest_load_addr = node->load;
@@ -151,13 +148,11 @@ int zynq_init_part_hdr_generic(bootrom_partition_hdr_t *ihdr,
   return BOOTROM_SUCCESS;
 }
 
-int zynq_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
-                               bif_node_t *node) {
+int zynq_init_part_hdr_default(bootrom_partition_hdr_t *ihdr, bif_node_t *node) {
   return zynq_init_part_hdr_generic(ihdr, node, BINARY_ATTR_GENERAL);
 }
 
-int zynq_init_part_hdr_dtb(bootrom_partition_hdr_t *ihdr,
-                           bif_node_t *node) {
+int zynq_init_part_hdr_dtb(bootrom_partition_hdr_t *ihdr, bif_node_t *node) {
   return zynq_init_part_hdr_generic(ihdr, node, BINARY_ATTR_RAMDISK);
 }
 
@@ -174,7 +169,7 @@ int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
 
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;
-  hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynq_t *) ihdr;
 
   /* Set the load and execution address */
   hdr->dest_load_addr = load;
@@ -186,14 +181,13 @@ int zynq_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
   return BOOTROM_SUCCESS;
 }
 
-int zynq_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr,
-                                 bif_node_t *node) {
+int zynq_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr, bif_node_t *node) {
   /* Handle unused parameters warning */
   (void) node;
 
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;
-  hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynq_t *) ihdr;
 
   /* Set destination device as the only attribute */
   hdr->attributes = BOOTROM_PART_ATTR_DEST_DEV_PL;
@@ -209,7 +203,7 @@ int zynq_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
                              linux_image_header_t *img) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;
-  hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynq_t *) ihdr;
   if (img->type == FILE_LINUX_IMG_TYPE_UIM) {
     hdr->attributes = BINARY_ATTR_LINUX;
   }
@@ -229,15 +223,13 @@ int zynq_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
   return BOOTROM_SUCCESS;
 }
 
-int zynq_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
-                         uint32_t *img_size,
-                         bootrom_offs_t *offs) {
+int zynq_finish_part_hdr(bootrom_partition_hdr_t *ihdr, uint32_t *img_size, bootrom_offs_t *offs) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynq_t *hdr;
-  hdr = (bootrom_partition_hdr_zynq_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynq_t *) ihdr;
 
   /* Is bitstream? */
-  if(hdr->attributes == BOOTROM_PART_ATTR_DEST_DEV_PL) {
+  if (hdr->attributes == BOOTROM_PART_ATTR_DEST_DEV_PL) {
     /* For some reason, a noop is appended after bitstream (only for zynq) */
     const uint8_t noop[4] = {0, 0, 0, 0x20};
     memcpy(offs->coff + (*img_size), noop, sizeof(noop));

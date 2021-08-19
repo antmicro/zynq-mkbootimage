@@ -1,8 +1,8 @@
-#include <stdio.h>
+#include <stdarg.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 
 #include <common.h>
 
@@ -25,7 +25,7 @@ uint32_t calc_checksum(uint32_t *start_addr, uint32_t *end_addr) {
   sum = 0;
   ptr = start_addr;
 
-  while(ptr <= end_addr) {
+  while (ptr <= end_addr) {
     sum += *ptr;
     ptr++;
   }
@@ -35,7 +35,7 @@ uint32_t calc_checksum(uint32_t *start_addr, uint32_t *end_addr) {
 
 /* Check if pfix is a postifx of string */
 int is_postfix(char *string, char *pfix) {
-  return strcmp(string+strlen(string)-strlen(pfix), pfix) == 0;
+  return strcmp(string + strlen(string) - strlen(pfix), pfix) == 0;
 }
 
 /* Check if a string is present on a list*/

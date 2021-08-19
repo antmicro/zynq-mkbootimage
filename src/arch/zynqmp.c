@@ -1,18 +1,17 @@
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <libgen.h>
 
-#include <bif.h>
-#include <bootrom.h>
-
-#include <common.h>
 #include <arch/common.h>
 #include <arch/zynqmp.h>
+#include <bif.h>
+#include <bootrom.h>
+#include <common.h>
+#include <fcntl.h>
+#include <libgen.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #define BOOTROM_ZYNQMP_OFFSET_AFTER_HEADERS 0x40
 
@@ -23,11 +22,10 @@ int zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *o
   /* Init constant offsets */
   offs->img_hdr_off = BOOTROM_IMG_HDR_OFF;
   offs->part_hdr_end_off = 0; /* Not needed by zynqmp */
-  offs->part_hdr_off = offs->img_hdr_off + sizeof(bootrom_img_hdr_tab_t)
-                     + sizeof(bootrom_img_hdr_t) * hdr_count;
-  offs->bins_off = offs->part_hdr_off
-                 + sizeof(bootrom_partition_hdr_t) * hdr_count
-                 + BOOTROM_ZYNQMP_OFFSET_AFTER_HEADERS;
+  offs->part_hdr_off =
+    offs->img_hdr_off + sizeof(bootrom_img_hdr_tab_t) + sizeof(bootrom_img_hdr_t) * hdr_count;
+  offs->bins_off = offs->part_hdr_off + sizeof(bootrom_partition_hdr_t) * hdr_count +
+                   BOOTROM_ZYNQMP_OFFSET_AFTER_HEADERS;
 
   /* Move the offset to reserve the space for headers */
   offs->poff = (offs->img_hdr_off) / sizeof(uint32_t) + img_ptr;
@@ -75,8 +73,8 @@ int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
   return BOOTROM_SUCCESS;
 }
 
-int zynqmp_bootrom_setup_fsbl_at_curr_off(bootrom_hdr_t* hdr,
-                                          bootrom_offs_t* offs,
+int zynqmp_bootrom_setup_fsbl_at_curr_off(bootrom_hdr_t *hdr,
+                                          bootrom_offs_t *offs,
                                           uint32_t img_len) {
   /* Update the header to point at the bootloader */
   hdr->src_offset = (offs->coff - offs->img_ptr) * sizeof(uint32_t);
@@ -106,7 +104,7 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   uint32_t img_hdr_size = 0;
 
   bootrom_partition_hdr_zynqmp_t *part_hdr;
-  part_hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
+  part_hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
 
   /* Call the common code */
   bootrom_init_img_hdr_tab(img_hdr_tab, offs);
@@ -115,9 +113,8 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
     img_hdr_size = sizeof(img_hdr[i]) / sizeof(uint32_t);
     memset(&img_hdr[i].padding, 0xFF, sizeof(img_hdr->padding));
 
-    img_hdr[i].part_hdr_off =
-      (offs->part_hdr_off / sizeof(uint32_t)) +
-      (i * sizeof(bootrom_partition_hdr_t) / sizeof(uint32_t));
+    img_hdr[i].part_hdr_off = (offs->part_hdr_off / sizeof(uint32_t)) +
+                              (i * sizeof(bootrom_partition_hdr_t) / sizeof(uint32_t));
 
     /* Calculate the next img hdr offsets */
     if (i + 1 == img_hdr_tab->hdrs_count) {
@@ -130,8 +127,7 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
     if (i > 0) {
       part_hdr[i - 1].next_part_hdr_off = img_hdr[i].part_hdr_off;
       part_hdr[i - 1].checksum =
-        calc_checksum(&(part_hdr[i - 1].pd_len),
-                      &(part_hdr[i - 1].checksum) - 1);
+        calc_checksum(&(part_hdr[i - 1].pd_len), &(part_hdr[i - 1].checksum) - 1);
     }
 
     /* Write the actual img_hdr data */
@@ -142,8 +138,7 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
 
     /* Calculate the checksum if this is the last header*/
     if (i + 1 == img_hdr_tab->hdrs_count) {
-      part_hdr[i].checksum = calc_checksum(&(part_hdr[i].pd_len),
-                                           &(part_hdr[i].checksum) - 1);
+      part_hdr[i].checksum = calc_checksum(&(part_hdr[i].pd_len), &(part_hdr[i].checksum) - 1);
     }
 
     if (i == 0) {
@@ -163,8 +158,7 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   memset(img_hdr_tab->reserved, 0x0, sizeof(img_hdr_tab->reserved));
 
   /* Recalculate the checksum */
-  img_hdr_tab->checksum = calc_checksum(&img_hdr_tab->version,
-                                        &(img_hdr_tab->checksum) - 1);
+  img_hdr_tab->checksum = calc_checksum(&img_hdr_tab->version, &(img_hdr_tab->checksum) - 1);
 
   return BOOTROM_SUCCESS;
 }
@@ -183,56 +177,55 @@ uint32_t zynqmp_calc_part_hdr_attr(bif_node_t *node) {
     attr |= BOOTROM_PART_ATTR_DEST_DEV_PL;
 
   switch (node->destination_cpu) {
-    case DST_CPU_A53_0:
-      attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_0;
-      break;
-    case DST_CPU_A53_1:
-      attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_1;
-      break;
-    case DST_CPU_A53_2:
-      attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_2;
-      break;
-    case DST_CPU_A53_3:
-      attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_3;
-      break;
-    case DST_CPU_R5_0:
-      attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_0;
-      break;
-    case DST_CPU_R5_1:
-      attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_1;
-      break;
-    case DST_CPU_R5_LOCKSTEP:
-      attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_L;
-      break;
-    default:
-      break;
+  case DST_CPU_A53_0:
+    attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_0;
+    break;
+  case DST_CPU_A53_1:
+    attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_1;
+    break;
+  case DST_CPU_A53_2:
+    attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_2;
+    break;
+  case DST_CPU_A53_3:
+    attr |= BOOTROM_PART_ATTR_DEST_CPU_A53_3;
+    break;
+  case DST_CPU_R5_0:
+    attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_0;
+    break;
+  case DST_CPU_R5_1:
+    attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_1;
+    break;
+  case DST_CPU_R5_LOCKSTEP:
+    attr |= BOOTROM_PART_ATTR_DEST_CPU_R5_L;
+    break;
+  default:
+    break;
   }
 
   switch (node->exception_level) {
-    case EL_0:
-      attr |= BOOTROM_PART_ATTR_EXC_LVL_EL0;
-      break;
-    case EL_1:
-      attr |= BOOTROM_PART_ATTR_EXC_LVL_EL1;
-      break;
-    case EL_2:
-      attr |= BOOTROM_PART_ATTR_EXC_LVL_EL2;
-      break;
-    case EL_3:
-      attr |= BOOTROM_PART_ATTR_EXC_LVL_EL3;
-      break;
-    default:
-      break;
+  case EL_0:
+    attr |= BOOTROM_PART_ATTR_EXC_LVL_EL0;
+    break;
+  case EL_1:
+    attr |= BOOTROM_PART_ATTR_EXC_LVL_EL1;
+    break;
+  case EL_2:
+    attr |= BOOTROM_PART_ATTR_EXC_LVL_EL2;
+    break;
+  case EL_3:
+    attr |= BOOTROM_PART_ATTR_EXC_LVL_EL3;
+    break;
+  default:
+    break;
   }
 
   return attr;
 }
 
-int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr,
-                                 bif_node_t *node) {
+int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr, bif_node_t *node) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
-  hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
 
   /* set destination device as the only attribute */
   hdr->attributes = zynqmp_calc_part_hdr_attr(node);
@@ -250,7 +243,7 @@ int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
                              uint8_t nbits) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
-  hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
 
   /* Set the load and execution address */
   hdr->dest_load_addr_lo = load;
@@ -281,12 +274,11 @@ int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
   return BOOTROM_SUCCESS;
 }
 
-int zynqmp_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr,
-                                   bif_node_t *node) {
+int zynqmp_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr, bif_node_t *node) {
   (void) node;
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
-  hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
 
   /* Set destination device as the only attribute */
   hdr->attributes = zynqmp_calc_part_hdr_attr(node);
@@ -303,7 +295,7 @@ int zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
                                bif_node_t *node,
                                linux_image_header_t *img) {
   bootrom_partition_hdr_zynqmp_t *hdr;
-  hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
 
   /* Despite what ug1283 p. 21 says, sometimes attributes need to be zeroed */
   if (img->type == FILE_LINUX_IMG_TYPE_URD) {
@@ -332,7 +324,7 @@ int zynqmp_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
                            bootrom_offs_t *offs) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
-  hdr = (bootrom_partition_hdr_zynqmp_t*) ihdr;
+  hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
 
   /* Set lengths to basic img_len if not set earlier */
   if (hdr->pd_len == 0)

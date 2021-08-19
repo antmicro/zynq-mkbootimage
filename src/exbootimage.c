@@ -13,56 +13,49 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include <stdint.h>
 #include <stddef.h>
-#include <string.h>
+#include <stdint.h>
 #include <stdio.h>
-#include <argp.h>
-
-#include <bif.h>
-#include <bootrom.h>
-#include <common.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <arch/zynq.h>
 #include <arch/zynqmp.h>
+#include <argp.h>
+#include <bif.h>
+#include <bootrom.h>
+#include <common.h>
 #include <file/bitstream.h>
-
 #include <sys/stat.h>
 
 /* A macro contructor of struct fmt */
 #define FORMAT(name, type, field, fmt) \
-  {name, offsetof(type, field), print_ ## fmt}
+  { name, offsetof(type, field), print_##fmt }
 
 /* Calculate absolute value of a byte or word address */
-#define ABS_BADDR(base, addr) \
-  ((void*)((uint8_t*)(base)+(addr)))
-#define ABS_WADDR(base, addr) \
-  ((void*)((uint32_t*)(base)+(addr)))
+#define ABS_BADDR(base, addr) ((void *) ((uint8_t *) (base) + (addr)))
+#define ABS_WADDR(base, addr) ((void *) ((uint32_t *) (base) + (addr)))
 
 /* Calculate relative byte addres from an absolute address */
-#define REL_BADDR(base, addr) \
-  ((uint32_t)((unsigned long)(addr)-(unsigned long)(base)))
+#define REL_BADDR(base, addr) ((uint32_t) ((unsigned long) (addr) - (unsigned long) (base)))
 
 /* Check if a byte or word address is correct */
-#define IS_REL_BADDR(bsize, addr) \
-  ((addr) < (bsize))
-#define IS_REL_WADDR(bsize, addr) \
-  ((addr)*sizeof(uint32_t) < (bsize))
+#define IS_REL_BADDR(bsize, addr) ((addr) < (bsize))
+#define IS_REL_WADDR(bsize, addr) ((addr) * sizeof(uint32_t) < (bsize))
 
 /* Check if an absolute address is relatively NULL  */
-#define IS_REL_NULL(base, addr) \
-  ((void*)(addr) <= (void*)(base))
+#define IS_REL_NULL(base, addr) ((void *) (addr) <= (void *) (base))
 
 /* A struct for describing binary data layout */
 struct format {
@@ -93,14 +86,14 @@ struct arguments {
 };
 
 /* Type definitions for local usage */
-typedef bootrom_img_hdr_t              img_hdr_t;
-typedef bootrom_partition_hdr_zynq_t   zynq_hdr_t;
+typedef bootrom_img_hdr_t img_hdr_t;
+typedef bootrom_partition_hdr_zynq_t zynq_hdr_t;
 typedef bootrom_partition_hdr_zynqmp_t zynqmp_hdr_t;
-typedef bootrom_hdr_t                  hdr_t;
-typedef bootrom_img_hdr_tab_t          img_hdr_tab_t;
-typedef bootrom_img_hdr_t              img_hdr_t;
+typedef bootrom_hdr_t hdr_t;
+typedef bootrom_img_hdr_tab_t img_hdr_tab_t;
+typedef bootrom_img_hdr_t img_hdr_t;
 
-typedef bootrom_partition_hdr_t        part_hdr_t;
+typedef bootrom_partition_hdr_t part_hdr_t;
 
 int print_dec(FILE *f, void *base, int offset);
 int print_word(FILE *f, void *base, int offset);
@@ -109,40 +102,38 @@ int print_name(FILE *f, void *base, int offset);
 int print_attr(FILE *f, void *base, int offset);
 
 static int name_to_string(char *dst, void *base, int offset);
-static int print_padding(FILE  *f, int times, char ch);
+static int print_padding(FILE *f, int times, char ch);
 static int is_good_waddr(void *base, uint32_t size, uint32_t *poffset);
 static int iter_imgs(void *base, uint32_t size, img_hdr_t **img);
 
 /* Prepare global variables for arg parser */
 const char *argp_program_version = MKBOOTIMAGE_VER;
 static char doc[] = "Extract data and files from Xilinx Zynq boot images.";
-static char args_doc[] = "[--zynqmp|-u] "
-                         "[--extract|-x] "
-                         "[--list|-l] "
-                         "[--describe|-d] "
-                         "[--header|-h] "
-                         "[--images|-i] "
-                         "[--parts|-p] "
-                         "[--bitstream|-bDESIGN,PART-NAME] "
-                         "<input_bit_file> <files_to_extract>";
+static char args_doc[] =
+  "[--zynqmp|-u] "
+  "[--extract|-x] "
+  "[--list|-l] "
+  "[--describe|-d] "
+  "[--header|-h] "
+  "[--images|-i] "
+  "[--parts|-p] "
+  "[--bitstream|-bDESIGN,PART-NAME] "
+  "<input_bit_file> <files_to_extract>";
 
-/* clang-format off */
 static struct argp_option argp_options[] = {
-  {"zynqmp",    'u', 0, 0, "Expect files for ZynqMP (default is Zynq)", 0},
-  {"extract",   'x', 0, 0, "Extract files embed in the image",          0},
-  {"force",     'f', 0, 0, "Don't avoid overwriting an extracted file", 0},
-  {"list",      'l', 0, 0, "List files embedded in the image",          0},
-  {"describe",  'd', 0, 0, "Describe the boot image (-hip equivalent)", 0},
-  {"header",    'h', 0, 0, "Print main boot image header",              0},
-  {"images",    'i', 0, 0, "Print partition image headers",             0},
-  {"parts",     'p', 0, 0, "Print partition headers",                   0},
-  {"bitstream", 'b',
-   "DESIGN,PART-NAME", 0,
-   "Reconstruct bitstream headers after extraction", 0
-  },
+  {"zynqmp", 'u', 0, 0, "Expect files for ZynqMP (default is Zynq)", 0},
+  {"extract", 'x', 0, 0, "Extract files embed in the image", 0},
+  {"force", 'f', 0, 0, "Don't avoid overwriting an extracted file", 0},
+  {"list", 'l', 0, 0, "List files embedded in the image", 0},
+  {"describe", 'd', 0, 0, "Describe the boot image (-hip equivalent)", 0},
+  {"header", 'h', 0, 0, "Print main boot image header", 0},
+  {"images", 'i', 0, 0, "Print partition image headers", 0},
+  {"parts", 'p', 0, 0, "Print partition headers", 0},
+  {"bitstream", 'b', "DESIGN,PART-NAME", 0, "Reconstruct bitstream headers after extraction", 0},
   {0},
 };
 
+/* clang-format off */
 static struct format hdr_fmt[] = {
   FORMAT("Width Detection Word",    hdr_t, width_detect,      word),
   FORMAT("Header Signature",        hdr_t, img_id,            word),
@@ -218,20 +209,20 @@ static struct format zynqmp_hdr_fmt[] = {
 
 /* Print a word as a decimal*/
 int print_dec(FILE *f, void *base, int offset) {
-  return fprintf(f, "%d", *(uint32_t*)ABS_BADDR(base, offset));
+  return fprintf(f, "%d", *(uint32_t *) ABS_BADDR(base, offset));
 }
 
 /* Print a word as a hexadecimal*/
 int print_word(FILE *f, void *base, int offset) {
-  return fprintf(f, "0x%08x", *(uint32_t*)ABS_BADDR(base, offset));
+  return fprintf(f, "0x%08x", *(uint32_t *) ABS_BADDR(base, offset));
 }
 
 /* Print double word as a decimal*/
 int print_dbl_word(FILE *f, void *base, int lo_offset) {
   uint32_t lo, hi;
 
-  lo = *((uint32_t*)ABS_BADDR(base, lo_offset));
-  hi = *((uint32_t*)ABS_BADDR(base, lo_offset)+1);
+  lo = *((uint32_t *) ABS_BADDR(base, lo_offset));
+  hi = *((uint32_t *) ABS_BADDR(base, lo_offset) + 1);
 
   return fprintf(f, "0x%08x%08x", hi, lo);
 }
@@ -247,16 +238,16 @@ int print_name(FILE *f, void *base, int offset) {
 }
 
 int print_attr(FILE *f, void *base, int offset) {
-  uint32_t attr = *(uint32_t*)ABS_BADDR(base, offset);
+  uint32_t attr = *(uint32_t *) ABS_BADDR(base, offset);
 
-  uint32_t owner =   (attr >> BOOTROM_PART_ATTR_OWNER_OFF)      & 0x3;
-  uint32_t rsa =     (attr >> BOOTROM_PART_ATTR_RSA_USED_OFF)   & 0x1;
-  uint32_t cpu =     (attr >> BOOTROM_PART_ATTR_DEST_CPU_OFF)   & 0x7;
+  uint32_t owner = (attr >> BOOTROM_PART_ATTR_OWNER_OFF) & 0x3;
+  uint32_t rsa = (attr >> BOOTROM_PART_ATTR_RSA_USED_OFF) & 0x1;
+  uint32_t cpu = (attr >> BOOTROM_PART_ATTR_DEST_CPU_OFF) & 0x7;
   uint32_t encrypt = (attr >> BOOTROM_PART_ATTR_ENCRYPTION_OFF) & 0x1;
-  uint32_t dev =     (attr >> BOOTROM_PART_ATTR_DEST_DEV_OFF)   & 0x7;
-  uint32_t exec =    (attr >> BOOTROM_PART_ATTR_A5X_EXEC_S_OFF) & 0x7;
-  uint32_t exclvl =  (attr >> BOOTROM_PART_ATTR_EXC_LVL_OFF)    & 0x3;
-  uint32_t trust =   (attr >> BOOTROM_PART_ATTR_TRUST_ZONE_OFF) & 0x1;
+  uint32_t dev = (attr >> BOOTROM_PART_ATTR_DEST_DEV_OFF) & 0x7;
+  uint32_t exec = (attr >> BOOTROM_PART_ATTR_A5X_EXEC_S_OFF) & 0x7;
+  uint32_t exclvl = (attr >> BOOTROM_PART_ATTR_EXC_LVL_OFF) & 0x3;
+  uint32_t trust = (attr >> BOOTROM_PART_ATTR_TRUST_ZONE_OFF) & 0x1;
 
   if (!attr) {
     print_word(f, base, offset);
@@ -271,62 +262,50 @@ int print_attr(FILE *f, void *base, int offset) {
   fprintf(f, "\n");
 
   print_padding(f, 13, ' ');
-  fprintf(f, "Owner: %s\n",
-    owner == 0 ? "FSBL" :
-    owner == 1 ? "UBOOT" :
-                 "INVALID");
+  fprintf(f, "Owner: %s\n", owner == 0 ? "FSBL" : owner == 1 ? "UBOOT" : "INVALID");
 
   print_padding(f, 13, ' ');
-  fprintf(f, "RSA: %s\n",
-    rsa == 0 ? "not used" :
-    rsa == 1 ? "used" :
-               "INVALID");
+  fprintf(f, "RSA: %s\n", rsa == 0 ? "not used" : rsa == 1 ? "used" : "INVALID");
 
   print_padding(f, 13, ' ');
-  fprintf(f, "Destination CPU: %s\n",
-    cpu == 0 ? "none" :
-    cpu == 1 ? "A53-0" :
-    cpu == 2 ? "A53-1" :
-    cpu == 3 ? "A53-2" :
-    cpu == 4 ? "A53-3" :
-    cpu == 5 ? "R5-0" :
-    cpu == 6 ? "R5-1" :
-    cpu == 7 ? "R5-L" :
-               "INVALID");
+  fprintf(f,
+          "Destination CPU: %s\n",
+          cpu == 0   ? "none"
+          : cpu == 1 ? "A53-0"
+          : cpu == 2 ? "A53-1"
+          : cpu == 3 ? "A53-2"
+          : cpu == 4 ? "A53-3"
+          : cpu == 5 ? "R5-0"
+          : cpu == 6 ? "R5-1"
+          : cpu == 7 ? "R5-L"
+                     : "INVALID");
 
   print_padding(f, 13, ' ');
-  fprintf(f, "Encryption: %s\n",
-    encrypt == 1 ? "yes" :
-    encrypt == 0 ? "no" :
-                   "INVALID");
+  fprintf(f, "Encryption: %s\n", encrypt == 1 ? "yes" : encrypt == 0 ? "no" : "INVALID");
 
   print_padding(f, 13, ' ');
-  fprintf(f, "Destination Device: %s\n",
-    dev == 0 ? "none" :
-    dev == 1 ? "PS" :
-    dev == 2 ? "PL" :
-    dev == 3 ? "INT" :
-               "INVALID");
+  fprintf(f,
+          "Destination Device: %s\n",
+          dev == 0   ? "none"
+          : dev == 1 ? "PS"
+          : dev == 2 ? "PL"
+          : dev == 3 ? "INT"
+                     : "INVALID");
 
   print_padding(f, 13, ' ');
-  fprintf(f, "A5x Execution State: %s\n",
-    exec == 0 ? "64 bit" :
-    exec == 1 ? "32 bit" :
-                "INVALID");
+  fprintf(f, "A5x Execution State: %s\n", exec == 0 ? "64 bit" : exec == 1 ? "32 bit" : "INVALID");
 
   print_padding(f, 13, ' ');
-  fprintf(f, "Exception Level: %s\n",
-    exclvl == 0 ? "0 (el-0)" :
-    exclvl == 1 ? "1 (el-1)" :
-    exclvl == 2 ? "2 (el-2)" :
-    exclvl == 3 ? "3 (el-3)" :
-                  "INVALID");
+  fprintf(f,
+          "Exception Level: %s\n",
+          exclvl == 0   ? "0 (el-0)"
+          : exclvl == 1 ? "1 (el-1)"
+          : exclvl == 2 ? "2 (el-2)"
+          : exclvl == 3 ? "3 (el-3)"
+                        : "INVALID");
 
   print_padding(f, 13, ' ');
-  fprintf(f, "Trust Zone: %s",
-    trust == 1 ? "yes" :
-    trust == 0 ? "no" :
-                 "INVALID");
+  fprintf(f, "Trust Zone: %s", trust == 1 ? "yes" : trust == 0 ? "no" : "INVALID");
   return 0;
 }
 
@@ -435,10 +414,7 @@ int print_partition_headers(FILE *f, hdr_t *base, uint32_t size, int zynqmp) {
   return err;
 }
 
-int print_partition_contents(FILE *f,
-                             hdr_t *base,
-                             uint32_t size,
-                             struct arguments *arguments) {
+int print_partition_contents(FILE *f, hdr_t *base, uint32_t size, struct arguments *arguments) {
   int err = 0;
   uint32_t partsize;
   img_hdr_t *img;
@@ -453,7 +429,7 @@ int print_partition_contents(FILE *f,
 
     /* Check if we're interested */
     if (arguments->extract_names && !is_on_list(arguments->extract_names, name))
-        continue;
+      continue;
 
     /* Get partition header pointer */
     if (!is_good_waddr(base, size, &img->part_hdr_off))
@@ -465,17 +441,17 @@ int print_partition_contents(FILE *f,
 
     /* Get partition data pointer */
     if (arguments->zynqmp) {
-      if (!is_good_waddr(base, size, &((zynqmp_hdr_t*) part)->actual_part_off))
+      if (!is_good_waddr(base, size, &((zynqmp_hdr_t *) part)->actual_part_off))
         return BOOTROM_ERROR_WADDR;
-      data = ABS_WADDR(base, ((zynqmp_hdr_t*) part)->actual_part_off);
+      data = ABS_WADDR(base, ((zynqmp_hdr_t *) part)->actual_part_off);
     } else {
-      if (!is_good_waddr(base, size, &((zynq_hdr_t*) part)->data_off))
+      if (!is_good_waddr(base, size, &((zynq_hdr_t *) part)->data_off))
         return BOOTROM_ERROR_WADDR;
-      data = ABS_WADDR(base, ((zynq_hdr_t*) part)->data_off);
+      data = ABS_WADDR(base, ((zynq_hdr_t *) part)->data_off);
     }
 
     /* Check if the file is fine */
-    if(!stat(name, &bstat) && !arguments->force) {
+    if (!stat(name, &bstat) && !arguments->force) {
       errorf("file %s alraedy exists, use -f to force\n", name);
       return BOOTROM_ERROR_NOFILE;
     }
@@ -488,11 +464,7 @@ int print_partition_contents(FILE *f,
 
     /* Reconstruct headers for bit files if it was requested */
     if (arguments->part && is_postfix(name, ".bit"))
-      bitstream_write_header(
-        bfile,
-        partsize,
-        arguments->design,
-        arguments->part);
+      bitstream_write_header(bfile, partsize, arguments->design, arguments->part);
 
     fwrite(data, partsize, sizeof(uint32_t), bfile);
     fclose(bfile);
@@ -506,13 +478,13 @@ int print_partition_contents(FILE *f,
 /* Convert a name encoded as big-endian 32bit words to string */
 static int name_to_string(char *dst, void *base, int offset) {
   int i, j, p = 0;
-  char *s = (char*)base+offset;
+  char *s = (char *) base + offset;
 
   for (i = 0; i < BOOTROM_IMG_MAX_NAME_LEN; i += sizeof(uint32_t)) {
-    if (*(uint32_t*)(s + i) == 0)
+    if (*(uint32_t *) (s + i) == 0)
       break;
 
-    for (j = i+3; j >= i; j--)
+    for (j = i + 3; j >= i; j--)
       if (s[j] > 0)
         dst[p++] = s[j];
   }
@@ -597,14 +569,14 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
     *s = '\0';
 
     arguments->design = arg;
-    arguments->part = s+1;
+    arguments->part = s + 1;
     break;
   case ARGP_KEY_ARG:
     if (state->arg_num == 0) {
       arguments->fname = arg;
     } else if (arguments->extract) {
       if (arguments->extract_count <= 0) {
-        arguments->extract_names = calloc(state->argc+1, sizeof(char*));
+        arguments->extract_names = calloc(state->argc + 1, sizeof(char *));
         if (!arguments->extract_names)
           return EXIT_FAILURE;
         arguments->extract_count = 0;
@@ -627,13 +599,7 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
 }
 
 /* Finally initialize argp struct */
-static struct argp argp = {
-  argp_options,
-  argp_parser,
-  args_doc,
-  doc,
-  0, 0, 0
-};
+static struct argp argp = {argp_options, argp_parser, args_doc, doc, 0, 0, 0};
 
 /* Declare the main function */
 int main(int argc, char *argv[]) {
@@ -650,7 +616,7 @@ int main(int argc, char *argv[]) {
   /* Parse program arguments */
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
-  if(stat(arguments.fname, &bfile_stat)) {
+  if (stat(arguments.fname, &bfile_stat)) {
     errorf("could not stat file: %s\n", arguments.fname);
     return BOOTROM_ERROR_NOFILE;
   }

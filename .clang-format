@@ -47,7 +47,7 @@ BreakBeforeBraces: Attach
 BreakInheritanceList: BeforeColon
 BreakBeforeTernaryOperators: true
 BreakStringLiterals: true
-ColumnLimit: 80
+ColumnLimit: 100
 ContinuationIndentWidth: 2
 DeriveLineEnding: true
 DerivePointerAlignment: true
@@ -56,16 +56,18 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
 IncludeBlocks:   Regroup
 IncludeCategories:
-  - Regex:           '^<src/file/.*/.h>'
-    Priority:        3
-  - Regex:           '^<src/arch/.*/.h>'
-    Priority:        4
-  - Regex:           '^<src/.*\.h>'
-    Priority:        2
-  - Regex:           '^<.*\.h>'
+  - Regex:           '^<st[^/]+.h>'
     Priority:        1
-  - Regex:           '.*'
+  - Regex:           '^<src/file/.*/.h>'
+    Priority:        4
+  - Regex:           '^<src/arch/.*/.h>'
+    Priority:        3
+  - Regex:           '^<src/.*\.h>'
     Priority:        5
+  - Regex:           '^<.*\.h>'
+    Priority:        6
+  - Regex:           '.*'
+    Priority:        2
 IndentCaseLabels: false
 IndentCaseBlocks: false
 IndentGotoLabels: false
@@ -107,8 +109,9 @@ SpacesInSquareBrackets: false
 SpaceBeforeSquareBrackets: false
 Standard:        Auto
 TabWidth:        2
+TypenameMacros: ['FORMAT']
 UseCRLF:         false
 UseTab:          Never
-WhitespaceSensitiveMacros: [FORMAT]
+WhitespaceSensitiveMacros: ['FORMAT']
 ...
 
