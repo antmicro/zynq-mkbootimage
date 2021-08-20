@@ -505,9 +505,7 @@ static error verify_waddr(void *base, uint32_t size, uint32_t *poffset) {
   return ERROR_BIN_WADDR;
 }
 
-/* Get next image absolute pointer from next_img_off value
- * The return value is negative on error, positive on end of iteration
- * and zero otherwise. */
+/* Get next image absolute pointer or pointer to the first one if *img is NULL*/
 static error get_next_image(void *base, uint32_t size, img_hdr_t **img) {
   error err;
   img_hdr_tab_t *tab;

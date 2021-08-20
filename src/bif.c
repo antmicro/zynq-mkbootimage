@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include <bif.h>
+#include <bootrom.h>
 #include <common.h>
 #include <ctype.h>
 #include <errno.h>
@@ -331,10 +332,10 @@ static error bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
   node->bootloader = 0;
   node->fsbl_config = 0;
   node->pmufw_image = 0;
-  node->exception_level = EL_UNDEF;
-  node->partition_owner = OWNER_FSBL;
-  node->destination_cpu = DST_CPU_UNDEF;
-  node->destination_device = DST_DEV_UNDEF;
+  node->exception_level = BOOTROM_PART_ATTR_EXC_LVL_EL0;
+  node->partition_owner = BOOTROM_PART_ATTR_OWNER_FSBL;
+  node->destination_cpu = BOOTROM_PART_ATTR_DEST_CPU_NONE;
+  node->destination_device = BOOTROM_PART_ATTR_DEST_DEV_NONE;
   node->is_file = 1;
 
   /* Parse the attribute list if it's present */
@@ -461,9 +462,9 @@ error bif_node_set_attr(
       return ERROR_BIF_PARSER;
     }
     if (strcmp(value, "fsbl") == 0)
-      node->partition_owner = OWNER_FSBL;
+      node->partition_owner = BOOTROM_PART_ATTR_OWNER_FSBL;
     else if (strcmp(value, "uboot") == 0)
-      node->partition_owner = OWNER_UBOOT;
+      node->partition_owner = BOOTROM_PART_ATTR_OWNER_UBOOT;
     else {
       perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
       return ERROR_BIF_UNSUPPORTED_VAL;
@@ -492,9 +493,9 @@ error bif_node_set_attr(
         return ERROR_BIF_PARSER;
       }
       if (strcmp(value, "ps") == 0)
-        node->destination_device = DST_DEV_PS;
+        node->destination_device = BOOTROM_PART_ATTR_DEST_DEV_PS;
       else if (strcmp(value, "pl") == 0)
-        node->destination_device = DST_DEV_PL;
+        node->destination_device = BOOTROM_PART_ATTR_DEST_DEV_PL;
       else {
         perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
         return ERROR_BIF_UNSUPPORTED_VAL;
@@ -509,19 +510,19 @@ error bif_node_set_attr(
         return ERROR_BIF_PARSER;
       }
       if (strcmp(value, "a53-0") == 0)
-        node->destination_cpu = DST_CPU_A53_0;
+        node->destination_cpu = BOOTROM_PART_ATTR_DEST_CPU_A53_0;
       else if (strcmp(value, "a53-1") == 0)
-        node->destination_cpu = DST_CPU_A53_1;
+        node->destination_cpu = BOOTROM_PART_ATTR_DEST_CPU_A53_1;
       else if (strcmp(value, "a53-2") == 0)
-        node->destination_cpu = DST_CPU_A53_2;
+        node->destination_cpu = BOOTROM_PART_ATTR_DEST_CPU_A53_2;
       else if (strcmp(value, "a53-3") == 0)
-        node->destination_cpu = DST_CPU_A53_3;
+        node->destination_cpu = BOOTROM_PART_ATTR_DEST_CPU_A53_3;
       else if (strcmp(value, "r5-0") == 0)
-        node->destination_cpu = DST_CPU_R5_0;
+        node->destination_cpu = BOOTROM_PART_ATTR_DEST_CPU_R5_0;
       else if (strcmp(value, "r5-1") == 0)
-        node->destination_cpu = DST_CPU_R5_1;
+        node->destination_cpu = BOOTROM_PART_ATTR_DEST_CPU_R5_1;
       else if (strcmp(value, "r5-lockstep") == 0)
-        node->destination_cpu = DST_CPU_R5_LOCKSTEP;
+        node->destination_cpu = BOOTROM_PART_ATTR_DEST_CPU_R5_L;
       else {
         perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
         return ERROR_BIF_UNSUPPORTED_VAL;
@@ -535,13 +536,13 @@ error bif_node_set_attr(
         return ERROR_BIF_PARSER;
       }
       if (strcmp(value, "el-0") == 0)
-        node->exception_level = EL_0;
+        node->exception_level = BOOTROM_PART_ATTR_EXC_LVL_EL0;
       else if (strcmp(value, "el-1") == 0)
-        node->exception_level = EL_1;
+        node->exception_level = BOOTROM_PART_ATTR_EXC_LVL_EL1;
       else if (strcmp(value, "el-2") == 0)
-        node->exception_level = EL_2;
+        node->exception_level = BOOTROM_PART_ATTR_EXC_LVL_EL2;
       else if (strcmp(value, "el-3") == 0)
-        node->exception_level = EL_3;
+        node->exception_level = BOOTROM_PART_ATTR_EXC_LVL_EL3;
       else {
         perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
         return ERROR_BIF_UNSUPPORTED_VAL;
