@@ -11,40 +11,6 @@
 #define BIF_ARCH_ZYNQ   (1 << 0)
 #define BIF_ARCH_ZYNQMP (1 << 1)
 
-typedef enum partition_owner_e
-{
-  OWNER_FSBL,
-  OWNER_UBOOT
-} partition_owner_t;
-
-typedef enum destination_device_e
-{
-  DST_DEV_UNDEF = -1,
-  DST_DEV_PS,
-  DST_DEV_PL
-} destination_device_t;
-
-typedef enum destination_cpu_e
-{
-  DST_CPU_UNDEF = -1,
-  DST_CPU_A53_0,
-  DST_CPU_A53_1,
-  DST_CPU_A53_2,
-  DST_CPU_A53_3,
-  DST_CPU_R5_0,
-  DST_CPU_R5_1,
-  DST_CPU_R5_LOCKSTEP
-} destination_cpu_t;
-
-typedef enum exception_level_e
-{
-  EL_UNDEF = -1,
-  EL_0,
-  EL_1,
-  EL_2,
-  EL_3
-} exception_level_t;
-
 enum token_type
 {
   TOKEN_EOF = 0,
@@ -73,14 +39,14 @@ typedef struct bif_node_t {
   uint8_t bootloader; /* boolean */
   uint32_t load;
   uint32_t offset;
-  partition_owner_t partition_owner;
+  uint32_t partition_owner;
 
   /* supported zynqmp attributes */
   uint8_t fsbl_config; /* boolean */
   uint8_t pmufw_image; /* boolean */
-  destination_device_t destination_device;
-  destination_cpu_t destination_cpu;
-  exception_level_t exception_level;
+  uint32_t destination_device;
+  uint32_t destination_cpu;
+  uint32_t exception_level;
 
   /* special, non-bootgen features */
   uint8_t is_file; /* for now equal to !fsbl_config */
