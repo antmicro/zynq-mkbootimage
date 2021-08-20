@@ -47,6 +47,9 @@ $(EXBOOTIMAGE_NAME): $(EXBOOTIMAGE_OBJS)
 format:
 	$(FMT) -i $(ALL_SRCS) $(ALL_HDRS)
 
+test:
+	./tests/tester.sh
+
 clean:
 	@- $(RM) $(MKBOOTIMAGE_NAME)
 	@- $(RM) $(MKBOOTIMAGE_OBJS)
