@@ -15,7 +15,7 @@
 
 #define BOOTROM_ZYNQMP_OFFSET_AFTER_HEADERS 0x40
 
-int zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *offs) {
+error zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *offs) {
   /* Copy the image pointer */
   offs->img_ptr = img_ptr;
 
@@ -31,17 +31,16 @@ int zynqmp_bootrom_init_offs(uint32_t *img_ptr, int hdr_count, bootrom_offs_t *o
   offs->poff = (offs->img_hdr_off) / sizeof(uint32_t) + img_ptr;
   offs->coff = (offs->bins_off) / sizeof(uint32_t) + img_ptr;
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
-int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
+error zynqmp_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
   int i;
-  int ret;
+  error err;
 
   /* Call the common init */
-  ret = bootrom_init_header(hdr);
-  if (ret != BOOTROM_SUCCESS)
-    return ret;
+  if ((err = bootrom_init_header(hdr)))
+    return err;
 
   hdr->fsbl_execution_addr = BOOTROM_FSBL_EXEC_ADDR;
 
@@ -70,12 +69,12 @@ int zynqmp_bootrom_init_header(bootrom_hdr_t *hdr, bootrom_offs_t *offs) {
   /* Calculate the checksum */
   bootrom_calc_hdr_checksum(hdr);
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
-int zynqmp_bootrom_setup_fsbl_at_curr_off(bootrom_hdr_t *hdr,
-                                          bootrom_offs_t *offs,
-                                          uint32_t img_len) {
+error zynqmp_bootrom_setup_fsbl_at_curr_off(bootrom_hdr_t *hdr,
+                                            bootrom_offs_t *offs,
+                                            uint32_t img_len) {
   /* Update the header to point at the bootloader */
   hdr->src_offset = (offs->coff - offs->img_ptr) * sizeof(uint32_t);
 
@@ -93,13 +92,13 @@ int zynqmp_bootrom_setup_fsbl_at_curr_off(bootrom_hdr_t *hdr,
   /* Recalculate the checksum */
   bootrom_calc_hdr_checksum(hdr);
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
-int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
-                                    bootrom_img_hdr_t *img_hdr,
-                                    bootrom_partition_hdr_t *ihdr,
-                                    bootrom_offs_t *offs) {
+error zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
+                                      bootrom_img_hdr_t *img_hdr,
+                                      bootrom_partition_hdr_t *ihdr,
+                                      bootrom_offs_t *offs) {
   unsigned int i;
   uint32_t img_hdr_size = 0;
 
@@ -160,7 +159,7 @@ int zynqmp_bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab,
   /* Recalculate the checksum */
   img_hdr_tab->checksum = calc_checksum(&img_hdr_tab->version, &(img_hdr_tab->checksum) - 1);
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
 uint32_t zynqmp_calc_part_hdr_attr(bif_node_t *node) {
@@ -222,7 +221,7 @@ uint32_t zynqmp_calc_part_hdr_attr(bif_node_t *node) {
   return attr;
 }
 
-int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr, bif_node_t *node) {
+error zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr, bif_node_t *node) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
   hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
@@ -232,15 +231,15 @@ int zynqmp_init_part_hdr_default(bootrom_partition_hdr_t *ihdr, bif_node_t *node
 
   hdr->dest_load_addr_lo = node->load;
   hdr->dest_exec_addr_hi = 0x0;
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
-int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
-                             bif_node_t *node,
-                             uint32_t *size,
-                             uint32_t load,
-                             uint32_t entry,
-                             uint8_t nbits) {
+error zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
+                               bif_node_t *node,
+                               uint32_t *size,
+                               uint32_t load,
+                               uint32_t entry,
+                               uint8_t nbits) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
   hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
@@ -271,10 +270,10 @@ int zynqmp_init_part_hdr_elf(bootrom_partition_hdr_t *ihdr,
     hdr->attributes |= BOOTROM_PART_ATTR_A5X_EXEC_S_64;
   }
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
-int zynqmp_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr, bif_node_t *node) {
+error zynqmp_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr, bif_node_t *node) {
   (void) node;
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
@@ -288,12 +287,12 @@ int zynqmp_init_part_hdr_bitstream(bootrom_partition_hdr_t *ihdr, bif_node_t *no
   hdr->dest_load_addr_hi = 0x0;
   hdr->dest_exec_addr_lo = 0x0;
   hdr->dest_exec_addr_hi = 0x0;
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
-int zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
-                               bif_node_t *node,
-                               linux_image_header_t *img) {
+error zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
+                                 bif_node_t *node,
+                                 linux_image_header_t *img) {
   bootrom_partition_hdr_zynqmp_t *hdr;
   hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
 
@@ -316,12 +315,12 @@ int zynqmp_init_part_hdr_linux(bootrom_partition_hdr_t *ihdr,
   /* No load/execution address */
   hdr->dest_load_addr_lo = node->load;
   hdr->dest_exec_addr_lo = 0x0;
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
-int zynqmp_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
-                           uint32_t *img_size,
-                           bootrom_offs_t *offs) {
+error zynqmp_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
+                             uint32_t *img_size,
+                             bootrom_offs_t *offs) {
   /* Retrieve the header */
   bootrom_partition_hdr_zynqmp_t *hdr;
   hdr = (bootrom_partition_hdr_zynqmp_t *) ihdr;
@@ -351,7 +350,7 @@ int zynqmp_finish_part_hdr(bootrom_partition_hdr_t *ihdr,
     (*img_size)++;
   }
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
 /* Define ops */

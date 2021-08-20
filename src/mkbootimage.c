@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
   struct arguments arguments;
   bootrom_ops_t *bops;
   bif_cfg_t cfg;
-  int ret;
+  error err;
   int i;
 
   /* Init non-string arguments */
@@ -120,10 +120,11 @@ int main(int argc, char *argv[]) {
   cfg.arch = (arguments.zynqmp) ? BIF_ARCH_ZYNQMP : BIF_ARCH_ZYNQ;
   bops = (arguments.zynqmp) ? &zynqmp_bops : &zynq_bops;
 
-  ret = bif_parse(arguments.bif_filename, &cfg);
-  if (ret != BIF_SUCCESS || cfg.nodes_num == 0) {
-    return EXIT_FAILURE;
-  }
+  err = bif_parse(arguments.bif_filename, &cfg);
+  if (err)
+    return err;
+  if (cfg.nodes_num == 0)
+    return ERROR_BOOTROM_NOFILE;
 
   printf("Nodes found in the %s file:\n", arguments.bif_filename);
   for (i = 0; i < cfg.nodes_num; i++) {
@@ -146,7 +147,7 @@ int main(int argc, char *argv[]) {
   /* Estimate memory required to fit all the binaries */
   esize = estimate_boot_image_size(&cfg);
   if (!esize)
-    return EXIT_FAILURE;
+    return ERROR_BOOTROM_NOFILE;
 
   /* Align estimated size to powers of two */
   esize_aligned = 2;
@@ -156,22 +157,20 @@ int main(int argc, char *argv[]) {
   /* Allocate memory for output image */
   file_data = malloc(sizeof *file_data * esize_aligned);
   if (!file_data) {
-    return -ENOMEM;
+    return ERROR_NOMEM;
   }
 
   /* Generate bin file */
-  ret = create_boot_image(file_data, &cfg, bops, &ofile_size);
-
-  if (ret != BOOTROM_SUCCESS) { /* Error */
+  err = create_boot_image(file_data, &cfg, bops, &ofile_size);
+  if (err) {
     free(file_data);
-    return EXIT_FAILURE;
+    return err;
   }
 
   ofile = fopen(arguments.bin_filename, "wb");
-
   if (ofile == NULL) {
     errorf("could not open output file: %s\n", arguments.bin_filename);
-    return EXIT_FAILURE;
+    return ERROR_CANT_WRITE;
   }
 
   fwrite(file_data, sizeof(uint32_t), ofile_size, ofile);
