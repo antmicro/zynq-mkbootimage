@@ -39,7 +39,7 @@
 #include <file/bitstream.h>
 #include <sys/stat.h>
 
-/* A macro contructor of struct fmt */
+/* A macro constructor of struct fmt */
 #define FORMAT(name, type, field, fmt) \
   { name, offsetof(type, field), print_##fmt }
 
@@ -103,8 +103,9 @@ int print_attr(FILE *f, void *base, int offset);
 
 static int name_to_string(char *dst, void *base, int offset);
 static int print_padding(FILE *f, int times, char ch);
-static int is_good_waddr(void *base, uint32_t size, uint32_t *poffset);
-static int iter_imgs(void *base, uint32_t size, img_hdr_t **img);
+
+static error verify_waddr(void *base, uint32_t size, uint32_t *poffset);
+static error get_next_image(void *base, uint32_t size, img_hdr_t **img);
 
 /* Prepare global variables for arg parser */
 const char *argp_program_version = MKBOOTIMAGE_VER;
@@ -333,12 +334,12 @@ int print_struct(FILE *f, void *base, struct format fmt[]) {
 
 /* Print desired number of repetitions of the same char */
 int print_padding(FILE *f, int times, char ch) {
-  int err = 0;
+  error err = SUCCESS;
 
   while (times-- > 0)
     if ((err = fputc(ch, f)) < 0)
-      return err;
-  return 0;
+      return ERROR_CANT_WRITE;
+  return SUCCESS;
 }
 
 /* Print a section header in program's output */
@@ -349,19 +350,19 @@ int print_section(FILE *f, char *section) {
   return 0;
 }
 
-int print_file_list(FILE *f, hdr_t *base, uint32_t size) {
-  int err = 0;
+error print_file_list(FILE *f, hdr_t *base, uint32_t size) {
+  error err = SUCCESS;
   img_hdr_t *img;
 
-  for (img = NULL; (err = iter_imgs(base, size, &img)) == 0;) {
+  for (img = NULL; (err = get_next_image(base, size, &img)) == SUCCESS;) {
     print_name(f, img, offsetof(img_hdr_t, name));
     fputc('\n', f);
   }
 
-  return err;
+  return err == ERROR_ITERATION_END ? SUCCESS : err;
 }
 
-int print_file_header(FILE *f, hdr_t *base, int zynqmp) {
+error print_file_header(FILE *f, hdr_t *base, int zynqmp) {
   img_hdr_tab_t *tab = ABS_BADDR(base, sizeof(hdr_t));
 
   print_section(f, "MAIN FILE HEADER SECTION");
@@ -374,31 +375,31 @@ int print_file_header(FILE *f, hdr_t *base, int zynqmp) {
     print_struct(f, tab, zynqmp_img_hdr_tab_fmt);
   fputc('\n', f);
 
-  return 0;
+  return SUCCESS;
 }
 
-int print_image_headers(FILE *f, hdr_t *base, uint32_t size) {
-  int err = 0;
+error print_image_headers(FILE *f, hdr_t *base, uint32_t size) {
+  error err = SUCCESS;
   img_hdr_t *img;
 
   print_section(f, "IMAGE HEADERS SECTION");
-  for (img = NULL; (err = iter_imgs(base, size, &img)) == 0;) {
+  for (img = NULL; (err = get_next_image(base, size, &img)) == SUCCESS;) {
     print_struct(f, img, img_hdr_fmt);
     fputc('\n', f);
   }
 
-  return err;
+  return err == ERROR_ITERATION_END ? SUCCESS : err;
 }
 
-int print_partition_headers(FILE *f, hdr_t *base, uint32_t size, int zynqmp) {
-  int err = 0;
+error print_partition_headers(FILE *f, hdr_t *base, uint32_t size, int zynqmp) {
+  error err = SUCCESS;
   img_hdr_t *img;
   part_hdr_t *part;
 
   print_section(f, "PARTITION HEADERS SECTION");
-  for (img = NULL; (err = iter_imgs(base, size, &img)) == 0;) {
-    if (!is_good_waddr(base, size, &img->part_hdr_off))
-      return BOOTROM_ERROR_WADDR;
+  for (img = NULL; (err = get_next_image(base, size, &img)) == SUCCESS;) {
+    if ((err = verify_waddr(base, size, &img->part_hdr_off)))
+      return err;
     part = ABS_WADDR(base, img->part_hdr_off);
 
     print_name(f, img, offsetof(img_hdr_t, name));
@@ -411,11 +412,11 @@ int print_partition_headers(FILE *f, hdr_t *base, uint32_t size, int zynqmp) {
     fputc('\n', f);
   }
 
-  return err;
+  return err == ERROR_ITERATION_END ? SUCCESS : err;
 }
 
-int print_partition_contents(FILE *f, hdr_t *base, uint32_t size, struct arguments *arguments) {
-  int err = 0;
+error print_partition_contents(FILE *f, hdr_t *base, uint32_t size, struct arguments *arguments) {
+  error err = SUCCESS;
   uint32_t partsize;
   img_hdr_t *img;
   part_hdr_t *part;
@@ -424,7 +425,7 @@ int print_partition_contents(FILE *f, hdr_t *base, uint32_t size, struct argumen
   FILE *bfile;
   char name[BOOTROM_IMG_MAX_NAME_LEN];
 
-  for (img = NULL; (err = iter_imgs(base, size, &img)) == 0;) {
+  for (img = NULL; (err = get_next_image(base, size, &img)) == SUCCESS;) {
     name_to_string(name, img, offsetof(img_hdr_t, name));
 
     /* Check if we're interested */
@@ -432,8 +433,8 @@ int print_partition_contents(FILE *f, hdr_t *base, uint32_t size, struct argumen
       continue;
 
     /* Get partition header pointer */
-    if (!is_good_waddr(base, size, &img->part_hdr_off))
-      return BOOTROM_ERROR_WADDR;
+    if ((err = verify_waddr(base, size, &img->part_hdr_off)))
+      return err;
     part = ABS_WADDR(base, img->part_hdr_off);
 
     /* Get partition size in bytes */
@@ -441,23 +442,23 @@ int print_partition_contents(FILE *f, hdr_t *base, uint32_t size, struct argumen
 
     /* Get partition data pointer */
     if (arguments->zynqmp) {
-      if (!is_good_waddr(base, size, &((zynqmp_hdr_t *) part)->actual_part_off))
-        return BOOTROM_ERROR_WADDR;
+      if ((err = verify_waddr(base, size, &((zynqmp_hdr_t *) part)->actual_part_off)))
+        return err;
       data = ABS_WADDR(base, ((zynqmp_hdr_t *) part)->actual_part_off);
     } else {
-      if (!is_good_waddr(base, size, &((zynq_hdr_t *) part)->data_off))
-        return BOOTROM_ERROR_WADDR;
+      if ((err = verify_waddr(base, size, &((zynq_hdr_t *) part)->data_off)))
+        return err;
       data = ABS_WADDR(base, ((zynq_hdr_t *) part)->data_off);
     }
 
     /* Check if the file is fine */
     if (!stat(name, &bstat) && !arguments->force) {
       errorf("file %s alraedy exists, use -f to force\n", name);
-      return BOOTROM_ERROR_NOFILE;
+      return ERROR_BIN_FILE_EXISTS;
     }
     if (!(bfile = fopen(name, "wb"))) {
       errorf("could not open file: %s\n", name);
-      return BOOTROM_ERROR_NOFILE;
+      return ERROR_BIN_NOFILE;
     }
 
     fprintf(f, "Extracting %s... ", name);
@@ -472,7 +473,7 @@ int print_partition_contents(FILE *f, hdr_t *base, uint32_t size, struct argumen
     fprintf(f, "done\n");
   }
 
-  return err;
+  return err == ERROR_ITERATION_END ? SUCCESS : err;
 }
 
 /* Convert a name encoded as big-endian 32bit words to string */
@@ -494,40 +495,41 @@ static int name_to_string(char *dst, void *base, int offset) {
 }
 
 /* Checkes wether poffset points to a correct word offset */
-static int is_good_waddr(void *base, uint32_t size, uint32_t *poffset) {
+static error verify_waddr(void *base, uint32_t size, uint32_t *poffset) {
   uint32_t rel;
 
   if (*poffset < size)
-    return 0xFF;
+    return SUCCESS;
   rel = REL_BADDR(base, poffset);
   errorf("0x%08x: wrong offset 0x%08x\n", rel, *poffset);
-  return 0;
+  return ERROR_BIN_WADDR;
 }
 
 /* Get next image absolute pointer from next_img_off value
- * The return value is positive on error, negative on end of iteration
+ * The return value is negative on error, positive on end of iteration
  * and zero otherwise. */
-static int iter_imgs(void *base, uint32_t size, img_hdr_t **img) {
+static error get_next_image(void *base, uint32_t size, img_hdr_t **img) {
+  error err;
   img_hdr_tab_t *tab;
 
   if (!*img) {
     /* Initialize *img if it was NULL */
     tab = ABS_BADDR(base, sizeof(hdr_t));
 
-    if (!is_good_waddr(base, size, &tab->part_img_hdr_off))
-      return BOOTROM_ERROR_WADDR;
+    if ((err = verify_waddr(base, size, &tab->part_img_hdr_off)))
+      return err;
     *img = ABS_WADDR(base, tab->part_img_hdr_off);
-  } else if (!is_good_waddr(base, size, &(*img)->next_img_off)) {
+  } else if ((err = verify_waddr(base, size, &(*img)->next_img_off))) {
     /* Return error if the next image offset is incorrect */
-    return BOOTROM_ERROR_WADDR;
+    return err;
   } else {
     /* Get next image pointer */
     *img = ABS_WADDR((base), (*img)->next_img_off);
   }
   if (IS_REL_NULL(base, *img)) {
-    return -1;
+    return ERROR_ITERATION_END;
   }
-  return 0;
+  return SUCCESS;
 }
 
 /* Define argument parser */
@@ -603,7 +605,7 @@ static struct argp argp = {argp_options, argp_parser, args_doc, doc, 0, 0, 0};
 
 /* Declare the main function */
 int main(int argc, char *argv[]) {
-  int err;
+  error err;
   struct arguments arguments;
   struct stat bfile_stat;
   uint32_t size;
@@ -618,25 +620,25 @@ int main(int argc, char *argv[]) {
 
   if (stat(arguments.fname, &bfile_stat)) {
     errorf("could not stat file: %s\n", arguments.fname);
-    return BOOTROM_ERROR_NOFILE;
+    return ERROR_BIN_NOFILE;
   }
   if (!(bfile = fopen(arguments.fname, "rb"))) {
     errorf("could not open file: %s\n", arguments.fname);
-    return BOOTROM_ERROR_NOFILE;
+    return ERROR_BIN_NOFILE;
   }
 
   /* Load the image */
   size = bfile_stat.st_size;
 
   if (!(base = malloc(size)))
-    return EXIT_FAILURE;
+    return ERROR_NOMEM;
 
   fread(base, sizeof(uint8_t), bfile_stat.st_size, bfile);
   fclose(bfile);
 
   if (arguments.list)
     /* Print partition names */
-    if ((err = print_file_list(stdout, base, size)) > 0)
+    if ((err = print_file_list(stdout, base, size)))
       return err;
 
   if (arguments.header)
@@ -646,17 +648,17 @@ int main(int argc, char *argv[]) {
 
   if (arguments.images)
     /* Print parition image headers */
-    if ((err = print_image_headers(stdout, base, size)) > 0)
+    if ((err = print_image_headers(stdout, base, size)))
       return err;
 
   if (arguments.partitions)
     /* Print partition headers */
-    if ((err = print_partition_headers(stdout, base, size, arguments.zynqmp)) > 0)
+    if ((err = print_partition_headers(stdout, base, size, arguments.zynqmp)))
       return err;
 
   if (arguments.extract)
     /* Write partition contents to files */
-    if ((err = print_partition_contents(stdout, base, size, &arguments)) > 0)
+    if ((err = print_partition_contents(stdout, base, size, &arguments)))
       return err;
 
   return EXIT_SUCCESS;

@@ -44,12 +44,12 @@
 /* Returns the offset by which the addr parameter should be moved
  * and partition header info via argument pointers.
  * The regular return value is the error code. */
-int append_file_to_image(uint32_t *addr,
-                         bootrom_ops_t *bops,
-                         bootrom_offs_t *offs,
-                         bif_node_t node,
-                         bootrom_partition_hdr_t *part_hdr,
-                         uint32_t *img_size) {
+error append_file_to_image(uint32_t *addr,
+                           bootrom_ops_t *bops,
+                           bootrom_offs_t *offs,
+                           bif_node_t node,
+                           bootrom_partition_hdr_t *part_hdr,
+                           uint32_t *img_size) {
   uint32_t file_header;
   struct stat cfile_stat;
   FILE *cfile;
@@ -58,7 +58,7 @@ int append_file_to_image(uint32_t *addr,
   uint8_t elf_nbits;
   uint32_t img_size_init;
   linux_image_header_t linux_img;
-  int ret;
+  error err;
 
   /* Initialize header with zeroes */
   memset(part_hdr, 0x0, sizeof(*part_hdr));
@@ -68,17 +68,17 @@ int append_file_to_image(uint32_t *addr,
 
   if (stat(node.fname, &cfile_stat)) {
     errorf("could not stat file: %s\n", node.fname);
-    return -BOOTROM_ERROR_NOFILE;
+    return ERROR_BOOTROM_NOFILE;
   }
   if (!S_ISREG(cfile_stat.st_mode)) {
     errorf("not a regular file: %s\n", node.fname);
-    return -BOOTROM_ERROR_NOFILE;
+    return ERROR_BOOTROM_NOFILE;
   }
   cfile = fopen(node.fname, "rb");
 
   if (cfile == NULL) {
     errorf("could not open file: %s\n", node.fname);
-    return -BOOTROM_ERROR_NOFILE;
+    return ERROR_BOOTROM_NOFILE;
   }
 
   /* Check file format */
@@ -90,19 +90,19 @@ int append_file_to_image(uint32_t *addr,
      * is PMU firmware waiting). File size is used as result size limit
      * as estimate_boot_image_size() makes that same assumption when
      * allocating the memory area for the boot image */
-    ret = elf_append(addr + img_size_init / sizeof(uint32_t),
+    err = elf_append(addr + img_size_init / sizeof(uint32_t),
                      node.fname,
                      cfile_stat.st_size,
                      img_size,
                      &elf_nbits,
                      &elf_load,
                      &elf_entry);
-    if (ret) {
+    if (err) {
       errorf("ELF file reading failed\n");
 
       /* Close the file */
       fclose(cfile);
-      return ret;
+      return err;
     }
 
     /* Init partition header, the img_size_init is non-zero only if this file
@@ -117,19 +117,19 @@ int append_file_to_image(uint32_t *addr,
     break;
   case FILE_MAGIC_XILINXBIT_0:
     /* Verify file */
-    if (bitstream_verify(cfile) != BOOTROM_SUCCESS) {
+    if ((err = bitstream_verify(cfile))) {
       errorf("not a valid bitstream file: %s.\n", node.fname);
 
       /* Close the file */
       fclose(cfile);
-      return -BOOTROM_ERROR_BITSTREAM;
+      return err;
     }
 
     /* It matches, append it to the image */
-    ret = bitstream_append(addr, cfile, img_size);
+    err = bitstream_append(addr, cfile, img_size);
 
-    if (ret != BOOTROM_SUCCESS)
-      return ret;
+    if (err)
+      return err;
 
     /* Init partition header */
     bops->init_part_hdr_bitstream(part_hdr, &node);
@@ -170,7 +170,7 @@ int append_file_to_image(uint32_t *addr,
   /* Close the file */
   fclose(cfile);
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
 /* Returns an estimation of the output image size */
@@ -207,15 +207,15 @@ uint32_t estimate_boot_image_size(bif_cfg_t *bif_cfg) {
 
 /* Returns total size of the created image via the last argument.
  * The regular return value is the error code. */
-int create_boot_image(uint32_t *img_ptr,
-                      bif_cfg_t *bif_cfg,
-                      bootrom_ops_t *bops,
-                      uint32_t *total_size) {
+error create_boot_image(uint32_t *img_ptr,
+                        bif_cfg_t *bif_cfg,
+                        bootrom_ops_t *bops,
+                        uint32_t *total_size) {
   /* declare variables */
   bootrom_hdr_t hdr;
   bootrom_offs_t offs;
   uint16_t i, j, f;
-  int ret;
+  error err;
   int img_term_n = 0;
   uint8_t img_name[BOOTROM_IMG_MAX_NAME_LEN];
   uint8_t pmufw_img[BOOTROM_PMUFW_MAX_SIZE];
@@ -269,22 +269,22 @@ int create_boot_image(uint32_t *img_ptr,
       /* Open pmu file */
       if (stat(bif_cfg->nodes[i].fname, &pmufile_stat)) {
         errorf("could not stat file: %s\n", bif_cfg->nodes[i].fname);
-        return -BOOTROM_ERROR_NOFILE;
+        return ERROR_BOOTROM_NOFILE;
       }
       if (!S_ISREG(pmufile_stat.st_mode)) {
         errorf("not a regular file: %s\n", bif_cfg->nodes[i].fname);
-        return -BOOTROM_ERROR_NOFILE;
+        return ERROR_BOOTROM_NOFILE;
       }
-      ret = elf_append(pmufw_img,
+      err = elf_append(pmufw_img,
                        bif_cfg->nodes[i].fname,
                        hdr.pmufw_len,
                        &pmufw_img_size,
                        &pmufw_img_nbits,
                        &pmufw_img_load,
                        &pmufw_img_entry);
-      if (ret != BOOTROM_SUCCESS) {
+      if (err) {
         errorf("failed to parse ELF file: %s\n", bif_cfg->nodes[i].fname);
-        return -BOOTROM_ERROR_ELF;
+        return ERROR_BOOTROM_ELF;
       }
       continue;
     }
@@ -292,7 +292,7 @@ int create_boot_image(uint32_t *img_ptr,
     if (bif_cfg->nodes[i].offset != 0 &&
         (img_ptr + bif_cfg->nodes[i].offset / sizeof(uint32_t)) < offs.coff) {
       errorf("binary sections overlapping.\n");
-      return -BOOTROM_ERROR_SEC_OVERLAP;
+      return ERROR_BOOTROM_SEC_OVERLAP;
     } else {
       /* Add 0xFF padding until this binary */
       while (offs.coff < (bif_cfg->nodes[i].offset / sizeof(uint32_t) + img_ptr)) {
@@ -310,11 +310,11 @@ int create_boot_image(uint32_t *img_ptr,
       img_size = 0;
     }
 
-    ret =
+    err =
       append_file_to_image(offs.coff, bops, &offs, bif_cfg->nodes[i], &(part_hdr[f]), &img_size);
 
-    if (ret != BOOTROM_SUCCESS) {
-      return ret;
+    if (err) {
+      return err;
     }
 
     /* Check if dealing with bootloader (size is in words - thus x 4) */
@@ -434,5 +434,5 @@ int create_boot_image(uint32_t *img_ptr,
 
   *total_size = offs.coff - img_ptr;
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }

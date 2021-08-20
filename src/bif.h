@@ -5,15 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <common.h>
 #include <linux/limits.h>
-
-#define BIF_SUCCESS                0
-#define BIF_ERROR_NOFILE           1
-#define BIF_ERROR_PARSER           2
-#define BIF_ERROR_UNSUPPORTED_ATTR 3
-#define BIF_ERROR_UNINITIALIZED    4
-#define BIF_ERROR_UNSUPPORTED_VAL  5
-#define BIF_ERROR_LEXER            6
 
 #define BIF_ARCH_ZYNQ   (1 << 0)
 #define BIF_ARCH_ZYNQMP (1 << 1)
@@ -103,12 +96,13 @@ typedef struct bif_cfg_t {
   bif_node_t *nodes;
 } bif_cfg_t;
 
-int init_bif_cfg(bif_cfg_t *cfg);
-int deinit_bif_cfg(bif_cfg_t *cfg);
+error init_bif_cfg(bif_cfg_t *cfg);
+error deinit_bif_cfg(bif_cfg_t *cfg);
 
-int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node);
-int bif_node_set_attr(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *value);
+error bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node);
+error bif_node_set_attr(
+  lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *value);
 
-int bif_parse(const char *fname, bif_cfg_t *cfg);
+error bif_parse(const char *fname, bif_cfg_t *cfg);
 
 #endif /* BIF_PARSER_H */

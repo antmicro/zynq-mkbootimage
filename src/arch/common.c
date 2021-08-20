@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-int bootrom_init_header(bootrom_hdr_t *hdr) {
+error bootrom_init_header(bootrom_hdr_t *hdr) {
   unsigned int i = 0;
   for (i = 0; i < sizeof(hdr->interrupt_table) / sizeof(hdr->interrupt_table[0]); i++) {
     hdr->interrupt_table[i] = BOOTROM_INT_TABLE_DEFAULT;
@@ -24,7 +24,7 @@ int bootrom_init_header(bootrom_hdr_t *hdr) {
   hdr->total_img_len = 0x0; /* Will be filled elsewhere */
   hdr->reserved_1 = BOOTROM_RESERVED_1_RL;
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
 void bootrom_calc_hdr_checksum(bootrom_hdr_t *hdr) {
@@ -33,7 +33,7 @@ void bootrom_calc_hdr_checksum(bootrom_hdr_t *hdr) {
   hdr->checksum = calc_checksum(&(hdr->width_detect), &(hdr->checksum) - 1);
 }
 
-int bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab, bootrom_offs_t *offs) {
+error bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab, bootrom_offs_t *offs) {
   /* Prepare image header table */
   img_hdr_tab->version = BOOTROM_IMG_VERSION;
   img_hdr_tab->part_hdr_off = 0x0;     /* filled below */
@@ -46,5 +46,5 @@ int bootrom_init_img_hdr_tab(bootrom_img_hdr_tab_t *img_hdr_tab, bootrom_offs_t 
   offs->hoff = offs->poff;
   offs->poff += sizeof(*img_hdr_tab) / sizeof(uint32_t);
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }

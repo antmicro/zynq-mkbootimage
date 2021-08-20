@@ -33,7 +33,7 @@
 #include <file/bitstream.h>
 #include <time.h>
 
-int bitstream_verify(FILE *bitfile) {
+error bitstream_verify(FILE *bitfile) {
   uint32_t fhdr;
 
   /* Seek to the start of the file */
@@ -41,15 +41,15 @@ int bitstream_verify(FILE *bitfile) {
 
   fread(&fhdr, 1, sizeof(fhdr), bitfile);
   if (fhdr != FILE_MAGIC_XILINXBIT_0)
-    return -BOOTROM_ERROR_BITSTREAM;
+    return ERROR_BOOTROM_BITSTREAM;
 
   /* Xilinx header is 64b, check the other half */
   fread(&fhdr, 1, sizeof(fhdr), bitfile);
   if (fhdr != FILE_MAGIC_XILINXBIT_1)
-    return -BOOTROM_ERROR_BITSTREAM;
+    return ERROR_BOOTROM_BITSTREAM;
 
   /* Both halves match */
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
 
 int bitstream_write_header_part(FILE *bitfile, const uint8_t tag, const char *data) {
@@ -127,7 +127,7 @@ int bitstream_write_header(FILE *bitfile, uint32_t size, const char *design, con
   return 0;
 }
 
-int bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
+error bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
   uint32_t *dest = addr;
   uint32_t chunk, rchunk;
   uint8_t section_size;
@@ -142,7 +142,7 @@ int bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
     if (section_hdr[1] != 0x1 && section_hdr[1] != 0x0) {
       fclose(bitfile);
       errorf("bitstream file seems to have mismatched sections.\n");
-      return -BOOTROM_ERROR_BITSTREAM;
+      return ERROR_BOOTROM_BITSTREAM;
     }
 
     if (section_hdr[0] == FILE_XILINXBIT_SEC_DATA)
@@ -165,5 +165,5 @@ int bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
     dest++;
   }
 
-  return BOOTROM_SUCCESS;
+  return SUCCESS;
 }
