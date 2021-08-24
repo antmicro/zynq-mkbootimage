@@ -41,6 +41,82 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+mask_name_t bootrom_part_attr_owner_names[] = {
+  {"fsbl", BOOTROM_PART_ATTR_OWNER_FSBL},
+  {"uboot", BOOTROM_PART_ATTR_OWNER_UBOOT},
+  {0},
+};
+
+mask_name_t bootrom_part_attr_rsa_used_names[] = {
+  {"used", BOOTROM_PART_ATTR_RSA_USED},
+  {"not used", BOOTROM_PART_ATTR_RSA_NOT_USED},
+  {0},
+};
+
+mask_name_t bootrom_part_attr_dest_cpu_names[] = {
+  {"none", BOOTROM_PART_ATTR_DEST_CPU_NONE},
+  {"a53-0", BOOTROM_PART_ATTR_DEST_CPU_A53_0},
+  {"a53-1", BOOTROM_PART_ATTR_DEST_CPU_A53_1},
+  {"a53-2", BOOTROM_PART_ATTR_DEST_CPU_A53_2},
+  {"a53-3", BOOTROM_PART_ATTR_DEST_CPU_A53_3},
+  {"r5-0", BOOTROM_PART_ATTR_DEST_CPU_R5_0},
+  {"r5-1", BOOTROM_PART_ATTR_DEST_CPU_R5_1},
+  {"r5-lockstep", BOOTROM_PART_ATTR_DEST_CPU_R5_L},
+  {0},
+};
+
+mask_name_t bootrom_part_attr_encryption_names[] = {
+  {"yes", BOOTROM_PART_ATTR_ENCRYPTION_YES},
+  {"no", BOOTROM_PART_ATTR_ENCRYPTION_NO},
+  {0},
+};
+
+mask_name_t bootrom_part_attr_dest_dev_names[] = {
+  {"none", BOOTROM_PART_ATTR_DEST_DEV_NONE},
+  {"ps", BOOTROM_PART_ATTR_DEST_DEV_PS},
+  {"pl", BOOTROM_PART_ATTR_DEST_DEV_PL},
+  {"int", BOOTROM_PART_ATTR_DEST_DEV_INT},
+  {0},
+};
+
+mask_name_t bootrom_part_attr_exec_s_names[] = {
+  {"32-bit", BOOTROM_PART_ATTR_A5X_EXEC_S_32},
+  {"64-bit", BOOTROM_PART_ATTR_A5X_EXEC_S_64},
+  {0},
+};
+
+mask_name_t bootrom_part_attr_exc_lvl_names[] = {
+  {"el-0", BOOTROM_PART_ATTR_EXC_LVL_EL0},
+  {"el-1", BOOTROM_PART_ATTR_EXC_LVL_EL1},
+  {"el-2", BOOTROM_PART_ATTR_EXC_LVL_EL2},
+  {"el-3", BOOTROM_PART_ATTR_EXC_LVL_EL3},
+  {0},
+};
+
+mask_name_t bootrom_part_attr_trust_zone_names[] = {
+  {"yes", BOOTROM_PART_ATTR_TRUST_ZONE_YES},
+  {"no", BOOTROM_PART_ATTR_TRUST_ZONE_NO},
+  {0},
+};
+
+uint32_t map_name_to_mask(mask_name_t mask_names[], char *name) {
+  int i;
+
+  for (i = 0; mask_names[i].name; i++)
+    if (strcmp(mask_names[i].name, name) == 0)
+      return mask_names[i].mask;
+  return -1; /* 0xffffffff */
+}
+
+char *map_mask_to_name(mask_name_t mask_names[], uint32_t mask) {
+  int i;
+
+  for (i = 0; mask_names[i].name; i++)
+    if (mask_names[i].mask == mask)
+      return mask_names[i].name;
+  return NULL;
+}
+
 /* Returns the offset by which the addr parameter should be moved
  * and partition header info via argument pointers.
  * The regular return value is the error code. */
