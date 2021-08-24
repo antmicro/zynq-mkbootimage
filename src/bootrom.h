@@ -144,6 +144,7 @@ typedef struct linux_image_header_t {
 #define BOOTROM_PART_ATTR_RSA_NOT_USED  (0 << BOOTROM_PART_ATTR_RSA_USED_OFF)
 
 #define BOOTROM_PART_ATTR_DEST_CPU_OFF   8
+#define BOOTROM_PART_ATTR_DEST_CPU_MASK  (7 << BOOTROM_PART_ATTR_DEST_CPU_OFF)
 #define BOOTROM_PART_ATTR_DEST_CPU_NONE  (0 << BOOTROM_PART_ATTR_DEST_CPU_OFF)
 #define BOOTROM_PART_ATTR_DEST_CPU_A53_0 (1 << BOOTROM_PART_ATTR_DEST_CPU_OFF)
 #define BOOTROM_PART_ATTR_DEST_CPU_A53_1 (2 << BOOTROM_PART_ATTR_DEST_CPU_OFF)
@@ -153,9 +154,10 @@ typedef struct linux_image_header_t {
 #define BOOTROM_PART_ATTR_DEST_CPU_R5_1  (6 << BOOTROM_PART_ATTR_DEST_CPU_OFF)
 #define BOOTROM_PART_ATTR_DEST_CPU_R5_L  (7 << BOOTROM_PART_ATTR_DEST_CPU_OFF)
 
-#define BOOTROM_PART_ATTR_ENCRYPTION_OFF 7
-#define BOOTROM_PART_ATTR_ENCRYPTION_YES (1 << BOOTROM_PART_ATTR_ENCRYPTION_OFF)
-#define BOOTROM_PART_ATTR_ENCRYPTION_NO  (0 << BOOTROM_PART_ATTR_ENCRYPTION_OFF)
+#define BOOTROM_PART_ATTR_ENCRYPTION_OFF  7
+#define BOOTROM_PART_ATTR_ENCRYPTION_MASK (1 << BOOTROM_PART_ATTR_ENCRYPTION_OFF)
+#define BOOTROM_PART_ATTR_ENCRYPTION_YES  (1 << BOOTROM_PART_ATTR_ENCRYPTION_OFF)
+#define BOOTROM_PART_ATTR_ENCRYPTION_NO   (0 << BOOTROM_PART_ATTR_ENCRYPTION_OFF)
 
 #define BOOTROM_PART_ATTR_DEST_DEV_OFF  4
 #define BOOTROM_PART_ATTR_DEST_DEV_MASK (7 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
@@ -164,20 +166,22 @@ typedef struct linux_image_header_t {
 #define BOOTROM_PART_ATTR_DEST_DEV_PL   (2 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
 #define BOOTROM_PART_ATTR_DEST_DEV_INT  (3 << BOOTROM_PART_ATTR_DEST_DEV_OFF)
 
-#define BOOTROM_PART_ATTR_A5X_EXEC_S_OFF 3
-#define BOOTROM_PART_ATTR_A5X_EXEC_S_64  (0 << BOOTROM_PART_ATTR_A5X_EXEC_S_OFF)
-#define BOOTROM_PART_ATTR_A5X_EXEC_S_32  (1 << BOOTROM_PART_ATTR_A5X_EXEC_S_OFF)
+#define BOOTROM_PART_ATTR_A5X_EXEC_S_OFF  3
+#define BOOTROM_PART_ATTR_A5X_EXEC_S_MASK (1 << BOOTROM_PART_ATTR_A5X_EXEC_S_OFF)
+#define BOOTROM_PART_ATTR_A5X_EXEC_S_64   (0 << BOOTROM_PART_ATTR_A5X_EXEC_S_OFF)
+#define BOOTROM_PART_ATTR_A5X_EXEC_S_32   (1 << BOOTROM_PART_ATTR_A5X_EXEC_S_OFF)
 
 #define BOOTROM_PART_ATTR_EXC_LVL_OFF  1
-#define BOOTROM_PART_ATTR_EXC_LVL_MASK (0x3 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
+#define BOOTROM_PART_ATTR_EXC_LVL_MASK (3 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
 #define BOOTROM_PART_ATTR_EXC_LVL_EL0  (0 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
 #define BOOTROM_PART_ATTR_EXC_LVL_EL1  (1 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
 #define BOOTROM_PART_ATTR_EXC_LVL_EL2  (2 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
 #define BOOTROM_PART_ATTR_EXC_LVL_EL3  (3 << BOOTROM_PART_ATTR_EXC_LVL_OFF)
 
-#define BOOTROM_PART_ATTR_TRUST_ZONE_OFF 0
-#define BOOTROM_PART_ATTR_TRUST_ZONE_YES (1 << BOOTROM_PART_ATTR_TRUST_ZONE_OFF)
-#define BOOTROM_PART_ATTR_TRUST_ZONE_NO  (0 << BOOTROM_PART_ATTR_TRUST_ZONE_OFF)
+#define BOOTROM_PART_ATTR_TRUST_ZONE_OFF  0
+#define BOOTROM_PART_ATTR_TRUST_ZONE_MASK (3 << BOOTROM_PART_ATTR_TRUST_ZONE_OFF)
+#define BOOTROM_PART_ATTR_TRUST_ZONE_YES  (1 << BOOTROM_PART_ATTR_TRUST_ZONE_OFF)
+#define BOOTROM_PART_ATTR_TRUST_ZONE_NO   (0 << BOOTROM_PART_ATTR_TRUST_ZONE_OFF)
 
 /* values taken from boot.bin generated with bootgen
  * so there is no understanding of them yet */
@@ -270,6 +274,23 @@ typedef struct bootrom_offs_t {
   uint32_t part_hdr_end_off;
   uint32_t bins_off;
 } bootrom_offs_t;
+
+typedef struct mask_name_t {
+  char *name;
+  uint32_t mask;
+} mask_name_t;
+
+extern mask_name_t bootrom_part_attr_owner_names[];
+extern mask_name_t bootrom_part_attr_rsa_used_names[];
+extern mask_name_t bootrom_part_attr_dest_cpu_names[];
+extern mask_name_t bootrom_part_attr_encryption_names[];
+extern mask_name_t bootrom_part_attr_dest_dev_names[];
+extern mask_name_t bootrom_part_attr_exec_s_names[];
+extern mask_name_t bootrom_part_attr_exc_lvl_names[];
+extern mask_name_t bootrom_part_attr_trust_zone_names[];
+
+uint32_t map_name_to_mask(mask_name_t mask_names[], char *name);
+char *map_mask_to_name(mask_name_t mask_names[], uint32_t mask);
 
 /* bootrom operations */
 typedef struct bootrom_ops_t {

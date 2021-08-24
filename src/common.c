@@ -38,7 +38,7 @@ int is_postfix(char *string, char *pfix) {
   return strcmp(string + strlen(string) - strlen(pfix), pfix) == 0;
 }
 
-/* Check if a string is present on a list*/
+/* Check if a string is present on a list */
 int is_on_list(char *list[], char *s) {
   int i;
 
@@ -47,3 +47,4 @@ int is_on_list(char *list[], char *s) {
       return 0xFF;
   return 0;
 }
+
