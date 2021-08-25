@@ -139,7 +139,7 @@ typedef struct linux_image_header_t {
 #define BOOTROM_PART_ATTR_OWNER_UBOOT (1 << BOOTROM_PART_ATTR_OWNER_OFF)
 
 #define BOOTROM_PART_ATTR_RSA_USED_OFF  15
-#define BOOTROM_PART_ATTR_RSA_USED_MASK (1 << BOOTROM_PATR_ATTR_RSA_USED_OFF)
+#define BOOTROM_PART_ATTR_RSA_USED_MASK (1 << BOOTROM_PART_ATTR_RSA_USED_OFF)
 #define BOOTROM_PART_ATTR_RSA_USED      (1 << BOOTROM_PART_ATTR_RSA_USED_OFF)
 #define BOOTROM_PART_ATTR_RSA_NOT_USED  (0 << BOOTROM_PART_ATTR_RSA_USED_OFF)
 
@@ -278,14 +278,16 @@ typedef struct bootrom_offs_t {
 typedef struct mask_name_t {
   char *name;
   uint32_t mask;
+  struct mask_name_t *submasks;
 } mask_name_t;
 
+extern mask_name_t bootrom_part_attr_mask_names[];
 extern mask_name_t bootrom_part_attr_owner_names[];
 extern mask_name_t bootrom_part_attr_rsa_used_names[];
 extern mask_name_t bootrom_part_attr_dest_cpu_names[];
 extern mask_name_t bootrom_part_attr_encryption_names[];
 extern mask_name_t bootrom_part_attr_dest_dev_names[];
-extern mask_name_t bootrom_part_attr_exec_s_names[];
+extern mask_name_t bootrom_part_attr_a5x_exec_s_names[];
 extern mask_name_t bootrom_part_attr_exc_lvl_names[];
 extern mask_name_t bootrom_part_attr_trust_zone_names[];
 

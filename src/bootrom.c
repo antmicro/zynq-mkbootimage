@@ -41,63 +41,77 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+/* clang-format off */
 mask_name_t bootrom_part_attr_owner_names[] = {
-  {"fsbl", BOOTROM_PART_ATTR_OWNER_FSBL},
-  {"uboot", BOOTROM_PART_ATTR_OWNER_UBOOT},
+  {"fsbl",  BOOTROM_PART_ATTR_OWNER_FSBL,  NULL},
+  {"uboot", BOOTROM_PART_ATTR_OWNER_UBOOT, NULL},
   {0},
 };
 
 mask_name_t bootrom_part_attr_rsa_used_names[] = {
-  {"used", BOOTROM_PART_ATTR_RSA_USED},
-  {"not used", BOOTROM_PART_ATTR_RSA_NOT_USED},
+  {"used",     BOOTROM_PART_ATTR_RSA_USED,     NULL},
+  {"not used", BOOTROM_PART_ATTR_RSA_NOT_USED, NULL},
   {0},
 };
 
 mask_name_t bootrom_part_attr_dest_cpu_names[] = {
-  {"none", BOOTROM_PART_ATTR_DEST_CPU_NONE},
-  {"a53-0", BOOTROM_PART_ATTR_DEST_CPU_A53_0},
-  {"a53-1", BOOTROM_PART_ATTR_DEST_CPU_A53_1},
-  {"a53-2", BOOTROM_PART_ATTR_DEST_CPU_A53_2},
-  {"a53-3", BOOTROM_PART_ATTR_DEST_CPU_A53_3},
-  {"r5-0", BOOTROM_PART_ATTR_DEST_CPU_R5_0},
-  {"r5-1", BOOTROM_PART_ATTR_DEST_CPU_R5_1},
-  {"r5-lockstep", BOOTROM_PART_ATTR_DEST_CPU_R5_L},
+  {"none",        BOOTROM_PART_ATTR_DEST_CPU_NONE,  NULL},
+  {"a53-0",       BOOTROM_PART_ATTR_DEST_CPU_A53_0, NULL},
+  {"a53-1",       BOOTROM_PART_ATTR_DEST_CPU_A53_1, NULL},
+  {"a53-2",       BOOTROM_PART_ATTR_DEST_CPU_A53_2, NULL},
+  {"a53-3",       BOOTROM_PART_ATTR_DEST_CPU_A53_3, NULL},
+  {"r5-0",        BOOTROM_PART_ATTR_DEST_CPU_R5_0,  NULL},
+  {"r5-1",        BOOTROM_PART_ATTR_DEST_CPU_R5_1,  NULL},
+  {"r5-lockstep", BOOTROM_PART_ATTR_DEST_CPU_R5_L,  NULL},
   {0},
 };
 
 mask_name_t bootrom_part_attr_encryption_names[] = {
-  {"yes", BOOTROM_PART_ATTR_ENCRYPTION_YES},
-  {"no", BOOTROM_PART_ATTR_ENCRYPTION_NO},
+  {"yes", BOOTROM_PART_ATTR_ENCRYPTION_YES, NULL},
+  {"no",  BOOTROM_PART_ATTR_ENCRYPTION_NO,  NULL},
   {0},
 };
 
 mask_name_t bootrom_part_attr_dest_dev_names[] = {
-  {"none", BOOTROM_PART_ATTR_DEST_DEV_NONE},
-  {"ps", BOOTROM_PART_ATTR_DEST_DEV_PS},
-  {"pl", BOOTROM_PART_ATTR_DEST_DEV_PL},
-  {"int", BOOTROM_PART_ATTR_DEST_DEV_INT},
+  {"none", BOOTROM_PART_ATTR_DEST_DEV_NONE, NULL},
+  {"ps",   BOOTROM_PART_ATTR_DEST_DEV_PS,   NULL},
+  {"pl",   BOOTROM_PART_ATTR_DEST_DEV_PL,   NULL},
+  {"int",  BOOTROM_PART_ATTR_DEST_DEV_INT,  NULL},
   {0},
 };
 
-mask_name_t bootrom_part_attr_exec_s_names[] = {
-  {"32-bit", BOOTROM_PART_ATTR_A5X_EXEC_S_32},
-  {"64-bit", BOOTROM_PART_ATTR_A5X_EXEC_S_64},
+mask_name_t bootrom_part_attr_a5x_exec_s_names[] = {
+  {"32-bit", BOOTROM_PART_ATTR_A5X_EXEC_S_32, NULL},
+  {"64-bit", BOOTROM_PART_ATTR_A5X_EXEC_S_64, NULL},
   {0},
 };
 
 mask_name_t bootrom_part_attr_exc_lvl_names[] = {
-  {"el-0", BOOTROM_PART_ATTR_EXC_LVL_EL0},
-  {"el-1", BOOTROM_PART_ATTR_EXC_LVL_EL1},
-  {"el-2", BOOTROM_PART_ATTR_EXC_LVL_EL2},
-  {"el-3", BOOTROM_PART_ATTR_EXC_LVL_EL3},
+  {"el-0", BOOTROM_PART_ATTR_EXC_LVL_EL0, NULL},
+  {"el-1", BOOTROM_PART_ATTR_EXC_LVL_EL1, NULL},
+  {"el-2", BOOTROM_PART_ATTR_EXC_LVL_EL2, NULL},
+  {"el-3", BOOTROM_PART_ATTR_EXC_LVL_EL3, NULL},
   {0},
 };
 
 mask_name_t bootrom_part_attr_trust_zone_names[] = {
-  {"yes", BOOTROM_PART_ATTR_TRUST_ZONE_YES},
-  {"no", BOOTROM_PART_ATTR_TRUST_ZONE_NO},
+  {"yes", BOOTROM_PART_ATTR_TRUST_ZONE_YES, NULL},
+  {"no",  BOOTROM_PART_ATTR_TRUST_ZONE_NO,  NULL},
   {0},
 };
+
+mask_name_t bootrom_part_attr_mask_names[] = {
+  {"Owner",               BOOTROM_PART_ATTR_OWNER_MASK,      bootrom_part_attr_owner_names},
+  {"RSA",                 BOOTROM_PART_ATTR_RSA_USED_MASK,   bootrom_part_attr_rsa_used_names},
+  {"Destination CPU",     BOOTROM_PART_ATTR_DEST_CPU_MASK,   bootrom_part_attr_dest_cpu_names},
+  {"Encryption",          BOOTROM_PART_ATTR_ENCRYPTION_MASK, bootrom_part_attr_encryption_names},
+  {"Destination Device",  BOOTROM_PART_ATTR_DEST_DEV_MASK,   bootrom_part_attr_dest_dev_names},
+  {"A5x Execution State", BOOTROM_PART_ATTR_A5X_EXEC_S_MASK, bootrom_part_attr_a5x_exec_s_names},
+  {"Exception Level",     BOOTROM_PART_ATTR_EXC_LVL_MASK,    bootrom_part_attr_exc_lvl_names},
+  {"Trust Zone",          BOOTROM_PART_ATTR_TRUST_ZONE_MASK, bootrom_part_attr_trust_zone_names},
+  {0}
+};
+/* clang-format on */
 
 uint32_t map_name_to_mask(mask_name_t mask_names[], char *name) {
   int i;
@@ -105,7 +119,7 @@ uint32_t map_name_to_mask(mask_name_t mask_names[], char *name) {
   for (i = 0; mask_names[i].name; i++)
     if (strcmp(mask_names[i].name, name) == 0)
       return mask_names[i].mask;
-  return -1; /* 0xffffffff */
+  return 0xffffffff;
 }
 
 char *map_mask_to_name(mask_name_t mask_names[], uint32_t mask) {
@@ -114,7 +128,7 @@ char *map_mask_to_name(mask_name_t mask_names[], uint32_t mask) {
   for (i = 0; mask_names[i].name; i++)
     if (mask_names[i].mask == mask)
       return mask_names[i].name;
-  return NULL;
+  return "INVALID";
 }
 
 /* Returns the offset by which the addr parameter should be moved
