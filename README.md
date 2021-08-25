@@ -15,7 +15,7 @@ To build these the tools run:
 make
 ```
 
-For code formatting use clang-format version 12 or newer.
+For details on project organization and contribution tips, see `src/README.md`.
 
 ## mkbootimage
 `mkbootimage` parses a `.bif` file and creates a Zynq boot image in the `.bin` format.
@@ -168,3 +168,4 @@ the boot image name:
 ```
 ./exbootimage -x boot.bin fpga.bit rootfs.img
 ```
+
