@@ -239,16 +239,11 @@ int print_name(FILE *f, void *base, int offset) {
 }
 
 int print_attr(FILE *f, void *base, int offset) {
+  mask_name_t *subm;
   uint32_t attr = *(uint32_t *) ABS_BADDR(base, offset);
-
-  uint32_t owner = (attr >> BOOTROM_PART_ATTR_OWNER_OFF) & 0x3;
-  uint32_t rsa = (attr >> BOOTROM_PART_ATTR_RSA_USED_OFF) & 0x1;
-  uint32_t cpu = (attr >> BOOTROM_PART_ATTR_DEST_CPU_OFF) & 0x7;
-  uint32_t encrypt = (attr >> BOOTROM_PART_ATTR_ENCRYPTION_OFF) & 0x1;
-  uint32_t dev = (attr >> BOOTROM_PART_ATTR_DEST_DEV_OFF) & 0x7;
-  uint32_t exec = (attr >> BOOTROM_PART_ATTR_A5X_EXEC_S_OFF) & 0x7;
-  uint32_t exclvl = (attr >> BOOTROM_PART_ATTR_EXC_LVL_OFF) & 0x3;
-  uint32_t trust = (attr >> BOOTROM_PART_ATTR_TRUST_ZONE_OFF) & 0x1;
+  uint32_t mask;
+  char *name;
+  int i;
 
   if (!attr) {
     print_word(f, base, offset);
@@ -262,51 +257,21 @@ int print_attr(FILE *f, void *base, int offset) {
   print_word(f, base, offset);
   fprintf(f, "\n");
 
-  print_padding(f, 13, ' ');
-  fprintf(f, "Owner: %s\n", owner == 0 ? "FSBL" : owner == 1 ? "UBOOT" : "INVALID");
+  for (i = 0; bootrom_part_attr_mask_names[i].name; i++) {
+    name = bootrom_part_attr_mask_names[i].name;
+    mask = bootrom_part_attr_mask_names[i].mask;
+    subm = bootrom_part_attr_mask_names[i].submasks;
 
-  print_padding(f, 13, ' ');
-  fprintf(f, "RSA: %s\n", rsa == 0 ? "not used" : rsa == 1 ? "used" : "INVALID");
+    print_padding(f, 13, ' ');
+    fprintf(f, "%s: %s",
+      name,
+      map_mask_to_name(subm, attr & mask));
 
-  print_padding(f, 13, ' ');
-  fprintf(f,
-          "Destination CPU: %s\n",
-          cpu == 0   ? "none"
-          : cpu == 1 ? "A53-0"
-          : cpu == 2 ? "A53-1"
-          : cpu == 3 ? "A53-2"
-          : cpu == 4 ? "A53-3"
-          : cpu == 5 ? "R5-0"
-          : cpu == 6 ? "R5-1"
-          : cpu == 7 ? "R5-L"
-                     : "INVALID");
+    /* Start a newline if there are more attribute values to be printed */
+    if (bootrom_part_attr_mask_names[i + 1].name)
+      fputc('\n', f);
+  }
 
-  print_padding(f, 13, ' ');
-  fprintf(f, "Encryption: %s\n", encrypt == 1 ? "yes" : encrypt == 0 ? "no" : "INVALID");
-
-  print_padding(f, 13, ' ');
-  fprintf(f,
-          "Destination Device: %s\n",
-          dev == 0   ? "none"
-          : dev == 1 ? "PS"
-          : dev == 2 ? "PL"
-          : dev == 3 ? "INT"
-                     : "INVALID");
-
-  print_padding(f, 13, ' ');
-  fprintf(f, "A5x Execution State: %s\n", exec == 0 ? "64 bit" : exec == 1 ? "32 bit" : "INVALID");
-
-  print_padding(f, 13, ' ');
-  fprintf(f,
-          "Exception Level: %s\n",
-          exclvl == 0   ? "0 (el-0)"
-          : exclvl == 1 ? "1 (el-1)"
-          : exclvl == 2 ? "2 (el-2)"
-          : exclvl == 3 ? "3 (el-3)"
-                        : "INVALID");
-
-  print_padding(f, 13, ' ');
-  fprintf(f, "Trust Zone: %s", trust == 1 ? "yes" : trust == 0 ? "no" : "INVALID");
   return 0;
 }
 
