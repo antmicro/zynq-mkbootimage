@@ -24,6 +24,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -33,7 +34,7 @@
 #include <gelf.h>
 #include <unistd.h>
 
-static int elf_is_loadable_section(const GElf_Shdr *elf_shdr) {
+static bool elf_is_loadable_section(const GElf_Shdr *elf_shdr) {
   return elf_shdr->sh_type != SHT_NOBITS && (elf_shdr->sh_flags & SHF_ALLOC) &&
          elf_shdr->sh_size != 0;
 }

@@ -1,4 +1,5 @@
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,17 +35,16 @@ uint32_t calc_checksum(uint32_t *start_addr, uint32_t *end_addr) {
 }
 
 /* Check if pfix is a postifx of string */
-int is_postfix(char *string, char *pfix) {
+bool is_postfix(char *string, char *pfix) {
   return strcmp(string + strlen(string) - strlen(pfix), pfix) == 0;
 }
 
 /* Check if a string is present on a list */
-int is_on_list(char *list[], char *s) {
+bool is_on_list(char *list[], char *s) {
   int i;
 
   for (i = 0; list[i]; i++)
     if (strcmp(list[i], s) == 0)
-      return 0xFF;
-  return 0;
+      return true;
+  return false;
 }
-

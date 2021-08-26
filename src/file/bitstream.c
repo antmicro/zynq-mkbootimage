@@ -24,6 +24,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -68,7 +69,7 @@ int bitstream_write_header_part(FILE *bitfile, const uint8_t tag, const char *da
   return 0;
 }
 
-int bitstream_write_header(FILE *bitfile, uint32_t size, const char *design, const char *part) {
+error bitstream_write_header(FILE *bitfile, uint32_t size, const char *design, const char *part) {
   const uint8_t header[] = {
     0x00,
     0x09,
@@ -124,7 +125,7 @@ int bitstream_write_header(FILE *bitfile, uint32_t size, const char *design, con
     fwrite(&n, sizeof(uint8_t), 1, bitfile);
   }
 
-  return 0;
+  return SUCCESS;
 }
 
 error bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {

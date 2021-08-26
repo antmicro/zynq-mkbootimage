@@ -36,7 +36,7 @@ typedef enum error
 
 int errorf(const char *fmt, ...);
 uint32_t calc_checksum(uint32_t *, uint32_t *);
-int is_postfix(char *, char *);
-int is_on_list(char **, char *);
+bool is_postfix(char *, char *);
+bool is_on_list(char **, char *);
 
 #endif

@@ -37,8 +37,6 @@
 #include <ctype.h>
 #include <errno.h>
 
-/* TODO: panic mode support */
-
 static int perrorf(lexer_t *lex, const char *fmt, ...);
 
 static inline char *get_token_name(int type);
@@ -212,7 +210,7 @@ static error bif_scan(lexer_t *lex) {
   /* Scan a single token from a BIF file */
 
   int ch = 0, prev, err;
-  bool esc = 0;
+  bool esc = false;
 
   /* Skip white chars and comments */
   for (;;) {

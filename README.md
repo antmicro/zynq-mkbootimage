@@ -168,4 +168,3 @@ the boot image name:
 ```
 ./exbootimage -x boot.bin fpga.bit rootfs.img
 ```
-
