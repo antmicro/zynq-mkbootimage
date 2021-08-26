@@ -24,6 +24,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -66,18 +67,17 @@ struct format {
 
 /* Prepare struct for holding parsed arguments */
 struct arguments {
-  uint8_t list;
-  uint8_t describe;
-  uint8_t header;
-  uint8_t images;
-  uint8_t partitions;
-  uint8_t zynqmp;
+  bool list;
+  bool describe;
+  bool header;
+  bool images;
+  bool partitions;
+  bool zynqmp;
 
-  uint8_t force;
-  uint8_t extract;
+  bool force;
+  bool extract;
   int extract_count;
   char **extract_names;
-  uint8_t in_file_list;
 
   char *design;
   char *part;
@@ -263,9 +263,7 @@ int print_attr(FILE *f, void *base, int offset) {
     subm = bootrom_part_attr_mask_names[i].submasks;
 
     print_padding(f, 13, ' ');
-    fprintf(f, "%s: %s",
-      name,
-      map_mask_to_name(subm, attr & mask));
+    fprintf(f, "%s: %s", name, map_mask_to_name(subm, attr & mask));
 
     /* Start a newline if there are more attribute values to be printed */
     if (bootrom_part_attr_mask_names[i + 1].name)
@@ -418,7 +416,7 @@ error print_partition_contents(FILE *f, hdr_t *base, uint32_t size, struct argum
 
     /* Check if the file is fine */
     if (!stat(name, &bstat) && !arguments->force) {
-      errorf("file %s alraedy exists, use -f to force\n", name);
+      errorf("file %s already exists, use -f to force\n", name);
       return ERROR_BIN_FILE_EXISTS;
     }
     if (!(bfile = fopen(name, "wb"))) {
@@ -502,30 +500,30 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
 
   switch (key) {
   case 'u':
-    arguments->zynqmp = 0xFF;
+    arguments->zynqmp = true;
     break;
   case 'x':
-    arguments->extract = 0xFF;
+    arguments->extract = true;
     break;
   case 'f':
-    arguments->force = 0xFF;
+    arguments->force = true;
     break;
   case 'l':
-    arguments->list = 0xFF;
+    arguments->list = true;
     break;
   case 'd':
-    arguments->header = 0xFF;
-    arguments->images = 0xFF;
-    arguments->partitions = 0xFF;
+    arguments->header = true;
+    arguments->images = true;
+    arguments->partitions = true;
     break;
   case 'h':
-    arguments->header = 0xFF;
+    arguments->header = true;
     break;
   case 'i':
-    arguments->images = 0xFF;
+    arguments->images = true;
     break;
   case 'p':
-    arguments->partitions = 0xFF;
+    arguments->partitions = true;
     break;
   case 'b':
     if (!(s = strchr(arg, ',')))

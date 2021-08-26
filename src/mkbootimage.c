@@ -24,6 +24,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,10 +49,10 @@ static struct argp_option argp_options[] = {
 
 /* Prapare struct for holding parsed arguments */
 struct arguments {
-  uint8_t zynqmp;
+  bool zynqmp;
+  bool parse_only;
   char *bif_filename;
   char *bin_filename;
-  uint8_t parse_only;
 };
 
 /* Define argument parser */
@@ -60,10 +61,10 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
 
   switch (key) {
   case 'u':
-    arguments->zynqmp = 0xFF;
+    arguments->zynqmp = true;
     break;
   case 'p':
-    arguments->parse_only = 0xFF;
+    arguments->parse_only = true;
     break;
   case ARGP_KEY_ARG:
     switch (state->arg_num) {
@@ -105,8 +106,7 @@ int main(int argc, char *argv[]) {
   int i;
 
   /* Init non-string arguments */
-  arguments.zynqmp = 0;
-  arguments.parse_only = 0;
+  memset(&arguments, 0, sizeof(arguments));
 
   /* Parse program arguments */
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
