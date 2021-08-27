@@ -4,15 +4,6 @@
 #include <bif.h>
 #include <gelf.h>
 
-#define BOOTROM_SUCCESS           0
-#define BOOTROM_ERROR_NOFILE      1
-#define BOOTROM_ERROR_BITSTREAM   2
-#define BOOTROM_ERROR_ELF         3
-#define BOOTROM_ERROR_SEC_OVERLAP 4
-#define BOOTROM_ERROR_UNSUPPORTED 5
-#define BOOTROM_ERROR_NOMEM       6
-#define BOOTROM_ERROR_WADDR       7
-
 /* BootROM Header based on ug585 and ug1085 */
 typedef struct bootrom_hdr_t {
   uint32_t interrupt_table[8];
@@ -284,39 +275,39 @@ typedef struct bootrom_offs_t {
 typedef struct bootrom_ops_t {
   /* Initialize offsets - image pointer should be
    * set before this one is called */
-  int (*init_offs)(uint32_t *, int, bootrom_offs_t *);
+  error (*init_offs)(uint32_t *, int, bootrom_offs_t *);
 
   /* Initialize the main bootrom header */
-  int (*init_header)(bootrom_hdr_t *, bootrom_offs_t *);
+  error (*init_header)(bootrom_hdr_t *, bootrom_offs_t *);
 
   /* Setup bootloader at the current offset */
-  int (*setup_fsbl_at_curr_off)(bootrom_hdr_t *, bootrom_offs_t *, uint32_t img_len);
+  error (*setup_fsbl_at_curr_off)(bootrom_hdr_t *, bootrom_offs_t *, uint32_t img_len);
 
   /* Prepare image header table */
-  int (*init_img_hdr_tab)(bootrom_img_hdr_tab_t *,
-                          bootrom_img_hdr_t *,
-                          bootrom_partition_hdr_t *,
-                          bootrom_offs_t *);
+  error (*init_img_hdr_tab)(bootrom_img_hdr_tab_t *,
+                            bootrom_img_hdr_t *,
+                            bootrom_partition_hdr_t *,
+                            bootrom_offs_t *);
 
   /* Partition header related callbacks */
-  int (*init_part_hdr_default)(bootrom_partition_hdr_t *, bif_node_t *);
-  int (*init_part_hdr_dtb)(bootrom_partition_hdr_t *, bif_node_t *);
-  int (*init_part_hdr_elf)(bootrom_partition_hdr_t *,
-                           bif_node_t *,
-                           uint32_t *size,
-                           uint32_t load,
-                           uint32_t entry,
-                           uint8_t nbits);
-  int (*init_part_hdr_bitstream)(bootrom_partition_hdr_t *, bif_node_t *);
-  int (*init_part_hdr_linux)(bootrom_partition_hdr_t *, bif_node_t *, linux_image_header_t *);
+  error (*init_part_hdr_default)(bootrom_partition_hdr_t *, bif_node_t *);
+  error (*init_part_hdr_dtb)(bootrom_partition_hdr_t *, bif_node_t *);
+  error (*init_part_hdr_elf)(bootrom_partition_hdr_t *,
+                             bif_node_t *,
+                             uint32_t *size,
+                             uint32_t load,
+                             uint32_t entry,
+                             uint8_t nbits);
+  error (*init_part_hdr_bitstream)(bootrom_partition_hdr_t *, bif_node_t *);
+  error (*init_part_hdr_linux)(bootrom_partition_hdr_t *, bif_node_t *, linux_image_header_t *);
   /* The finish function is common for all partition types */
-  int (*finish_part_hdr)(bootrom_partition_hdr_t *, uint32_t *img_size, bootrom_offs_t *);
+  error (*finish_part_hdr)(bootrom_partition_hdr_t *, uint32_t *img_size, bootrom_offs_t *);
 
   /* Some archs require a null partition at the end */
   uint8_t append_null_part;
 } bootrom_ops_t;
 
 uint32_t estimate_boot_image_size(bif_cfg_t *);
-int create_boot_image(uint32_t *, bif_cfg_t *, bootrom_ops_t *, uint32_t *);
+error create_boot_image(uint32_t *, bif_cfg_t *, bootrom_ops_t *, uint32_t *);
 
 #endif /* BOOTROM_H */

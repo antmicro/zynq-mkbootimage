@@ -43,13 +43,13 @@ static int perrorf(lexer_t *lex, const char *fmt, ...);
 static inline char *get_token_name(int type);
 
 static inline void update_pos(lexer_t *lex, char ch);
-static inline int append_token(lexer_t *lex, char ch);
+static inline error append_token(lexer_t *lex, char ch);
 
-static int bif_scan(lexer_t *lex);
-static inline int bif_consume(lexer_t *lex, int type);
-static inline int bif_expect(lexer_t *lex, int type);
-static int bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node);
-static int bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node);
+static error bif_scan(lexer_t *lex);
+static inline error bif_consume(lexer_t *lex, int type);
+static inline error bif_expect(lexer_t *lex, int type);
+static error bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node);
+static error bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node);
 
 static const char *special_chars = ":{}[],=/\\";
 
@@ -66,7 +66,7 @@ static int perrorf(lexer_t *lex, const char *fmt, ...) {
   return n;
 }
 
-int init_bif_cfg(bif_cfg_t *cfg) {
+error init_bif_cfg(bif_cfg_t *cfg) {
   /* Initially setup 8 nodes */
   cfg->nodes_num = 0;
   cfg->nodes_avail = 8;
@@ -74,27 +74,27 @@ int init_bif_cfg(bif_cfg_t *cfg) {
   /* Alloc memory for it */
   cfg->nodes = malloc(sizeof(bif_node_t) * cfg->nodes_avail);
   if (!cfg->nodes) {
-    return -ENOMEM;
+    return ERROR_NOMEM;
   }
 
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
 
-int deinit_bif_cfg(bif_cfg_t *cfg) {
+error deinit_bif_cfg(bif_cfg_t *cfg) {
   cfg->nodes_num = 0;
   cfg->nodes_avail = 0;
 
   free(cfg->nodes);
 
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
 
-static int init_lexer(lexer_t *lex, const char *fname) {
-  int err;
+static error init_lexer(lexer_t *lex, const char *fname) {
+  error err;
 
   if (!(lex->file = fopen(fname, "r"))) {
     errorf("could not open file \"%s\"\n", fname);
-    return BIF_ERROR_NOFILE;
+    return ERROR_BIF_NOFILE;
   }
 
   lex->fname = malloc(strlen(fname) + 1);
@@ -112,15 +112,15 @@ static int init_lexer(lexer_t *lex, const char *fname) {
   if ((err = bif_scan(lex)))
     return err;
 
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
 
-static int deinit_lexer(lexer_t *lex) {
+static error deinit_lexer(lexer_t *lex) {
   fclose(lex->file);
   free(lex->fname);
   free(lex->buffer);
 
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
 
 static inline char *get_token_name(int type) {
@@ -165,7 +165,7 @@ static inline void update_pos(lexer_t *lex, char ch) {
   }
 }
 
-static inline int append_token(lexer_t *lex, char ch) {
+static inline error append_token(lexer_t *lex, char ch) {
   lex->len++;
 
   if (lex->len >= lex->cap) {
@@ -173,16 +173,16 @@ static inline int append_token(lexer_t *lex, char ch) {
     lex->buffer = realloc(lex->buffer, lex->cap);
     if (!lex->buffer) {
       errorf("out of memory\n");
-      return -ENOMEM;
+      return ERROR_NOMEM;
     }
   }
 
   lex->buffer[lex->len - 1] = ch;
   lex->buffer[lex->len] = '\0';
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
 
-static inline int bif_scan_comment(lexer_t *lex, char type) {
+static inline error bif_scan_comment(lexer_t *lex, char type) {
   int ch = 0, prev;
 
   if (type == '*') {
@@ -191,7 +191,7 @@ static inline int bif_scan_comment(lexer_t *lex, char type) {
       /* Break if its the end of file */
       if ((ch = fgetc(lex->file)) < 0) {
         perrorf(lex, "file ended while scanning a C-style comment\n");
-        return BIF_ERROR_LEXER;
+        return ERROR_BIF_LEXER;
       }
       /* Break if its the end of the comment */
       if (prev == '*' && ch == '/')
@@ -204,10 +204,10 @@ static inline int bif_scan_comment(lexer_t *lex, char type) {
       update_pos(lex, ch);
     /* Don't update the pos after the last ch, it will happen in bif_scan */
   }
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
 
-static int bif_scan(lexer_t *lex) {
+static error bif_scan(lexer_t *lex) {
   /* Scan a single token from a BIF file */
 
   int ch = 0, prev, err;
@@ -219,7 +219,8 @@ static int bif_scan(lexer_t *lex) {
     ch = fgetc(lex->file);
 
     if (ch < 0) {
-      return TOKEN_EOF;
+      lex->type = TOKEN_EOF;
+      return SUCCESS;
     } else if (prev == '/') {
       if (ch == '/' || ch == '*') {
         /* Update the pos before reading the comment */
@@ -267,7 +268,7 @@ static int bif_scan(lexer_t *lex) {
 
       if (ch < 0) {
         perrorf(lex, "file ended while scanning a string\n");
-        return BIF_ERROR_LEXER;
+        return ERROR_BIF_LEXER;
       } else if (ch == '\\') {
         esc = true;
         continue;
@@ -299,27 +300,31 @@ static int bif_scan(lexer_t *lex) {
     }
   }
 
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
 
-static inline int bif_consume(lexer_t *lex, int type) {
+static inline error bif_consume(lexer_t *lex, int type) {
   /* Read next token if its of the assumed type */
+  error err;
+
   if (lex->type != type)
-    return BIF_ERROR_PARSER;
-  return bif_scan(lex);
+    return ERROR_BIF_PARSER;
+  if ((err = bif_scan(lex)))
+    return err;
+  return SUCCESS;
 }
 
-static inline int bif_expect(lexer_t *lex, int type) {
+static inline error bif_expect(lexer_t *lex, int type) {
   /* Throw errors if the next token is unexpected */
-  int err = bif_consume(lex, type);
+  error err = bif_consume(lex, type);
 
-  if (err == BIF_ERROR_PARSER)
+  if (err == ERROR_BIF_PARSER)
     perrorf(lex, "expected %s, got %s\n", get_token_name(type), get_token_name(lex->type));
   return err;
 }
 
-static int bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
-  int err;
+static error bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
+  error err;
 
   node->load = 0;
   node->offset = 0;
@@ -354,11 +359,11 @@ static int bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
   strcpy(node->fname, lex->buffer);
   bif_consume(lex, TOKEN_NAME);
 
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
 
-static int bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
-  int err;
+static error bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
+  error err;
   char *key = NULL, *value = NULL;
 
   /* Parse an attribute name */
@@ -386,8 +391,8 @@ static int bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
   return err;
 }
 
-int bif_parse(const char *fname, bif_cfg_t *cfg) {
-  int err;
+error bif_parse(const char *fname, bif_cfg_t *cfg) {
+  error err;
   lexer_t lex;
   bif_node_t node;
 
@@ -414,46 +419,46 @@ int bif_parse(const char *fname, bif_cfg_t *cfg) {
 
   deinit_lexer(&lex);
 
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
 
-int bif_node_set_attr(
+error bif_node_set_attr(
   lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node, char *attr_name, char *value) {
   /* TODO: parser errors on wrong scans */
 
   if (strcmp(attr_name, "bootloader") == 0) {
     node->bootloader = 0xFF;
-    return BIF_SUCCESS;
+    return SUCCESS;
   }
 
   if (strcmp(attr_name, "load") == 0) {
     if (!value) {
       perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
-      return BIF_ERROR_PARSER;
+      return ERROR_BIF_PARSER;
     }
     if (sscanf(value, "0x%08x", &(node->load)) < 1) {
       perrorf(lex, "the value \"%s\" in an improper format, expected '0xhhhhhhhh' form\n", value);
-      return BIF_ERROR_PARSER;
+      return ERROR_BIF_PARSER;
     }
-    return BIF_SUCCESS;
+    return SUCCESS;
   }
 
   if (strcmp(attr_name, "offset") == 0) {
     if (!value) {
       perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
-      return BIF_ERROR_PARSER;
+      return ERROR_BIF_PARSER;
     }
     if (sscanf(value, "0x%08x", &(node->offset)) < 1) {
       perrorf(lex, "the value \"%s\" in an improper format, expected '0xhhhhhhhh' form\n", value);
-      return BIF_ERROR_PARSER;
+      return ERROR_BIF_PARSER;
     }
-    return BIF_SUCCESS;
+    return SUCCESS;
   }
 
   if (strcmp(attr_name, "partition_owner") == 0) {
     if (!value) {
       perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
-      return BIF_ERROR_PARSER;
+      return ERROR_BIF_PARSER;
     }
     if (strcmp(value, "fsbl") == 0)
       node->partition_owner = OWNER_FSBL;
@@ -461,9 +466,9 @@ int bif_node_set_attr(
       node->partition_owner = OWNER_UBOOT;
     else {
       perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
-      return BIF_ERROR_UNSUPPORTED_VAL;
+      return ERROR_BIF_UNSUPPORTED_VAL;
     }
-    return BIF_SUCCESS;
+    return SUCCESS;
   }
 
   /* Only handle these for zynqmp arch */
@@ -473,18 +478,18 @@ int bif_node_set_attr(
 
       /* This attribute does not refer to file */
       node->is_file = 0x00;
-      return BIF_SUCCESS;
+      return SUCCESS;
     }
 
     if (strcmp(attr_name, "pmufw_image") == 0) {
       node->pmufw_image = 0xFF;
-      return BIF_SUCCESS;
+      return SUCCESS;
     }
 
     if (strcmp(attr_name, "destination_device") == 0) {
       if (!value) {
         perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
-        return BIF_ERROR_PARSER;
+        return ERROR_BIF_PARSER;
       }
       if (strcmp(value, "ps") == 0)
         node->destination_device = DST_DEV_PS;
@@ -492,16 +497,16 @@ int bif_node_set_attr(
         node->destination_device = DST_DEV_PL;
       else {
         perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
-        return BIF_ERROR_UNSUPPORTED_VAL;
+        return ERROR_BIF_UNSUPPORTED_VAL;
       }
 
-      return BIF_SUCCESS;
+      return SUCCESS;
     }
 
     if (strcmp(attr_name, "destination_cpu") == 0) {
       if (!value) {
         perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
-        return BIF_ERROR_PARSER;
+        return ERROR_BIF_PARSER;
       }
       if (strcmp(value, "a53-0") == 0)
         node->destination_cpu = DST_CPU_A53_0;
@@ -519,15 +524,15 @@ int bif_node_set_attr(
         node->destination_cpu = DST_CPU_R5_LOCKSTEP;
       else {
         perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
-        return BIF_ERROR_UNSUPPORTED_VAL;
+        return ERROR_BIF_UNSUPPORTED_VAL;
       }
-      return BIF_SUCCESS;
+      return SUCCESS;
     }
 
     if (strcmp(attr_name, "exception_level") == 0) {
       if (!value) {
         perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
-        return BIF_ERROR_PARSER;
+        return ERROR_BIF_PARSER;
       }
       if (strcmp(value, "el-0") == 0)
         node->exception_level = EL_0;
@@ -539,23 +544,24 @@ int bif_node_set_attr(
         node->exception_level = EL_3;
       else {
         perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
-        return BIF_ERROR_UNSUPPORTED_VAL;
+        return ERROR_BIF_UNSUPPORTED_VAL;
       }
-      return BIF_SUCCESS;
+      return SUCCESS;
     }
   }
 
   perrorf(lex, "node attribute not supported: \"%s\"\n", attr_name);
-  return BIF_ERROR_UNSUPPORTED_ATTR;
+  return ERROR_BIF_UNSUPPORTED_ATTR;
 }
 
-int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
+error bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
   uint16_t pos;
   bif_node_t tmp_node;
 
   /* Check if initialized */
   if (cfg->nodes_avail == 0) {
-    return BIF_ERROR_UNINITIALIZED;
+    errorf("the BIF config is not initialized\n");
+    return ERROR_BIF_UNINITIALIZED;
   }
 
   pos = cfg->nodes_num;
@@ -596,8 +602,8 @@ int bif_cfg_add_node(bif_cfg_t *cfg, bif_node_t *node) {
     cfg->nodes_avail *= 2;
     cfg->nodes = realloc(cfg->nodes, sizeof(bif_node_t) * cfg->nodes_avail);
     if (!cfg->nodes) {
-      return -ENOMEM;
+      return ERROR_NOMEM;
     }
   }
-  return BIF_SUCCESS;
+  return SUCCESS;
 }
