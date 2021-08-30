@@ -461,7 +461,7 @@ error bif_node_set_attr(
       return ERROR_BIF_PARSER;
     }
     mask = map_name_to_mask(bootrom_part_attr_owner_names, value);
-    if (mask == 0xffffffff) {
+    if (mask == NOMASK) {
       perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
       return ERROR_BIF_UNSUPPORTED_VAL;
     }
@@ -489,7 +489,7 @@ error bif_node_set_attr(
         return ERROR_BIF_PARSER;
       }
       mask = map_name_to_mask(bootrom_part_attr_dest_dev_names, value);
-      if (mask == 0xffffffff) {
+      if (mask == NOMASK) {
         perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
         return ERROR_BIF_UNSUPPORTED_VAL;
       }
@@ -503,7 +503,7 @@ error bif_node_set_attr(
         return ERROR_BIF_PARSER;
       }
       mask = map_name_to_mask(bootrom_part_attr_dest_cpu_names, value);
-      if (mask == 0xffffffff) {
+      if (mask == NOMASK) {
         perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
         return ERROR_BIF_UNSUPPORTED_VAL;
       }
@@ -517,7 +517,7 @@ error bif_node_set_attr(
         return ERROR_BIF_PARSER;
       }
       mask = map_name_to_mask(bootrom_part_attr_exc_lvl_names, value);
-      if (mask == 0xffffffff) {
+      if (mask == NOMASK) {
         perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
         return ERROR_BIF_UNSUPPORTED_VAL;
       }

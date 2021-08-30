@@ -120,7 +120,7 @@ uint32_t map_name_to_mask(mask_name_t mask_names[], char *name) {
   for (i = 0; mask_names[i].name; i++)
     if (strcmp(mask_names[i].name, name) == 0)
       return mask_names[i].mask;
-  return 0xffffffff;
+  return NOMASK;
 }
 
 char *map_mask_to_name(mask_name_t mask_names[], uint32_t mask) {

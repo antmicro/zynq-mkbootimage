@@ -4,6 +4,8 @@
 #include <bif.h>
 #include <gelf.h>
 
+#define NOMASK 0xFFFFFFFF
+
 /* BootROM Header based on ug585 and ug1085 */
 typedef struct bootrom_hdr_t {
   uint32_t interrupt_table[8];
