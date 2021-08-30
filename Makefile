@@ -2,6 +2,8 @@
 
 CC=gcc
 
+FMT=clang-format
+
 MKBOOTIMAGE_NAME:=mkbootimage
 EXBOOTIMAGE_NAME:=exbootimage
 
@@ -10,13 +12,20 @@ VERSION_MINOR:=$(shell git rev-parse --short HEAD)
 
 VERSION:=$(MKBOOTIMAGE_NAME) $(VERSION_MAJOR)-$(VERSION_MINOR)
 
-COMMON_SRCS:=src/bif.c src/bootrom.c src/common.c $(wildcard src/arch/*.c) $(wildcard src/file/*.c)
+COMMON_SRCS:=src/bif.c src/bootrom.c src/common.c \
+	 $(wildcard src/arch/*.c) $(wildcard src/file/*.c)
 
-MKBOOTIMAGE_SRCS:=src/mkbootimage.c $(COMMON_SRCS)
+COMMON_HDRS:=src/bif.h src/bootrom.h src/common.h \
+	 $(wildcard src/arch/*.h) $(wildcard src/file/*.h)
+
+MKBOOTIMAGE_SRCS:=$(COMMON_SRCS) src/mkbootimage.c
 MKBOOTIMAGE_OBJS:=$(MKBOOTIMAGE_SRCS:.c=.o)
 
-EXBOOTIMAGE_SRCS:=src/exbootimage.c $(COMMON_SRCS)
+EXBOOTIMAGE_SRCS:=$(COMMON_SRCS) src/exbootimage.c
 EXBOOTIMAGE_OBJS:=$(EXBOOTIMAGE_SRCS:.c=.o)
+
+ALL_SRCS:=$(COMMON_SRCS) src/mkbootimage.c src/exbootimage.c
+ALL_HDRS:=$(COMMON_HDRS)
 
 INCLUDE_DIRS:=src
 
@@ -34,6 +43,12 @@ $(MKBOOTIMAGE_NAME): $(MKBOOTIMAGE_OBJS)
 
 $(EXBOOTIMAGE_NAME): $(EXBOOTIMAGE_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(EXBOOTIMAGE_OBJS) -o $(EXBOOTIMAGE_NAME) $(LDLIBS)
+
+format:
+	$(FMT) -i $(ALL_SRCS) $(ALL_HDRS)
+
+test:
+	./tests/tester.sh
 
 clean:
 	@- $(RM) $(MKBOOTIMAGE_NAME)
