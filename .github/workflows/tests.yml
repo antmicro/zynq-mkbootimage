@@ -15,7 +15,7 @@ jobs:
 
       - name: Run formatting check
         run: |
-          clang-format-12 -i src/{arch/,file/,}*.{c,h}
+          make format FMT=clang-format-12
           git diff --exit-code > formatting.log
           if [ $? -ne 0 ]; then
             echo The code formatting is not proper
@@ -44,7 +44,7 @@ jobs:
           test -f mkbootimage
 
       - name: Run integration tests
-        run:  tests/tester.sh
+        run: make test
 
       - name: Save logs
         uses: actions/upload-artifact@v2
