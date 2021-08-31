@@ -128,6 +128,17 @@ error bitstream_write_header(FILE *bitfile, uint32_t size, const char *design, c
   return SUCCESS;
 }
 
+error bitstream_write(FILE *bitfile, uint32_t size, uint32_t *data) {
+  uint32_t swapped;
+  unsigned int i;
+
+  for (i = 0; i < size; i++) {
+    swapped = __builtin_bswap32(data[i]);
+    fwrite(&swapped, 1, sizeof(swapped), bitfile);
+  }
+  return SUCCESS;
+}
+
 error bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
   uint32_t *dest = addr;
   uint32_t chunk, rchunk;

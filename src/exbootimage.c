@@ -81,6 +81,7 @@ struct arguments {
 
   char *design;
   char *part;
+  bool swap;
 
   char *fname;
 };
@@ -119,6 +120,7 @@ static char args_doc[] =
   "[--images|-i] "
   "[--parts|-p] "
   "[--bitstream|-bDESIGN,PART-NAME] "
+  "[--swap|-s] "
   "<input_bit_file> <files_to_extract>";
 
 static struct argp_option argp_options[] = {
@@ -130,7 +132,8 @@ static struct argp_option argp_options[] = {
   {"header", 'h', 0, 0, "Print main boot image header", 0},
   {"images", 'i', 0, 0, "Print partition image headers", 0},
   {"parts", 'p', 0, 0, "Print partition headers", 0},
-  {"bitstream", 'b', "DESIGN,PART-NAME", 0, "Reconstruct bitstream headers after extraction", 0},
+  {"bitstream", 'b', "DESIGN,PART-NAME", 0, "Reconstruct bitstream with headers on extraction", 0},
+  {"swap", 's', 0, 0, "Swap bitstream bytes but don't reconstruct headers", 0},
   {0},
 };
 
@@ -426,11 +429,25 @@ error print_partition_contents(FILE *f, hdr_t *base, uint32_t size, struct argum
 
     fprintf(f, "Extracting %s... ", name);
 
-    /* Reconstruct headers for bit files if it was requested */
-    if (arguments->part && is_postfix(name, ".bit"))
-      bitstream_write_header(bfile, partsize, arguments->design, arguments->part);
+    /* Treat bitstream files in a separate way */
+    if (is_postfix(name, ".bit")) {
+      /* Zynq bitstream partisions are appended with an extra noop */
+      if (!arguments->zynqmp)
+        partsize--;
 
-    fwrite(data, partsize, sizeof(uint32_t), bfile);
+      /* Reconstruct headers for bit files if it was requested */
+      if (arguments->part)
+        bitstream_write_header(bfile, partsize, arguments->design, arguments->part);
+
+      /* Perform byteswapped extraction if it was requested */
+      if (arguments->swap)
+        bitstream_write(bfile, partsize, data);
+      else
+        fwrite(data, partsize, sizeof(uint32_t), bfile);
+    } else {
+      fwrite(data, partsize, sizeof(uint32_t), bfile);
+    }
+
     fclose(bfile);
 
     fprintf(f, "done\n");
@@ -525,6 +542,9 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
   case 'p':
     arguments->partitions = true;
     break;
+  case 's':
+    arguments->swap = true;
+    break;
   case 'b':
     if (!(s = strchr(arg, ',')))
       argp_usage(state);
@@ -533,6 +553,7 @@ static error_t argp_parser(int key, char *arg, struct argp_state *state) {
 
     arguments->design = arg;
     arguments->part = s + 1;
+    arguments->swap = true;
     break;
   case ARGP_KEY_ARG:
     if (state->arg_num == 0) {
