@@ -1,6 +1,6 @@
 # Zynq mkbootimage
 
-Copyright (c) 2015-2021 [Antmicro](https://antmicro.com)
+Copyright (c) 2015-2022 [Antmicro](https://antmicro.com)
 
 This is an open-source replacement for the Xilinx `bootgen` application.
 The package provides sources of two binaries `mkbootimage` and `exbootimage`
