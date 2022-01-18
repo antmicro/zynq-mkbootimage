@@ -50,7 +50,7 @@ static inline error bif_expect(lexer_t *lex, int type);
 static error bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node);
 static error bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node);
 
-static const char *special_chars = ":{}[],=/\\";
+static const char *special_chars = ":{}[],=\\";
 
 /* errorf equivalent for parser errors */
 static int perrorf(lexer_t *lex, const char *fmt, ...) {
