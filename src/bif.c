@@ -237,8 +237,12 @@ static error bif_scan(lexer_t *lex) {
         ch = prev;
         break;
       }
-    } else if (ch == '/') {
-      /* Ignore a single '/' as it might start a comment */
+    } else if (prev == '*' && ch == '/') {
+      perrorf(lex, "comment end without start\n");
+      return ERROR_BIF_LEXER;
+    } else if (ch == '/' || ch == '*') {
+      /* Ignore a single '/' as it might start a comment
+         '*' might end a comment that didn't start */
       ;
     } else if (!isspace(ch)) {
       break;
