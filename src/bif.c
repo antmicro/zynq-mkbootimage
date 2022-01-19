@@ -356,7 +356,8 @@ static error bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
   if (lex->type != TOKEN_NAME)
     return bif_expect(lex, TOKEN_NAME);
   strcpy(node->fname, lex->buffer);
-  bif_consume(lex, TOKEN_NAME);
+  if ((err = bif_consume(lex, TOKEN_NAME)))
+    return err;
 
   return SUCCESS;
 }
@@ -370,7 +371,8 @@ static error bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node)
     return bif_expect(lex, TOKEN_NAME);
   key = malloc(lex->len);
   strcpy(key, lex->buffer);
-  bif_consume(lex, TOKEN_NAME);
+  if ((err = bif_consume(lex, TOKEN_NAME)))
+    return err;
 
   /* Parse the attribute value if it was present */
   if (!bif_consume(lex, '=')) {
@@ -378,7 +380,8 @@ static error bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node)
       return bif_expect(lex, TOKEN_NAME);
     value = malloc(lex->len);
     strcpy(value, lex->buffer);
-    bif_consume(lex, TOKEN_NAME);
+    if ((err = bif_consume(lex, TOKEN_NAME)))
+      return err;
   }
 
   /* If the value wasn't present, it stays NULL */
