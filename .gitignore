@@ -1,4 +1,5 @@
 mkbootimage
+exbootimage
 *.bif
 *.bin
 *.bit
