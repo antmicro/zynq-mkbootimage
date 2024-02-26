@@ -103,7 +103,7 @@ To use it, type in:
 ./exbootimage [--zynqmp|-u]   [--extract|-x] [--force|-f]  [--list|-l]
               [--describe|-d] [--header|-h]  [--images|-i] [--parts|-p]
               [--bitstream|-d DESIGN,PART-NAME]
-              <input_bif_file> [extract_file...]
+              <input_bin_file> [extract_file...]
 ```
 
 To see all available options, run:
