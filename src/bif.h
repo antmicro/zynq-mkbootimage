@@ -40,6 +40,7 @@ typedef struct bif_node_t {
   uint32_t load;
   uint32_t offset;
   uint32_t partition_owner;
+  uint8_t elf_use_ph;  /* boolean */
 
   /* supported zynqmp attributes */
   uint8_t fsbl_config; /* boolean */

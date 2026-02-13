@@ -187,7 +187,8 @@ error append_file_to_image(uint32_t *addr,
                      img_size,
                      &elf_nbits,
                      &elf_load,
-                     &elf_entry);
+                     &elf_entry,
+                     node.elf_use_ph);
     if (err) {
       errorf("ELF file reading failed\n");
 
@@ -372,7 +373,8 @@ error create_boot_image(uint32_t *img_ptr,
                        &pmufw_img_size,
                        &pmufw_img_nbits,
                        &pmufw_img_load,
-                       &pmufw_img_entry);
+                       &pmufw_img_entry,
+                       bif_cfg->nodes[i].elf_use_ph);
       if (err) {
         errorf("failed to parse ELF file: %s\n", bif_cfg->nodes[i].fname);
         return ERROR_BOOTROM_ELF;
