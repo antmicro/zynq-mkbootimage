@@ -9,6 +9,7 @@ error elf_append(void *addr,
                  uint32_t *img_size,
                  uint8_t *elf_nbits,
                  uint32_t *elf_load,
-                 uint32_t *elf_entry);
+                 uint32_t *elf_entry,
+                 uint8_t elf_use_ph);
 
 #endif

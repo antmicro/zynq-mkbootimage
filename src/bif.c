@@ -332,6 +332,7 @@ static error bif_parse_file(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node) {
   node->load = 0;
   node->offset = 0;
   node->bootloader = 0;
+  node->elf_use_ph = 0;
   node->fsbl_config = 0;
   node->pmufw_image = 0;
   node->exception_level = BOOTROM_PART_ATTR_EXC_LVL_EL0;
@@ -459,6 +460,11 @@ error bif_node_set_attr(
       perrorf(lex, "the value \"%s\" in an improper format, expected '0xhhhhhhhh' form\n", value);
       return ERROR_BIF_PARSER;
     }
+    return SUCCESS;
+  }
+
+  if (strcmp(attr_name, "elf_use_ph") == 0) {
+    node->elf_use_ph = 0xFF;
     return SUCCESS;
   }
 
