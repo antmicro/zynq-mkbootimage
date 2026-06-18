@@ -1,8 +1,10 @@
 .PHONY: all clean distclean
 
-CC=gcc
+CC?=cc
 
 FMT=clang-format
+
+osname != uname
 
 MKBOOTIMAGE_NAME:=mkbootimage
 EXBOOTIMAGE_NAME:=exbootimage
@@ -28,13 +30,19 @@ ALL_SRCS:=$(COMMON_SRCS) src/mkbootimage.c src/exbootimage.c
 ALL_HDRS:=$(COMMON_HDRS)
 
 INCLUDE_DIRS:=src
+ifeq ($(osname), OpenBSD)
+	INCLUDE_DIRS:=src /usr/local/include
+endif
 
 override CFLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir)) \
 	-DMKBOOTIMAGE_VER="\"$(VERSION)\"" \
 	-Wall -Wextra -Wpedantic \
 	--std=c11
 
-LDLIBS = -lelf
+LDLIBS ?= -lelf
+ifeq ($(osname), OpenBSD)
+	LDLIBS += -lelf -L/usr/local/lib -largp
+endif
 
 all: $(MKBOOTIMAGE_NAME) $(EXBOOTIMAGE_NAME)
 
