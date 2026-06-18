@@ -33,7 +33,9 @@
 #include <arch/common.h>
 #include <bif.h>
 #include <bootrom.h>
+#ifdef __limux
 #include <byteswap.h>
+#endif
 #include <common.h>
 #include <fcntl.h>
 #include <file/bitstream.h>
