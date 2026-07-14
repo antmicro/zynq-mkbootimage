@@ -16,17 +16,7 @@ jobs:
       - name: Run formatting check
         run: |
           make format FMT=clang-format
-          git diff --exit-code > formatting.log
-          if [ $? -ne 0 ]; then
-            echo The code formatting is not proper
-            exit 1
-          fi
-
-      - name: Save diff
-        uses: actions/upload-artifact@v7
-        with:
-          name: formatting
-          path: formatting.log
+          test $(git status --porcelain | wc -l) -eq 0 || { git diff; false; }
 
   test-zynq-mkbootimage:
     runs-on: ubuntu-latest
