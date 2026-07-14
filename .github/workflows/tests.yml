@@ -7,15 +7,15 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          sudo apt-get install --yes clang-format-12
-          clang-format-12 --version
+          sudo apt-get install --yes clang-format
+          clang-format --version
 
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Run formatting check
         run: |
-          make format FMT=clang-format-12
+          make format FMT=clang-format
           git diff --exit-code > formatting.log
           if [ $? -ne 0 ]; then
             echo The code formatting is not proper
