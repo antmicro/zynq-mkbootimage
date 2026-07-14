@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   check-formatting:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
         run: |
@@ -29,7 +29,7 @@ jobs:
           path: formatting.log
 
   test-zynq-mkbootimage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
         run: |
