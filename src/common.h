@@ -1,8 +1,7 @@
 #ifndef MKBOOTIMAGE_COMMON_H
 #define MKBOOTIMAGE_COMMON_H
 
-typedef enum error
-{
+typedef enum error {
   /* The job was ended sucessfully */
   SUCCESS = 0,
 

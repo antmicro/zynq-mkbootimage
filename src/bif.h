@@ -11,8 +11,7 @@
 #define BIF_ARCH_ZYNQ   (1 << 0)
 #define BIF_ARCH_ZYNQMP (1 << 1)
 
-enum token_type
-{
+enum token_type {
   TOKEN_EOF = 0,
 
   TOKEN_UNKNOWN = 256, /* skip ASCII */
