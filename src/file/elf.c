@@ -34,9 +34,71 @@
 #include <gelf.h>
 #include <unistd.h>
 
+static error elf_create_image_from_ph(Elf *elf, uint32_t start_addr, uint8_t *out_buf) {
+  size_t n_phdrs;
+
+  if(elf_getphdrnum(elf, &n_phdrs) != 0) {
+    printf("elf_getphdrnum failed\n");
+    return ERROR_BOOTROM_ELF;
+  }
+  size_t file_size;
+  uint8_t *raw_data = elf_rawfile(elf, &file_size);
+  if (raw_data == NULL) {
+    return ERROR_BOOTROM_ELF;
+  }
+  for (size_t i = 0; i < n_phdrs; ++i) {
+    GElf_Phdr phdr;
+    if (gelf_getphdr(elf, i, &phdr) == NULL) {
+      printf("gelf_getphdr returned no address\n");
+      continue;
+    }
+    if (phdr.p_type == PT_LOAD) {
+      if (phdr.p_offset + phdr.p_filesz > file_size) {
+        return ERROR_BOOTROM_ELF;
+      }
+      if (phdr.p_filesz > 0) {
+        uint8_t *segment_data = raw_data + phdr.p_offset;
+        size_t segment_size = phdr.p_filesz;
+
+        memcpy(out_buf + phdr.p_paddr - start_addr,
+             segment_data,
+             segment_size);
+      }
+    }
+  }
+  return SUCCESS;
+}
+
 static bool elf_is_loadable_section(const GElf_Shdr *elf_shdr) {
   return elf_shdr->sh_type != SHT_NOBITS && (elf_shdr->sh_flags & SHF_ALLOC) &&
          elf_shdr->sh_size != 0;
+}
+
+static error elf_get_startaddr_endaddr_from_ph(Elf *elf, uint32_t *start_addr, uint32_t *end_addr) {
+  size_t n_phdrs;
+  *start_addr = -1;
+  *end_addr = 0;
+
+  if (elf_getphdrnum(elf, &n_phdrs) != 0) {
+      return ERROR_BOOTROM_ELF;
+  }
+
+  for (size_t i = 0; i < n_phdrs; ++i) {
+    GElf_Phdr phdr;
+    if (gelf_getphdr(elf, i, &phdr) == NULL) {
+      continue;
+    }
+    if (phdr.p_type == PT_LOAD) {
+      if (*start_addr > phdr.p_paddr) {
+        *start_addr = phdr.p_paddr;
+      }
+
+      if (phdr.p_paddr + phdr.p_filesz > *end_addr) {
+        *end_addr = phdr.p_paddr + phdr.p_filesz;
+      }
+    }
+  }
+  return SUCCESS;
 }
 
 static error elf_get_startaddr_endaddr(Elf *elf, uint32_t *start_addr, uint32_t *end_addr) {
@@ -95,7 +157,8 @@ error elf_append(void *addr,
                  uint32_t *img_size,
                  uint8_t *elf_nbits,
                  uint32_t *elf_load,
-                 uint32_t *elf_entry) {
+                 uint32_t *elf_entry,
+                 uint8_t elf_use_ph) {
   error err;
   int fd_elf;
   Elf *elf;
@@ -124,10 +187,18 @@ error elf_append(void *addr,
     return ERROR_BOOTROM_ELF;
   }
 
-  if ((err = elf_get_startaddr_endaddr(elf, &start_addr, &end_addr))) {
-    elf_end(elf);
-    close(fd_elf);
-    return err;
+  if (elf_use_ph) {
+    if ((err = elf_get_startaddr_endaddr_from_ph(elf, &start_addr, &end_addr))) {
+      elf_end(elf);
+      close(fd_elf);
+      return err;
+    }
+  } else {
+    if ((err = elf_get_startaddr_endaddr(elf, &start_addr, &end_addr))) {
+      elf_end(elf);
+      close(fd_elf);
+      return err;
+    }
   }
 
   if (end_addr - start_addr > img_max_size) {
@@ -138,10 +209,18 @@ error elf_append(void *addr,
 
   memset(addr, 0, end_addr - start_addr);
 
-  if ((err = elf_create_image(elf, start_addr, addr))) {
-    elf_end(elf);
-    close(fd_elf);
-    return err;
+  if (elf_use_ph) {
+    if ((err = elf_create_image_from_ph(elf, start_addr, addr))) {
+      elf_end(elf);
+      close(fd_elf);
+      return err;
+    }
+  } else {
+    if ((err = elf_create_image(elf, start_addr, addr))) {
+      elf_end(elf);
+      close(fd_elf);
+      return err;
+    }
   }
 
   if (gelf_getehdr(elf, &elf_ehdr) != &elf_ehdr) {
