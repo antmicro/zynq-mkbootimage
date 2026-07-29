@@ -373,7 +373,7 @@ static error bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node)
   /* Parse an attribute name */
   if (lex->type != TOKEN_NAME)
     return bif_expect(lex, TOKEN_NAME);
-  key = malloc(lex->len);
+  key = malloc(lex->len + 1);
   strcpy(key, lex->buffer);
   if ((err = bif_consume(lex, TOKEN_NAME)))
     return err;
@@ -382,7 +382,7 @@ static error bif_parse_attribute(lexer_t *lex, bif_cfg_t *cfg, bif_node_t *node)
   if (!bif_consume(lex, '=')) {
     if (lex->type != TOKEN_NAME)
       return bif_expect(lex, TOKEN_NAME);
-    value = malloc(lex->len);
+    value = malloc(lex->len + 1);
     strcpy(value, lex->buffer);
     if ((err = bif_consume(lex, TOKEN_NAME)))
       return err;
