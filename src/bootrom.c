@@ -243,12 +243,24 @@ error append_file_to_image(uint32_t *addr,
 
     bops->init_part_hdr_dtb(part_hdr, &node);
     break;
-  default: /* Treat as a binary file */
-
-    fseek(cfile, 0, SEEK_SET);
-    *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
-
-    bops->init_part_hdr_default(part_hdr, &node);
+  default: /* Treat as a binary file
+              FPGA bitstream. Convert binary file 32-bit word byte
+              order in the sameway as the payload extracted
+              from a Xilinx .bit file.
+            */
+    if (node.destination_device == BOOTROM_PART_ATTR_DEST_DEV_PL) {
+      err = bitstream_bin_append(addr, cfile, img_size);
+      if (err) {
+        errorf("raw bitstream reading failed: %s\n", node.fname);
+        fclose(cfile);
+        return err;
+      }
+      bops->init_part_hdr_bitstream(part_hdr, &node);
+    } else {
+      fseek(cfile, 0, SEEK_SET);
+      *img_size = fread(addr, 1, cfile_stat.st_size, cfile);
+      bops->init_part_hdr_default(part_hdr, &node);
+    }
   };
 
   *img_size += img_size_init;

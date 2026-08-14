@@ -179,3 +179,44 @@ error bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size) {
 
   return SUCCESS;
 }
+
+error bitstream_bin_append(uint32_t *addr, FILE *binfile, uint32_t *img_size) {
+  uint32_t *dest = addr;
+  uint32_t chunk, rchunk;
+  long file_size;
+  unsigned int i;
+
+  /* Determine raw bitstream size */
+  if (fseek(binfile, 0, SEEK_END) != 0) {
+    errorf("could not seek raw bitstream file.\n");
+    return ERROR_BOOTROM_BITSTREAM;
+  }
+
+  file_size = ftell(binfile);
+  if (file_size < 0) {
+    errorf("could not determine raw bitstream size.\n");
+    return ERROR_BOOTROM_BITSTREAM;
+  }
+
+  if ((file_size % sizeof(uint32_t)) != 0) {
+    errorf("raw bitstream size is not a multiple of 4 bytes.\n");
+    return ERROR_BOOTROM_BITSTREAM;
+  }
+
+  rewind(binfile);
+
+  *img_size = (uint32_t) file_size;
+
+  for (i = 0; i < *img_size; i += sizeof(chunk)) {
+    if (fread(&chunk, 1, sizeof(chunk), binfile) != sizeof(chunk)) {
+      errorf("could not read raw bitstream data.\n");
+      return ERROR_BOOTROM_BITSTREAM;
+    }
+
+    rchunk = __builtin_bswap32(chunk);
+    memcpy(dest, &rchunk, sizeof(rchunk));
+    dest++;
+  }
+
+  return SUCCESS;
+}
