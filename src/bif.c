@@ -475,6 +475,20 @@ error bif_node_set_attr(
     return SUCCESS;
   }
 
+  if (strcmp(attr_name, "destination_device") == 0) {
+    if (!value) {
+      perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
+      return ERROR_BIF_PARSER;
+    }
+    mask = map_name_to_mask(bootrom_part_attr_dest_dev_names, value);
+    if (mask == NOMASK) {
+      perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
+      return ERROR_BIF_UNSUPPORTED_VAL;
+    }
+    node->destination_device = mask;
+    return SUCCESS;
+  }
+
   /* Only handle these for zynqmp arch */
   if (cfg->arch & BIF_ARCH_ZYNQMP) {
     if (strcmp(attr_name, "fsbl_config") == 0) {
@@ -487,20 +501,6 @@ error bif_node_set_attr(
 
     if (strcmp(attr_name, "pmufw_image") == 0) {
       node->pmufw_image = 0xFF;
-      return SUCCESS;
-    }
-
-    if (strcmp(attr_name, "destination_device") == 0) {
-      if (!value) {
-        perrorf(lex, "the \"%s\" attribute requires an argument\n", attr_name);
-        return ERROR_BIF_PARSER;
-      }
-      mask = map_name_to_mask(bootrom_part_attr_dest_dev_names, value);
-      if (mask == NOMASK) {
-        perrorf(lex, "value: \"%s\" not supported for the \"%s\" attribute\n", value, attr_name);
-        return ERROR_BIF_UNSUPPORTED_VAL;
-      }
-      node->destination_device = mask;
       return SUCCESS;
     }
 
