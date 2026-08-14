@@ -11,4 +11,10 @@ error bitstream_write(FILE *bfile, uint32_t size, uint32_t *data);
  * The regular return value is the error code. */
 error bitstream_append(uint32_t *addr, FILE *bitfile, uint32_t *img_size);
 
+/* Append a raw binary bitstream.
+   Unlike bitstream_append(), this input has no Xilinx .bit header.
+   The binary contains the FPGA configuration payload directly, so
+   only the 32-bit word byte swapping is required. */
+error bitstream_bin_append(uint32_t *addr, FILE *binfile, uint32_t *img_size);
+
 #endif
