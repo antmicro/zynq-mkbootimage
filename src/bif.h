@@ -1,16 +1,16 @@
 #ifndef BIF_PARSER_H
 #define BIF_PARSER_H
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <common.h>
 #ifdef __linux__
-#include <linux/limits.h>
+  #include <linux/limits.h>
 #elif __OpenBSD__
-#include <sys/syslimits.h>
+  #include <sys/syslimits.h>
 #endif
 
 #define BIF_ARCH_ZYNQ   (1 << 0)
