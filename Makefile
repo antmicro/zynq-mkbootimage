@@ -39,9 +39,9 @@ override CFLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir)) \
 	-Wall -Wextra -Wpedantic \
 	--std=c11
 
-LDLIBS ?= -lelf
+LDLIBS += -lelf
 ifeq ($(osname), OpenBSD)
-	LDLIBS += -lelf -L/usr/local/lib -largp
+	LDLIBS += -L/usr/local/lib -largp
 endif
 
 all: $(MKBOOTIMAGE_NAME) $(EXBOOTIMAGE_NAME)
