@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+#ifndef MKBOOTIMAGE_VER
+  #warning "version is unknown, please define MKBOOTIMAGE_VER in the Makefile"
+  #define MKBOOTIMAGE_VER "unknown"
+#endif
+
 typedef enum error {
   /* The job was ended sucessfully */
   SUCCESS = 0,
