@@ -1,6 +1,7 @@
 #ifndef BIF_PARSER_H
 #define BIF_PARSER_H
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>

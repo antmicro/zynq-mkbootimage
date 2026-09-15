@@ -1,6 +1,8 @@
 #ifndef MKBOOTIMAGE_COMMON_H
 #define MKBOOTIMAGE_COMMON_H
 
+#include <stdint.h>
+
 typedef enum error {
   /* The job was ended sucessfully */
   SUCCESS = 0,

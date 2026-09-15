@@ -35,7 +35,6 @@
 #include <bootrom.h>
 #include <common.h>
 #include <ctype.h>
-#include <errno.h>
 
 static int perrorf(lexer_t *lex, const char *fmt, ...);
 

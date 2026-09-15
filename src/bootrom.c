@@ -27,15 +27,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <arch/common.h>
 #include <bif.h>
 #include <bootrom.h>
-#ifdef __limux
-#include <byteswap.h>
-#endif
 #include <common.h>
 #include <fcntl.h>
 #include <file/bitstream.h>
